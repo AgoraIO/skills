@@ -1,0 +1,7 @@
+{
+  "default": true,
+  "MD013": false,
+  "MD033": false,
+  "MD060": false,
+  "comment": "MD013 (line-length): disabled — URLs, API paths, and table columns cannot be wrapped at 80 chars without breaking links or destroying table readability. MD033 (inline-html): disabled — arrow entities and diagram characters in table cells are not real inline HTML. MD060 (table-column-style): disabled — existing tables use spaced-pipe style consistently; enforcing compact style would require mass reformatting with no readability gain."
+}

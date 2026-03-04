@@ -1,0 +1,14 @@
+# Forbidden patterns for scripts/validate-skills.sh (PRD-03)
+#
+# Format: each non-comment line is either:
+#   REGEX:<pattern>   — treated as a grep -E extended regex
+#   LITERAL:<string>  — treated as a grep -F fixed string
+#
+# Any match in agora/ or tests/ is a CI failure.
+# -------------------------------------------------------
+
+# Absolute local paths — never in public docs
+REGEX:/Users/[a-zA-Z0-9._-]+/
+
+# Internal cross-project reference — separate project, not a dependency
+LITERAL:ben-agent-toolkit

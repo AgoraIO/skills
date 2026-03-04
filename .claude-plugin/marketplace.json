@@ -1,0 +1,17 @@
+{
+  "name": "agora-skills",
+  "owner": {
+    "name": "Agora"
+  },
+  "metadata": {
+    "description": "Skills for building real-time communication applications with Agora SDKs"
+  },
+  "plugins": [
+    {
+      "name": "agora",
+      "source": "./",
+      "description": "Real-time communication with Agora SDKs — RTC, RTM, Conversational AI, and token generation",
+      "version": "1.0.0"
+    }
+  ]
+}

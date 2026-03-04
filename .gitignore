@@ -1,0 +1,7 @@
+agora-rtc-client/
+*.skill
+node_modules/
+.next/
+.env
+
+.DS_Store
