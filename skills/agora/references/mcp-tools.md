@@ -3,15 +3,15 @@
 Internal guide for the model. Describes how to use the Agora Doc MCP server
 to fetch up-to-date documentation during skill execution.
 
-**MCP endpoint:** `https://doc-mcp.shengwang.cn/mcp`
+**MCP endpoint:** `https://mcp.agora.io`
 
 ## Tools
 
-| Tool | Input | Returns | When to use |
-|------|-------|---------|-------------|
-| `get-doc-content` | `{"uri": "docs://..."}` | Full markdown content | Read a specific doc (preferred) |
-| `search-docs` | `{"query": "keyword"}` | List of matching doc URIs | Find docs when URI is unknown |
-| `list-docs` | `{"category": "...", "limit": 20}` | All docs in a category | Browse available docs |
+| Tool              | Input                              | Returns                   | When to use                     |
+| ----------------- | ---------------------------------- | ------------------------- | ------------------------------- |
+| `get-doc-content` | `{"uri": "docs://..."}`            | Full markdown content     | Read a specific doc (preferred) |
+| `search-docs`     | `{"query": "keyword"}`             | List of matching doc URIs | Find docs when URI is unknown   |
+| `list-docs`       | `{"category": "...", "limit": 20}` | All docs in a category    | Browse available docs           |
 
 ## Preferred Approach: Direct URI
 
@@ -25,16 +25,16 @@ get-doc-content {"uri": "docs://default/convoai/restful/get-started/quick-start"
 
 ## Known Doc URIs
 
-| Product | Topic | URI |
-|---------|-------|-----|
-| ConvoAI | Quick Start (Python/curl) | `docs://default/convoai/restful/get-started/quick-start` |
-| ConvoAI | Quick Start (Go) | `docs://default/convoai/restful/get-started/quick-start-go` |
-| ConvoAI | Quick Start (Java) | `docs://default/convoai/restful/get-started/quick-start-java` |
-| RTC | Quick Start (Web) | `docs://default/rtc/javascript/get-started/quick-start` |
-| RTC | Quick Start (Android) | `docs://default/rtc/android/get-started/quick-start` |
-| RTC | Quick Start (iOS) | `docs://default/rtc/ios/get-started/quick-start` |
-| RTM | Quick Start (Web) | `docs://default/rtm2/javascript/get-started/quick-start` |
-| Cloud Recording | Quick Start | `docs://default/cloud-recording/restful/get-started/quick-start` |
+| Product         | Topic                     | URI                                                              |
+| --------------- | ------------------------- | ---------------------------------------------------------------- |
+| ConvoAI         | Quick Start (Python/curl) | `docs://default/convoai/restful/get-started/quick-start`         |
+| ConvoAI         | Quick Start (Go)          | `docs://default/convoai/restful/get-started/quick-start-go`      |
+| ConvoAI         | Quick Start (Java)        | `docs://default/convoai/restful/get-started/quick-start-java`    |
+| RTC             | Quick Start (Web)         | `docs://default/rtc/javascript/get-started/quick-start`          |
+| RTC             | Quick Start (Android)     | `docs://default/rtc/android/get-started/quick-start`             |
+| RTC             | Quick Start (iOS)         | `docs://default/rtc/ios/get-started/quick-start`                 |
+| RTM             | Quick Start (Web)         | `docs://default/rtm2/javascript/get-started/quick-start`         |
+| Cloud Recording | Quick Start               | `docs://default/cloud-recording/restful/get-started/quick-start` |
 
 ## Fallback: Search Then Read
 
