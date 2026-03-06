@@ -90,7 +90,6 @@ skills/
     ├── SKILL.md                            (72 lines)   Entry point, product index
     └── references/
         ├── mcp-tools.md                    (93 lines)   MCP tool reference and graceful degradation
-        ├── convoai-restapi-summary.yaml   (197 lines)   Condensed ConvoAI schema (90% use case)
         ├── rtc/                                          RTC (Video/Voice SDK)
         │   ├── README.md                   (85 lines)   Critical rules, encoder profiles, cross-platform notes
         │   ├── web.md                     (498 lines)   agora-rtc-sdk-ng: client, tracks, events, screen share
