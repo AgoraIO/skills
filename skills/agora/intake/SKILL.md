@@ -33,6 +33,7 @@ the full product landscape, identifies what the user needs, and routes to the ri
 | ConvoAI | AI voice agent (ASR→LLM→TTS over RTC) | "AI assistant", "voice bot", "conversational AI" |
 | Cloud Recording | Record RTC sessions server-side | "recording", "archive sessions", "record calls" |
 | Server/Tokens | Auth token generation | "token server", "authentication", "App Certificate" |
+| Server Gateway SDK | Server-side media streaming (Linux) | "server SDK", "Linux SDK", "send audio from server", "server gateway" |
 
 ### Product Relationships
 
@@ -130,6 +131,7 @@ For each identified product, route to its skill file:
 | RTM | [references/rtm/README.md](../references/rtm/README.md) |
 | Cloud Recording | [references/cloud-recording/README.md](../references/cloud-recording/README.md) |
 | Token generation | [references/server/README.md](../references/server/README.md) |
+| Server Gateway SDK | [references/server-gateway/README.md](../references/server-gateway/README.md) |
 
 When multiple products are needed, run the primary product's skill first,
 then address supporting products in order.

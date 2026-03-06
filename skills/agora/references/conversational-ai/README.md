@@ -32,7 +32,7 @@ details rather than relying on inline content.
 
 **When MCP is unavailable:**
 
-1. Use `references/convoai-restapi-summary.yaml` for parameter details (common endpoints)
+1. Fetch the live OpenAPI spec: `https://docs-md.agora.io/api/conversational-ai-api-v2.x.yaml`
 2. Fall back to: <https://docs.agora.io/en/conversational-ai/develop/rest-api>
 3. Notify the user: "MCP unavailable — using local fallback. Please verify against
    current docs before deploying."
