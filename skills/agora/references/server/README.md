@@ -22,7 +22,7 @@ The `agora-agent-sdk` TypeScript SDK supports both token-based auth and Basic Au
 - **Token auth (preferred)**: Pass `appId` + `appCertificate` when creating the client — the SDK generates a combined RTC + RTM token (via `RtcTokenBuilder.buildTokenWithRtm`) for each API call automatically. Or pass a pre-built token via `authToken`.
 - **Basic Auth (legacy)**: Pass `customerId` + `customerSecret` (from Agora Console → Developer Toolkit → RESTful API).
 
-See the [agora-agent-sdk README](../../../../../agora-agent-ts-sdk/README.md) for full examples.
+See the [agora-agent-sdk README](https://github.com/AgoraIO-Conversational-AI/agora-agent-ts-sdk) for full examples.
 
 ## Reference Files
 
