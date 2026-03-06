@@ -54,6 +54,12 @@ Token generation and server utilities. Required for production authentication.
 
 **[references/server/README.md](references/server/README.md)** — Token generation for Node.js, Python, Go
 
+### Server Gateway SDK
+
+Self-hosted Linux SDK for server-side audio/video stream transmission. Use when a server process needs to send or receive media in an Agora RTC channel (call centers, AI audio processing, network testing).
+
+**[references/server-gateway/README.md](references/server-gateway/README.md)** — C++, Java, Go, Python
+
 ### Testing Guidance
 
 Mocking patterns and testing requirements for Agora SDK integration code.
