@@ -116,7 +116,7 @@ https://api.agora.io/api/conversational-ai-agent/v2/projects/{appid}
 Each file maps to one repo in [AgoraIO-Conversational-AI](https://github.com/AgoraIO-Conversational-AI):
 
 - **[agent-samples.md](agent-samples.md)** — Backend (simple-backend), React clients, profile system, MLLM/Gemini config, deployment
-- **[agent-toolkit.md](agent-toolkit.md)** — `@agora/agent-client-toolkit` + `@agora/agent-client-toolkit-react`: AgoraVoiceAI, events, transcript, sendText, interrupt, React hooks
+- **[agent-toolkit.md](agent-toolkit.md)** — `agora-agent-client-toolkit` + `agora-agent-client-toolkit-react`: AgoraVoiceAI, events, transcript, sendText, interrupt, React hooks
 - **[agent-client-toolkit-react.md](agent-client-toolkit-react.md)** — React hooks detail: ConversationalAIProvider, useTranscript, useAgentState, useAgentError, useAgentMetrics, useConversationalAI
 - **[agent-ui-kit.md](agent-ui-kit.md)** — `@agora/agent-ui-kit` React components: voice, chat, video, settings
 - **[server-custom-llm.md](server-custom-llm.md)** — Custom LLM proxy: RAG, tool calling, conversation memory

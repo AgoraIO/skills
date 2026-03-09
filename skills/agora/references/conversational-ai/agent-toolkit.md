@@ -2,10 +2,10 @@
 name: agora-agent-client-toolkit
 description: |
   Client-side TypeScript SDK for adding Agora Conversational AI features to applications
-  already using the Agora RTC SDK. Use when the user needs to integrate @agora/agent-client-toolkit
-  or @agora/agent-client-toolkit-react, receive transcripts, track agent state, send messages
+  already using the Agora RTC SDK. Use when the user needs to integrate agora-agent-client-toolkit
+  or agora-agent-client-toolkit-react, receive transcripts, track agent state, send messages
   to an AI agent, handle agent events, or build a ConvoAI front-end client. Triggers on
-  @agora/agent-client-toolkit, AgoraVoiceAI, useConversationalAI, useTranscript, useAgentState,
+  agora-agent-client-toolkit, AgoraVoiceAI, useConversationalAI, useTranscript, useAgentState,
   agent transcript, agent state, TRANSCRIPT_UPDATED, AGENT_STATE_CHANGED, ConversationalAIProvider.
 license: MIT
 metadata:
@@ -17,7 +17,7 @@ metadata:
 
 Client-side SDK for adding Agora Conversational AI features to applications already using the Agora RTC SDK. Runs in the browser — adds transcript rendering, agent state tracking, and RTM-based messaging controls on top of `agora-rtc-sdk-ng`.
 
-**npm:** `@agora/agent-client-toolkit` (core) · `@agora/agent-client-toolkit-react` (React hooks)
+**npm:** `agora-agent-client-toolkit` (core) · `agora-agent-client-toolkit-react` (React hooks)
 **Repo:** <https://github.com/AgoraIO-Conversational-AI/agent-client-toolkit-ts>
 
 > This toolkit is a **client add-on** — it does not start agents. Start agents via the ConvoAI REST API first. See [README.md](README.md) for the REST API.
@@ -25,10 +25,10 @@ Client-side SDK for adding Agora Conversational AI features to applications alre
 ## Installation
 
 ```bash
-npm install @agora/agent-client-toolkit agora-rtc-sdk-ng agora-rtm
+npm install agora-agent-client-toolkit agora-rtc-sdk-ng agora-rtm
 
 # React
-npm install @agora/agent-client-toolkit-react agora-rtc-react
+npm install agora-agent-client-toolkit-react agora-rtc-react
 ```
 
 ## Initialization
@@ -38,7 +38,7 @@ npm install @agora/agent-client-toolkit-react agora-rtc-react
 ```typescript
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import AgoraRTM from 'agora-rtm';
-import { AgoraVoiceAI } from '@agora/agent-client-toolkit';
+import { AgoraVoiceAI } from 'agora-agent-client-toolkit';
 
 // Your existing RTC + RTM setup
 const rtcClient = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
@@ -75,7 +75,7 @@ ai.subscribeMessage('CHANNEL');
 Register handlers before calling `subscribeMessage()`. All 9 events:
 
 ```typescript
-import { AgoraVoiceAIEvents } from '@agora/agent-client-toolkit';
+import { AgoraVoiceAIEvents } from 'agora-agent-client-toolkit';
 
 // Transcript — delivers FULL history every time, replace don't append
 ai.on(AgoraVoiceAIEvents.TRANSCRIPT_UPDATED, (transcript) => {
@@ -123,7 +123,7 @@ ai.on(AgoraVoiceAIEvents.DEBUG_LOG, (message) => {});
 Requires `rtmConfig` — throws `RTMRequiredError` if called without RTM.
 
 ```typescript
-import { ChatMessageType, ChatMessagePriority } from '@agora/agent-client-toolkit';
+import { ChatMessageType, ChatMessagePriority } from 'agora-agent-client-toolkit';
 
 // Send text to the agent
 await ai.sendText(agentUserId, {
