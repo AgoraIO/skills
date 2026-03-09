@@ -23,9 +23,9 @@ The `agora-agent-sdk` TypeScript SDK supports both token-based auth and Basic Au
 - **Basic Auth (legacy)**: Pass `customerId` + `customerSecret` (from Agora Console → Developer Toolkit → RESTful API).
 
 See the agent SDK READMEs for full examples:
-- [agora-agent-ts-sdk](https://github.com/AgoraIO-Conversational-AI/agora-agent-ts-sdk)
-- [agora-agent-go-sdk](https://github.com/AgoraIO-Conversational-AI/agora-agent-go-sdk)
-- [agora-agent-python-sdk](https://github.com/AgoraIO-Conversational-AI/agora-agent-python-sdk)
+- [agent-server-sdk-ts](https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-ts)
+- [agent-server-sdk-go](https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-go)
+- [agent-server-sdk-python](https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-python)
 
 ## Reference Files
 

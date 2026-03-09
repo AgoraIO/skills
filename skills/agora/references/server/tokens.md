@@ -18,12 +18,22 @@ Tokens authenticate users before joining channels. Generated server-side from Ap
 
 ## Token Libraries
 
-| Language | Package |
-|----------|---------|
-| Node.js | [`agora-token`](https://www.npmjs.com/package/agora-token) — uses AccessToken2 |
-| Python | `agora-token-builder` |
-| Go | `github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/rtctokenbuilder2` |
-| Java, PHP, C++ | Available in [AgoraIO/Tools](https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey) |
+All implementations are in [AgoraIO/Tools — DynamicKey/AgoraDynamicKey](https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey):
+
+| Language | Notes |
+|----------|-------|
+| Node.js | Also available as [`agora-token`](https://www.npmjs.com/package/agora-token) on npm |
+| Python 3 | Use `python3/` directory |
+| Go | |
+| Java | |
+| C# | |
+| Dart | |
+| Deno | Native implementation — do NOT use the `agora-token` npm package in Deno |
+| Rust | |
+| PHP | |
+| Ruby | |
+| Lua | |
+| Perl | |
 
 ## Token Types
 
