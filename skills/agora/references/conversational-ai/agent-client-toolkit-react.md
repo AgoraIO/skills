@@ -2,9 +2,9 @@
 name: agora-agent-client-toolkit-react
 description: |
   React hooks for Agora Conversational AI client integration. Use when the user is building
-  a React app with Agora ConvoAI and needs @agora/agent-client-toolkit-react hooks.
+  a React app with Agora ConvoAI and needs agora-agent-client-toolkit-react hooks.
   Triggers on useTranscript, useAgentState, useAgentError, useAgentMetrics,
-  ConversationalAIProvider, @agora/agent-client-toolkit-react, React ConvoAI hooks,
+  ConversationalAIProvider, agora-agent-client-toolkit-react, React ConvoAI hooks,
   agent transcript React, agent state React hook.
 license: MIT
 metadata:
@@ -14,15 +14,15 @@ metadata:
 
 # Agent Client Toolkit — React
 
-React hooks for `@agora/agent-client-toolkit`. Wraps the `AgoraVoiceAI` singleton into React state and effects. Must be used alongside `agora-rtc-react` — this package handles ConvoAI concerns only, not RTC primitives (mic tracks, camera, remote users).
+React hooks for `agora-agent-client-toolkit`. Wraps the `AgoraVoiceAI` singleton into React state and effects. Must be used alongside `agora-rtc-react` — this package handles ConvoAI concerns only, not RTC primitives (mic tracks, camera, remote users).
 
-**npm:** `@agora/agent-client-toolkit-react`
-**Requires:** `@agora/agent-client-toolkit`, `agora-rtc-react`, React >= 18
+**npm:** `agora-agent-client-toolkit-react`
+**Requires:** `agora-agent-client-toolkit`, `agora-rtc-react`, React >= 18
 
 ## Installation
 
 ```bash
-npm install @agora/agent-client-toolkit-react @agora/agent-client-toolkit agora-rtc-react agora-rtm
+npm install agora-agent-client-toolkit-react agora-agent-client-toolkit agora-rtc-react agora-rtm
 ```
 
 ## Usage
@@ -41,7 +41,7 @@ import {
   useAgentState,
   useAgentError,
   useAgentMetrics,
-} from '@agora/agent-client-toolkit-react';
+} from 'agora-agent-client-toolkit-react';
 
 const rtcClient = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
 const rtmClient = new AgoraRTM.RTM('APP_ID', 'USER_ID');
