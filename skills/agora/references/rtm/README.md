@@ -17,13 +17,9 @@ Signaling, text messaging, presence, and metadata — used alongside or independ
 - **Presence**: Track who is online, user status metadata.
 - **Storage**: Channel and user metadata (key-value store with versioning).
 - **Lock**: Distributed locking for shared resources.
-- RTM uses **string UIDs** (not numeric like RTC).
+- RTM uses **string UIDs** (not numeric like RTC). When using RTC and RTM together, use `String(rtcUid)` as the RTM user ID to maintain a consistent mapping.
 
 ## Platform Reference Files
 
 - **[web.md](web.md)** — `agora-rtm` v2 (JS/TS): RTM client, messaging, presence, v1 legacy API
-- **iOS / Android** — fetch the entry point below and follow platform-specific links
-
-## Live Docs
-
-<https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart.md>
+- **iOS / Android** — <https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart.md>

@@ -67,10 +67,7 @@ Token auth is handled automatically when `appCertificate` is provided. For vendo
 - [agent-server-sdk-go](https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-go)
 - [agent-server-sdk-python](https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-python)
 
-## Live Docs
-
-<https://docs-md.agora.io/en/video-calling/token-authentication/deploy-token-server.md>
-
 ## Reference Files
 
 - **[tokens.md](tokens.md)** — Token generation for Node.js, Python, and Go. Express server example, security best practices.
+- **Full token auth guide** — <https://docs-md.agora.io/en/video-calling/token-authentication/deploy-token-server.md>
