@@ -67,15 +67,10 @@ Hardware minimum: 8-core CPU 1.8 GHz, 2 GB RAM (4 GB recommended).
 ## Platform Reference Files
 
 - **[linux-cpp.md](linux-cpp.md)** — C++ full implementation: init, senders, receivers, video mixing, shutdown sequence
+- **Java, Go, Python** — see the official documentation links below for each platform
 
 ## Official Documentation
 
-- **[Product Overview](https://docs.agora.io/en/server-gateway/overview/product-overview)**
-- **[Integrate the SDK — C++](https://docs.agora.io/en/server-gateway/get-started/integrate-sdk?platform=linux-cpp)**
-- **[Integrate the SDK — Java](https://docs.agora.io/en/server-gateway/get-started/integrate-sdk?platform=linux-java)**
-- **[Integrate the SDK — Go](https://docs.agora.io/en/server-gateway/get-started/integrate-sdk?platform=go)** — Go SDK: `github.com/AgoraIO-Extensions/Agora-Golang-Server-SDK`
-- **[Integrate the SDK — Python](https://docs.agora.io/en/server-gateway/get-started/integrate-sdk?platform=python)**
-- **[Send and Receive Media Streams](https://docs.agora.io/en/server-gateway/develop/send-receive-media-streams)**
-- **[API Reference](https://docs.agora.io/en/server-gateway/reference/api)**
+- **[Product Overview](https://docs-md.agora.io/en/server-gateway/overview/product-overview.md)**
+- **[Integrate the SDK](https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk.md)** — covers C++, Java, Go (`github.com/AgoraIO-Extensions/Agora-Golang-Server-SDK`), Python
 - **[SDK Downloads](https://docs.agora.io/en/sdks)**
-- **[Release Notes](https://docs.agora.io/en/server-gateway/overview/release-notes)**

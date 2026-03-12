@@ -93,3 +93,11 @@ Read the file matching the user's platform:
 - **[android.md](android.md)** — `RtcEngine` (Kotlin/Java): engine setup, callbacks, permissions
 
 For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).
+
+## Live Docs
+
+For content not covered by the bundled platform files (advanced features, new SDK
+capabilities, additional platforms), fetch the entry point directly:
+
+- **Video calling:** <https://docs-md.agora.io/en/video-calling/get-started/get-started-sdk.md>
+- **Voice calling:** <https://docs-md.agora.io/en/voice-calling/get-started/get-started-sdk.md>

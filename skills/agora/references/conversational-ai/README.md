@@ -2,6 +2,14 @@
 
 REST API-driven voice AI agents. Create agents that join RTC channels and converse with users via speech. Front-end clients connect via RTC+RTM.
 
+The TypeScript, Go, and Python SDKs are convenience wrappers around this REST API.
+For any other backend language (Java, Ruby, PHP, C#, etc.), call the REST API directly.
+The live OpenAPI spec is the authoritative source for request/response schemas:
+
+```
+GET https://docs-md.agora.io/api/conversational-ai-api-v2.x.yaml
+```
+
 ## Architecture
 
 ```text
@@ -19,27 +27,23 @@ ASR → LLM → TTS             Receives audio + transcripts
 3. ASR converts speech to text → LLM generates response → TTS converts to speech
 4. The agent publishes audio back to the channel; transcripts arrive via RTC data channel or RTM
 
-## MCP Integration
+## Documentation Lookup
 
-The ConvoAI REST API documentation is fast-moving. Use MCP to fetch current parameter
-details rather than relying on inline content.
+The bundled references in this file cover gotchas, generation rules, and the stable
+behavioral contracts. For content that changes with doc updates, use Level 2:
 
-**When MCP is available:** Call `get-doc-content` with the Quick Start URI for your language:
+1. Fetch `https://docs.agora.io/en/llms.txt`
+2. Scan for a URL matching your topic (e.g., `conversational-ai`, `quick-start`, `rest-api`)
+3. Fetch that URL
 
-- Python/curl: `docs://default/convoai/restful/get-started/quick-start`
-- Go: `docs://default/convoai/restful/get-started/quick-start-go`
-- Java: `docs://default/convoai/restful/get-started/quick-start-java`
+Common topics to fetch via Level 2: quick-start code (Python, Go, Java), TTS/ASR/LLM
+vendor configs, error code listings.
 
-**When MCP is unavailable:**
+For full request/response schemas, fetch the OpenAPI spec directly — it is always
+current and covers every endpoint and field:
+`https://docs-md.agora.io/api/conversational-ai-api-v2.x.yaml`
 
-1. Fetch the live OpenAPI spec: `https://docs-md.agora.io/api/conversational-ai-api-v2.x.yaml`
-2. Fall back to: <https://docs.agora.io/en/conversational-ai/develop/rest-api>
-3. Notify the user: "MCP unavailable — using local fallback. Please verify against
-   current docs before deploying."
-
-The behavioral guidance and gotchas in this file (uid types, agent name uniqueness, MLLM location field, etc.) are always valid regardless of MCP status.
-
-See [../mcp-tools.md](../mcp-tools.md) for full MCP tool reference.
+See [../doc-fetching.md](../doc-fetching.md) for the full procedure.
 
 ## Authentication
 
@@ -126,26 +130,29 @@ Each file maps to one repo in [AgoraIO-Conversational-AI](https://github.com/Ago
 
 Full request/response details for all endpoints:
 
-- **[Start Agent (Join)](https://docs.agora.io/en/conversational-ai/rest-api/agent/join)** — POST /join: start agent with LLM/TTS/ASR config
-- **[Stop Agent (Leave)](https://docs.agora.io/en/conversational-ai/rest-api/agent/leave)** — POST /leave: stop agent
-- **[Update Agent](https://docs.agora.io/en/conversational-ai/rest-api/agent/update)** — POST /update: update token, LLM config
-- **[Query Agent Status](https://docs.agora.io/en/conversational-ai/rest-api/agent/query)** — GET /agents/{id}: query status
-- **[List Agents](https://docs.agora.io/en/conversational-ai/rest-api/agent/list)** — GET /agents: list with filters
-- **[Broadcast Message (Speak)](https://docs.agora.io/en/conversational-ai/rest-api/agent/speak)** — POST /speak: broadcast TTS
-- **[Interrupt Agent](https://docs.agora.io/en/conversational-ai/rest-api/agent/interrupt)** — POST /interrupt
-- **[Conversation History](https://docs.agora.io/en/conversational-ai/rest-api/agent/history)** — GET /history
+- **[Start Agent (Join)](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/join.md)** — POST /join: start agent with LLM/TTS/ASR config
+- **[Stop Agent (Leave)](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/leave.md)** — POST /leave: stop agent
+- **[Update Agent](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/update.md)** — POST /update: update token, LLM config
+- **[Query Agent Status](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/query.md)** — GET /agents/{id}: query status
+- **[List Agents](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/list.md)** — GET /agents: list with filters
+- **[Broadcast Message (Speak)](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/speak.md)** — POST /speak: broadcast TTS
+- **[Interrupt Agent](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/interrupt.md)** — POST /interrupt
+- **[Conversation History](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/history.md)** — GET /history
 
 ## Agent Configuration (join payload `properties` object)
 
-- **[Custom LLM Guide](https://docs.agora.io/en/conversational-ai/develop/custom-llm)** — LLM vendor, model, url, api_key, system prompt, greeting, style; TTS vendor, model, voice settings; ASR vendor, language, model
-- **[Gemini Live MLLM](https://docs.agora.io/en/conversational-ai/models/mllm/gemini)** — Multimodal: vendor, model, credentials, location
-- **[Join Endpoint (full schema)](https://docs.agora.io/en/conversational-ai/rest-api/agent/join)** — Complete properties schema: channel, token, turn detection, VAD, tools, avatars, encryption, filler words
-- **[Release Notes](https://docs.agora.io/en/conversational-ai/overview/release-notes)** — New parameters and features
+- **[Custom LLM Guide](https://docs-md.agora.io/en/conversational-ai/develop/custom-llm.md)** — LLM vendor, model, url, api_key, system prompt, greeting, style; TTS vendor, model, voice settings; ASR vendor, language, model
+- **[Gemini Live MLLM](https://docs-md.agora.io/en/conversational-ai/models/mllm/gemini.md)** — Multimodal: vendor, model, credentials, location
+- **[Join Endpoint (full schema)](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/join.md)** — Complete properties schema: channel, token, turn detection, VAD, tools, avatars, encryption, filler words
+- **[Release Notes](https://docs-md.agora.io/en/conversational-ai/overview/release-notes.md)** — New parameters and features
 
 ## Gotchas & Quirks
 
 Things the official docs don't emphasize that cause frequent mistakes:
 
+- **`agent_rtc_uid` is a string, not an int** — pass `"0"` (string) for auto-assignment, not `0`. Passing an integer will cause a type error at the API boundary.
+- **`remote_rtc_uids` is an array of strings** — use `["*"]` to subscribe to all users, not `"*"` or `["0"]`. The wildcard must be in array form.
+- **Agent name must be unique per project** — collisions return HTTP 409. Use a short UUID suffix: `agent_{uuid[:8]}`. On 409, generate a new name and retry; do not retry with the same name.
 - **Token auth is not in the official docs yet — use it anyway.** The ConvoAI REST API accepts `Authorization: agora token=<token>` using a combined RTC + RTM token from `RtcTokenBuilder.buildTokenWithRtm`. This is **safer than Basic Auth**: tokens are scoped to a single App ID + channel, while Customer ID/Secret grants access to every project on the account. Default to token auth unless the user explicitly requests Basic Auth. See [Authentication → Option A](#authentication) for the implementation.
 
 - **`/update` overwrites `params` entirely** — sending `{ "llm": { "params": { "max_tokens": 2048 } } }` erases `model` and everything else in `params`. Always send the full object.

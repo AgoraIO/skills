@@ -22,3 +22,8 @@ Signaling, text messaging, presence, and metadata — used alongside or independ
 ## Platform Reference Files
 
 - **[web.md](web.md)** — `agora-rtm` v2 (JS/TS): RTM client, messaging, presence, v1 legacy API
+- **iOS / Android** — fetch the entry point below and follow platform-specific links
+
+## Live Docs
+
+<https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart.md>

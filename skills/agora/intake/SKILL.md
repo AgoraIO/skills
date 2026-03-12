@@ -10,7 +10,7 @@ description: |
 license: MIT
 metadata:
   author: agora
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Agora Intake — Product Routing & Needs Analysis
