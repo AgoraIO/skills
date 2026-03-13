@@ -10,7 +10,7 @@ description: |
 license: MIT
 metadata:
   author: agora
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Agora Intake — Product Routing & Needs Analysis
@@ -94,6 +94,16 @@ Based on the user's description, determine:
 
 Use the Product Relationships and Common Combinations tables to make this determination.
 
+**Server-side disambiguation** — "backend", "Python/Go/Node.js server", or "server-side" alone is ambiguous. Clarify which server role is needed before routing:
+
+| User says | They need |
+|-----------|-----------|
+| "authenticate users", "issue tokens", "token server" | Server/Tokens → `references/server/` |
+| "start an AI agent", "call the ConvoAI API", "Python ConvoAI backend" | ConvoAI → `references/conversational-ai/` |
+| "my server sends audio/video", "server joins RTC channel", "Linux media SDK" | Server Gateway → `references/server-gateway/` |
+
+If unclear, ask: *"Does your server need to (a) generate auth tokens, (b) call the ConvoAI REST API to start agents, or (c) send/receive audio-video media directly?"*
+
 **Example analysis:**
 
 > User: "I want to build an AI customer service bot where users call in and an AI answers"
@@ -145,8 +155,10 @@ For common patterns, skip the full intake flow:
 | User says | Shortcut |
 |-----------|----------|
 | "video call" / "live stream" / "RTC" | → `references/rtc/README.md` directly |
+| "screen share" / "screen sharing" | → `references/rtc/README.md` → `cross-platform-coordination.md` |
 | "chat" / "messaging" / "signaling" | → `references/rtm/README.md` directly |
 | "voice bot" / "AI assistant" / "ConvoAI" | → `references/conversational-ai/README.md` directly |
-| "recording" / "record sessions" | → `references/cloud-recording/README.md` directly |
-| "generate token" / "token server" | → `references/server/README.md` directly |
+| "recording" / "record sessions" / "record calls" | → `references/cloud-recording/README.md` directly |
+| "generate token" / "token server" / "App Certificate" | → `references/server/README.md` directly |
+| "Server Gateway" / "Linux SDK" / "server sends audio" | → `references/server-gateway/README.md` directly |
 

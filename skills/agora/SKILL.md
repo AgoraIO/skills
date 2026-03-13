@@ -1,6 +1,6 @@
 ---
 name: agora
-description: Write code using Agora SDKs (agora.io) for real-time communication. Covers RTC (video/voice calling, live streaming), RTM (signaling, messaging, presence), Conversational AI (voice AI agents), Cloud Recording, and server-side token generation. Use when the user wants to build real-time audio/video applications, integrate Agora SDKs (Web JS/TS, React, iOS Swift, Android Kotlin/Java, Go, Python), manage channels, tracks, tokens, use RTM for messaging/signaling, or build Conversational AI with the agent-toolkit. Triggers on mentions of Agora, agora.io, RTC, RTM, video calling, voice calling, real-time communication, agora-rtc-sdk-ng, agora-rtc-react, agora-rtm, conversational AI with Agora, Agora token generation, Cloud Recording, agora-agent-client-toolkit, agora-agent-client-toolkit-react, AgoraVoiceAI, useConversationalAI, useTranscript, useAgentState, agent transcript, agent state hook.
+description: Write code using Agora SDKs (agora.io) for real-time communication. Covers RTC (video/voice calling, live streaming, screen sharing), RTM (signaling, messaging, presence), Conversational AI (voice AI agents), Cloud Recording, Server Gateway, and server-side token generation. Use when the user wants to build real-time audio/video applications, integrate Agora SDKs (Web JS/TS, React, iOS Swift, Android Kotlin/Java, Go, Python), manage channels, tracks, tokens, use RTM for messaging/signaling, record RTC sessions, or build Conversational AI with the agent-toolkit. Triggers on mentions of Agora, agora.io, RTC, RTM, video calling, voice calling, real-time communication, screen share, screen sharing, record session, record calls, Cloud Recording, Server Gateway, Linux media SDK, agora-rtc-sdk-ng, agora-rtc-react, agora-rtm, conversational AI with Agora, Agora token generation, Agora authentication, agora-agent-client-toolkit, agora-agent-client-toolkit-react, agora-agent-server-sdk, AgoraVoiceAI, AgoraClient, useConversationalAI, useTranscript, useAgentState, agent transcript, agent state hook.
 metadata:
   author: agora
   version: '1.1.0'
@@ -40,7 +40,7 @@ Text messaging, signaling, presence, and metadata. Independent from RTC — chan
 
 REST API-driven voice AI agents. Create agents that join RTC channels and converse with users via speech. Front-end clients connect via RTC+RTM.
 
-**[references/conversational-ai/README.md](references/conversational-ai/README.md)** — REST API, agent config, 5 recipe repos (agent-samples, agent-toolkit, agent-ui-kit, server-custom-llm, server-mcp)
+**[references/conversational-ai/README.md](references/conversational-ai/README.md)** — REST API, agent config, 6 recipe repos (agent-samples, agent-toolkit, agent-client-toolkit-react, agent-ui-kit, server-custom-llm, server-mcp)
 
 ### Cloud Recording
 
@@ -78,17 +78,19 @@ Examples of clear requests:
 - "Generate RTC token in Go" → `references/server/tokens.md`
 
 **Vague or multi-product request:** Route through `intake/SKILL.md`.
+Intake handles product identification, combination recommendations, and routing.
 
-Examples of vague requests:
+## Documentation Lookup
 
-- "I want to build an AI customer service bot" (product unclear)
-- "Help me set up live streaming with recording" (multi-product)
-- "What do I need to build a voice app?" (product unknown)
+Check bundled references first (Level 1). If they don't cover the detail needed,
+fetch `https://docs.agora.io/en/llms.txt`, find the relevant URL, and fetch it (Level 2).
+See [references/doc-fetching.md](references/doc-fetching.md) for the full procedure, fallback URLs, and freeze-forever decision table.
 
-## MCP Integration
+**Always fetch Level 2 before answering questions about**: TTS/ASR/LLM vendor configs, model names, full request/response schemas, error code listings, or release notes. These change frequently — do not answer from training data or memory.
 
-When MCP is configured, product skills use the Agora Doc MCP server for fast-moving
-content. See [mcp-tools.md](references/mcp-tools.md) for tool reference and compatibility notes.
+**If MCP is unavailable or Level 2 fetch fails**: use the fallback URLs in `doc-fetching.md` to reach the official markdown docs directly. Never fabricate API parameters — always tell the user to verify against official docs if live fetch is unavailable.
+
+If a user explicitly asks about the Agora MCP server, see [references/mcp-tools.md](references/mcp-tools.md).
 
 ## Web Framework Notes
 

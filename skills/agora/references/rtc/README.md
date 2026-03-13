@@ -91,5 +91,12 @@ Read the file matching the user's platform:
 - **[nextjs.md](nextjs.md)** — Next.js / SSR dynamic import patterns (App Router + Pages Router)
 - **[ios.md](ios.md)** — `AgoraRtcEngineKit` (Swift): engine setup, delegation, permissions
 - **[android.md](android.md)** — `RtcEngine` (Kotlin/Java): engine setup, callbacks, permissions
+- **[cross-platform-coordination.md](cross-platform-coordination.md)** — UID strategy, codec interop, screen sharing across platforms, audio routing, common cross-platform bugs
+
+For additional platforms and advanced features: <https://docs-md.agora.io/en/video-calling/get-started/get-started-sdk.md> — voice-only: <https://docs-md.agora.io/en/voice-calling/get-started/get-started-sdk.md>
 
 For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).
+
+## When to Fetch More
+
+Always use Level 2 fetch for: encoder profile parameter details, error code listings, release notes, Flutter/Windows/Electron/React Native platform quick-starts. See [../doc-fetching.md](../doc-fetching.md).

@@ -11,16 +11,7 @@ Server-side recording of RTC channel audio/video. REST API only — no client SD
 | Auth | HTTP Basic Auth (`AGORA_CUSTOMER_KEY:AGORA_CUSTOMER_SECRET`) |
 | Prerequisite | Cloud Recording enabled in Agora Console |
 | Depends on | Active RTC channel with participants |
-
-## MCP Quick Start
-
-When MCP is available, fetch the full quick start guide before writing any code:
-
-```text
-get-doc-content {"uri": "docs://default/cloud-recording/restful/get-started/quick-start"}
-```
-
-If MCP is unavailable: <https://docs.agora.io/en/cloud-recording/develop/rest-api>
+| Full REST API reference | <https://docs-md.agora.io/en/cloud-recording/reference/restful-api.md> |
 
 ## Recording Lifecycle
 
@@ -89,3 +80,7 @@ Authorization: Basic base64("{AGORA_CUSTOMER_KEY}:{AGORA_CUSTOMER_SECRET}")
 ```
 
 Credentials must come from environment variables — never hardcoded.
+
+## When to Fetch More
+
+Always use Level 2 fetch for: full REST API field details, storage config options (S3/OSS/GCS), composite layout parameters, error code listings. Fetch directly: <https://docs-md.agora.io/en/cloud-recording/reference/restful-api.md>

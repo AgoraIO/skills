@@ -138,6 +138,24 @@ For each case:
 - Pass Criteria: Token auth option is mentioned and explained; if token auth is used, imports `agora-token` and calls `buildTokenWithRtm`; does not present Basic Auth as the only option
 - Result: ___
 
+### C-10: ConvoAI `/update` — full params object required
+
+- User Input: "Update the max tokens for my ConvoAI agent's LLM"
+- Expected Behavior: Generated code sends the full `params` object in the update payload, not just the changed field
+- Pass Criteria: Update body includes `model` alongside `max_tokens` (or notes that omitting `model` will erase it); references the "overwrites entirely" gotcha
+
+### C-11: RTM + RTC UID consistency
+
+- User Input: "I'm building an app with both RTC and RTM — how do I join both?"
+- Expected Behavior: Uses `String(rtcUid)` as the RTM user ID after RTC join resolves
+- Pass Criteria: RTM login receives `String(rtcUid)`; does not use a separate hardcoded string or numeric UID for RTM
+
+### C-12: ConvoAI token auth is the default
+
+- User Input: "Show me a ConvoAI join request"
+- Expected Behavior: Presents token-based auth as the default; does not default to Basic Auth (Customer ID + Secret) without being asked
+- Pass Criteria: `Authorization: agora token=<token>` pattern appears in the primary example; Basic Auth shown as an alternative only
+
 ---
 
 ## 3. Failure Paths (F-series)
@@ -170,6 +188,18 @@ For each case:
 - Expected Behavior: Warns the user that their project has no token security enabled; any channel can be joined by anyone without authentication; advises enabling App Certificate in Agora Console before proceeding
 - Pass Criteria: Warning is issued before or instead of generating code; includes advice to enable App Certificate; does not silently generate code that passes `null` as token without the warning
 - Result: ___
+
+### F-05: Hardcoded credentials in user code
+
+- User Input: "Here's my code: `const client = AgoraRTC.createClient(...); await client.join('my-app-id', channel, 'my-app-certificate', uid)`"
+- Expected Behavior: Warns that App Certificate must never appear in client-side code; explains the token generation flow
+- Pass Criteria: Warning is issued before or instead of continuing with the code; advises moving App Certificate to a server-side token generator; does not silently continue with the insecure pattern
+
+### F-06: Non-existent product asked about
+
+- User Input: "How do I use Agora's Cloud Recording SDK?"
+- Expected Behavior: Clarifies that Cloud Recording is REST API only — there is no client SDK; describes the acquire/start/stop REST API pattern
+- Pass Criteria: Does not fabricate a "Cloud Recording SDK" package or import; routes to `references/cloud-recording/README.md`
 
 ---
 

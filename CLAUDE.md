@@ -12,12 +12,15 @@ skills/
     ├── SKILL.md               ← entry point; do not restructure this file
     ├── intake/SKILL.md        ← intake router; do not restructure this file
     └── references/
-        ├── mcp-tools.md       ← MCP reference + freeze-forever decision table
+        ├── doc-fetching.md    ← two-tier lookup procedure (agent-facing)
+        ├── mcp-tools.md       ← Agora MCP server install guide (user-facing)
         ├── rtc/
         ├── rtm/
         ├── conversational-ai/
         ├── server/
-        └── cloud-recording/
+        ├── cloud-recording/
+        ├── server-gateway/
+        └── testing-guidance/
 ```
 
 ## Protected Files
@@ -36,9 +39,20 @@ These files contain stable, high-value inline examples. Edits require a verified
 Before adding any inline content, ask: **will this still be correct in 6 months without any updates?**
 
 - **Yes** → put it inline (stable APIs, initialization sequences, gotchas)
-- **No** → route to MCP or an external link (REST API schemas, SDK changelogs, vendor configs, model names)
+- **No** → route to Level 2 fetch or an external link (REST API schemas, SDK changelogs, vendor configs, model names)
 
-See [`skills/agora/references/mcp-tools.md`](skills/agora/references/mcp-tools.md) for the full decision table.
+| Content type | Where it lives |
+|---|---|
+| RTC initialization, track management, event registration | Inline — `references/rtc/` |
+| RTM messaging and presence patterns | Inline — `references/rtm/` |
+| Token generation (RTC, RTM, AccessToken2) | Inline — `references/server/` |
+| ConvoAI gotchas, field-type rules, lifecycle | Inline — `references/conversational-ai/README.md` |
+| ConvoAI quick-start code (Python, Go, Java) | Level 2 fetch |
+| ConvoAI full request/response schemas | Level 2 fetch |
+| TTS / ASR / LLM vendor configs and model names | Level 2 fetch |
+| Cloud Recording REST API field details | Level 2 fetch |
+| Error code listings | Level 2 fetch |
+| Release notes and new parameters | Level 2 fetch |
 
 ## Naming Rule
 

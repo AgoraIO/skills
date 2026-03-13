@@ -1,80 +1,43 @@
-# Agora Doc MCP Tools
+# Agora Doc MCP Server
 
-Internal guide for the model. Describes how to use the Agora Doc MCP server
-to fetch up-to-date documentation during skill execution.
+The Agora Doc MCP server gives AI assistants direct tool-call access to Agora
+documentation. It is an optional enhancement — the skill works without it using
+the two-tier fetch approach in [doc-fetching.md](doc-fetching.md).
+
+**Only use MCP when the user explicitly asks for it.** The default documentation
+lookup is the two-tier fetch approach in [doc-fetching.md](doc-fetching.md) — use
+that regardless of whether MCP is installed.
 
 **MCP endpoint:** `https://mcp.agora.io`
 
 ## Tools
 
-| Tool              | Input                              | Returns                   | When to use                     |
-| ----------------- | ---------------------------------- | ------------------------- | ------------------------------- |
-| `get-doc-content` | `{"uri": "docs://..."}`            | Full markdown content     | Read a specific doc (preferred) |
-| `search-docs`     | `{"query": "keyword"}`             | List of matching doc URIs | Find docs when URI is unknown   |
-| `list-docs`       | `{"category": "...", "limit": 20}` | All docs in a category    | Browse available docs           |
+| Tool | Input | Returns |
+|---|---|---|
+| `get-doc-content` | `{"uri": "docs://..."}` | Full markdown content |
+| `search-docs` | `{"query": "keyword"}` | List of matching doc URIs |
+| `list-docs` | `{"category": "...", "limit": 20}` | All docs in a category |
 
-## Preferred Approach: Direct URI
+Use `search-docs` when the topic is known but the URI isn't. Use `get-doc-content`
+directly when the URI is known.
 
-When the doc URI is known, call `get-doc-content` directly — no search needed.
+## Installation
 
-> **After fetching quick-start docs:** use the fetched content for API structure and field names only. Do NOT copy sample code verbatim — quick-start examples typically hardcode credentials and omit production requirements. Apply the gotchas and rules in `references/conversational-ai/README.md` to any generated code (token auth, uid types, agent name uniqueness, credential env vars).
-
-```text
-get-doc-content {"uri": "docs://default/convoai/restful/get-started/quick-start"}
+**Claude Code:**
+```bash
+claude mcp add agora-docs --transport http https://mcp.agora.io
 ```
 
-## Known Doc URIs
+**Cursor / Windsurf / other MCP-compatible tools:** Add `https://mcp.agora.io` as
+an HTTP MCP server in your tool's MCP settings. See your tool's documentation for
+the exact configuration format.
 
-| Product         | Topic                     | URI                                                              |
-| --------------- | ------------------------- | ---------------------------------------------------------------- |
-| ConvoAI         | Quick Start (Python/curl) | `docs://default/convoai/restful/get-started/quick-start`         |
-| ConvoAI         | Quick Start (Go)          | `docs://default/convoai/restful/get-started/quick-start-go`      |
-| ConvoAI         | Quick Start (Java)        | `docs://default/convoai/restful/get-started/quick-start-java`    |
-| RTC             | Quick Start (Web)         | `docs://default/rtc/javascript/get-started/quick-start`          |
-| RTC             | Quick Start (Android)     | `docs://default/rtc/android/get-started/quick-start`             |
-| RTC             | Quick Start (iOS)         | `docs://default/rtc/ios/get-started/quick-start`                 |
-| RTM             | Quick Start (Web)         | `docs://default/rtm2/javascript/get-started/quick-start`         |
-| Cloud Recording | Quick Start               | `docs://default/cloud-recording/restful/get-started/quick-start` |
+For the latest setup instructions and any changes to the endpoint, see:
+<https://docs.agora.io/en/mcp>
 
-## Fallback: Search Then Read
+## Usage Note
 
-When the URI is unknown, search first:
-
-```text
-Step 1: search-docs {"query": "convoai <topic>"}
-        → returns [{uri: "docs://...", text: "..."}, ...]
-
-Step 2: get-doc-content {"uri": "docs://..."}
-        → returns full doc content
-```
-
-## When to Call MCP
-
-**Always call for:**
-
-- ConvoAI API field details, request/response schemas, vendor configurations (TTS, ASR)
-- Error codes and their meanings (ConvoAI, Cloud Recording)
-- Any content that changes with documentation updates
-
-**Do NOT call for:**
-
-- RTC initialization, track management, event registration — stable, in `references/rtc/`
-- RTM messaging patterns — stable, in `references/rtm/`
-- Token generation patterns — stable, in `references/server/`
-- ConvoAI gotchas and critical rules — behavioral knowledge, inline in `references/conversational-ai/README.md`
-
-## Freeze-Forever Content
-
-The "When to Call MCP" section above is the categorization table. Rule: if content changes with doc updates or vendor releases, call MCP. If it's a stable SDK pattern, use inline skill content.
-
-## AI Assistant MCP Support
-
-MCP tool calls require an MCP-compatible AI assistant with the Agora Doc MCP server
-configured at `https://doc-mcp.shengwang.cn/mcp`.
-
-- **Claude Code**: MCP supported. Install the Agora Doc MCP server per official instructions.
-- **Cursor, Windsurf, GitHub Copilot**: MCP support varies by version. Check your tool's documentation.
-
-When MCP is not available: use the graceful degradation paths defined in each product skill.
-For ConvoAI: see the MCP Fallback section in `references/conversational-ai/README.md`.
-For all other products: inline code in the skill files is the primary source — no degradation needed.
+After fetching quick-start docs via MCP, use the content for API structure and field
+names only. Do NOT copy sample code verbatim — quick-start examples typically hardcode
+credentials and omit production requirements. Apply the gotchas and generation rules
+in `references/conversational-ai/README.md` to any generated code.
