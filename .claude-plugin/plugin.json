@@ -5,8 +5,9 @@
   "author": {
     "name": "Agora"
   },
-  "repository": "https://github.com/AgoraIO-Conversational-AI/skills",
+  "repository": "https://github.com/AgoraIO/skills",
   "license": "MIT",
+  "mcpServers": "./mcp-config.json",
   "keywords": [
     "agora",
     "rtc",

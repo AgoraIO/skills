@@ -80,3 +80,7 @@ Authorization: Basic base64("{AGORA_CUSTOMER_KEY}:{AGORA_CUSTOMER_SECRET}")
 ```
 
 Credentials must come from environment variables — never hardcoded.
+
+## When to Fetch More
+
+Always use Level 2 fetch for: full REST API field details, storage config options (S3/OSS/GCS), composite layout parameters, error code listings. Fetch directly: <https://docs-md.agora.io/en/cloud-recording/reference/restful-api.md>

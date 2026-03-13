@@ -10,6 +10,9 @@ Changes should improve routing accuracy, code generation quality, and maintainab
 
 ## Adding a New Product Skill
 
+Examples of existing products added this way: Cloud Recording (`references/cloud-recording/`),
+Server Gateway (`references/server-gateway/`), Testing Guidance (`references/testing-guidance/`).
+
 1. Create `skills/agora/references/{product}/README.md` (Layer 3 — overview,
    critical rules, topic links, 20–100 lines)
 2. Add an entry to the **Products** section of `skills/agora/SKILL.md`
@@ -23,6 +26,7 @@ Changes should improve routing accuracy, code generation quality, and maintainab
    - Add relevant rows to Common Product Combinations
    - Add a routing entry to the Step 4 table
    - Add a Decision Shortcuts row if the product has a clear keyword trigger
+7. Bump the version in all three version files (see [Version Bumping](#version-bumping))
 
 ## Adding a New Platform
 
@@ -50,7 +54,7 @@ without any updates?**
   ConvoAI request/response schemas): put it **behind an MCP call** or an **external link**.
   Never hardcode fast-moving content.
 
-Ben's existing link-first vs inline decision table in `README.md` already encodes this
+The link-first vs inline decision table in `README.md` already encodes this
 principle. Follow it. When in doubt, add a new row to that table and document your
 reasoning in the PR description.
 
@@ -119,6 +123,74 @@ Rules:
 ## Local Validation
 
     bash scripts/validate-skills.sh
+
+## Running Evals
+
+Eval cases live in `tests/eval-cases.md`. To run them:
+
+1. Load the skill in your AI coding assistant (see [README — Installation](README.md#installation))
+2. For each case, send the "User Input" to the assistant with the skill active
+3. Compare the response against "Expected Behavior" and "Pass Criteria"
+4. Record `PASS` or `FAIL` in the Result field
+5. Add the run to the **Evaluation Log** table at the bottom of `tests/eval-cases.md`
+   (date, skill version, pass/fail counts, failed case IDs, fix actions taken)
+
+Run the full suite after every non-trivial skill change. Failed cases drive targeted
+skill edits — don't ship a fix without verifying the case now passes.
+
+## Version Bumping
+
+Versions must stay in sync across three files. Bump all three together:
+
+| File | Field |
+|------|-------|
+| `skills/agora/SKILL.md` | `metadata.version` in frontmatter |
+| `.claude-plugin/plugin.json` | `"version"` |
+| `.claude-plugin/marketplace.json` | `plugins[0].version` |
+
+Version rules:
+- **Patch** (`x.y.Z`): gotcha fixes, broken link repairs, content corrections
+- **Minor** (`x.Y.0`): new product or platform added, new eval cases, new topic files
+- **Major** (`X.0.0`): breaking restructure of skill entry points or routing logic
+
+Document the change in `CHANGELOG.md` under a new `[x.y.z]` heading.
+
+## Plugin & Marketplace Registration
+
+This skill is published to:
+
+- **[agentskills.io](https://agentskills.io)** — open skill registry (`.claude-plugin/marketplace.json`)
+- **Claude Code plugin marketplace** — hosted at `AgoraIO/skills` on GitHub (`.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json`)
+
+Users install via two slash commands inside Claude Code:
+
+```
+/plugin marketplace add AgoraIO/skills
+/plugin install agora@agora-skills
+```
+
+(`agora-skills` is the marketplace `name` in `marketplace.json`; `agora` is the plugin `name`.)
+
+To update a registration after a version bump:
+1. Submit a PR with the bumped version in both JSON files
+2. Once merged, users get the update automatically when Claude Code refreshes (`/plugin marketplace update`)
+3. For agentskills.io manual updates, follow the [agentskills.io submission guide](https://agentskills.io)
+
+The Agora MCP server config is bundled in `.claude-plugin/mcp-config.json` and
+referenced from `plugin.json` via `"mcpServers": "./mcp-config.json"`.
+
+## Verifying URLs
+
+Before opening a PR, check that all `https://` links in skill files are reachable:
+
+```bash
+grep -roh 'https://[^ )]*' skills/ | sort -u | while read url; do
+  code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 10 "$url")
+  echo "$code $url"
+done
+```
+
+Any non-200 response (except intentional 301 redirects) should be investigated and fixed.
 
 ## Code of Conduct
 

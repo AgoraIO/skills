@@ -4,41 +4,57 @@ Structured reference knowledge for [Agora](https://www.agora.io) (agora.io) real
 
 ## Installation
 
-### Option A: Skills CLI (recommended)
+### Skills CLI (recommended)
 
 ```bash
-npx skills add github:AgoraIO-Conversational-AI/skills
+npx skills add github:AgoraIO/skills
 ```
 
 Skills activate automatically when your agent detects relevant tasks (e.g., "build a voice agent", "integrate Agora RTC", "generate a token").
 
-### Option B: Git clone
+### Claude Code Plugin (recommended if using Claude)
+
+Install Agora skills and the Agora Docs MCP server as a Claude Code plugin. Run these two slash commands inside Claude Code:
+
+```
+/plugin marketplace add AgoraIO/skills
+/plugin install agora@agora-skills
+```
+
+The Agora MCP server (`mcp.agora.io`) is bundled automatically — no separate MCP configuration needed.
+
+### Git clone
 
 Clone the repo once, then point your tool at `skills/agora/`:
 
 ```bash
-git clone https://github.com/AgoraIO-Conversational-AI/skills.git ~/agora-skills
+git clone https://github.com/AgoraIO/skills.git ~/agora-skills
 ```
+
+### Configure with your Agent or IDE (optional)
 
 **Claude Code — symlink (user-level):**
 
+When installing the skill using the Skills CLI, you can symlink the skill to your home directory. This will make the skill available to all your agents.
+
 ```bash
-mkdir -p ~/.claude/skills
 ln -s ~/agora-skills/skills/agora ~/.claude/skills/agora
 ```
 
 **Claude Code — copy (project-level, shared with team):**
+
+When installing the skill using the Claude Code Plugin, you can copy the skill to your project directory. This will make the skill available to all your agents in the project.
 
 ```bash
 mkdir -p .claude/skills
 cp -r ~/agora-skills/skills/agora .claude/skills/agora
 ```
 
-**Cursor:** Copy or symlink into `.cursor/rules/`.
+**Cursor:** Copy or symlink into `.cursor/rules/`. See [Cursor skills docs](https://cursor.com/docs/skills#skill-directories).
 
-**Windsurf:** Add `skills/agora/` to your Cascade context.
+**Windsurf:** Add `skills/agora/` to your Cascade context. See [Windsurf skills docs](https://docs.windsurf.com/windsurf/cascade/skills).
 
-**GitHub Copilot:** Reference via `@workspace` or add to `.github/copilot-instructions.md`.
+**GitHub Copilot:** Reference via `@workspace` or add to `.github/copilot-instructions.md`. See [Copilot CLI skills](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/create-skills) and [Copilot Agents skills](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-skills).
 
 **Any other tool:** The skill files are plain markdown. Point your tool at `skills/agora/` or load individual files directly. Use `SKILL.md` as the entry point — it links to everything else.
 
@@ -50,11 +66,13 @@ This repo contains markdown skill files that give AI coding assistants deep know
 
 **Products covered:**
 
-- **RTC (Video/Voice SDK)** — Web, React, iOS (Swift), Android (Kotlin/Java)
+- **RTC (Video/Voice SDK)** — Web, React, Next.js, iOS (Swift), Android (Kotlin/Java)
 - **RTM (Signaling)** — Web (JS/TS) messaging, presence, metadata, stream channels
-- **Conversational AI** — REST API, agent config, 5 recipe repos (agent-samples, agent-toolkit, agent-ui-kit, server-custom-llm, server-mcp)
+- **Conversational AI** — REST API, agent config, Gemini Live + OpenAI Realtime MLLM, 6 recipe repos (agent-samples, agent-toolkit, agent-client-toolkit-react, agent-ui-kit, server-custom-llm, server-mcp)
+- **Cloud Recording** — REST API acquire/start/query/stop lifecycle
+- **Server Gateway** — Linux SDK (C++) for server-side RTC
 - **Server-Side** — Token generation for Node.js, Python, Go
-
+- **Testing Guidance** — ConvoAI and RTC testing patterns
 
 ## Design — 4-Layer Progressive Disclosure
 
@@ -79,37 +97,47 @@ Not all content belongs inline. The skill uses two strategies depending on how f
 | **RTC / RTM**         | Inline code examples                     | Stable APIs, official docs lack good examples |
 | **Server / Tokens**   | TOC + links to official docs             | Well-documented at docs.agora.io              |
 
-
-ConvoAI files are aligned 1:1 with repos in [AgoraIO-Conversational-AI](https://github.com/AgoraIO-Conversational-AI). Each file maps to one repo and links to its README and AGENT.md as sources of truth. Gotchas and quirks that LLMs consistently get wrong stay inline in the ConvoAI README.
+ConvoAI files are aligned 1:1 with repos in [AgoraIO-Conversational-AI](https://github.com/orgs/AgoraIO-Conversational-AI/repositories). Each file maps to one repo and links to its README and AGENT.md as sources of truth. Gotchas and quirks that LLMs consistently get wrong stay inline in the ConvoAI README.
 
 ## File Structure
 
 ```
 skills/
-└── agora/                                                   Skill root
-    ├── SKILL.md                            (72 lines)   Entry point, product index
+└── agora/                          Skill root
+    ├── SKILL.md                    Entry point, product index
+    ├── intake/
+    │   └── SKILL.md                Multi-product needs analysis router
     └── references/
-        ├── mcp-tools.md                    (93 lines)   MCP tool reference and graceful degradation
-        ├── rtc/                                          RTC (Video/Voice SDK)
-        │   ├── README.md                   (85 lines)   Critical rules, encoder profiles, cross-platform notes
-        │   ├── web.md                     (498 lines)   agora-rtc-sdk-ng: client, tracks, events, screen share
-        │   ├── react.md                   (295 lines)   agora-rtc-react: hooks, custom patterns
-        │   ├── nextjs.md                               Next.js / SSR dynamic import patterns
-        │   ├── ios.md                     (301 lines)   AgoraRtcEngineKit (Swift): setup, delegation
-        │   └── android.md                 (340 lines)   RtcEngine (Kotlin/Java): setup, callbacks
-        ├── rtm/                                          RTM (Signaling / Messaging)
-        │   ├── README.md                   (25 lines)   Key concepts, platform links
-        │   └── web.md                     (375 lines)   agora-rtm v2: messaging, presence, stream channels
-        ├── conversational-ai/                            Conversational AI (Voice AI Agents)
-        │   ├── README.md                  (100 lines)   Architecture, endpoints, auth, lifecycle, REST API + config links, gotchas
-        │   ├── agent-samples.md            (80 lines)   Backend, React clients, profiles, MLLM, deployment
-        │   ├── agent-toolkit.md            (57 lines)   @agora/conversational-ai SDK: API, helpers, hooks
-        │   ├── agent-ui-kit.md             (52 lines)   @agora/agent-ui-kit React components
-        │   ├── server-custom-llm.md        (36 lines)   Custom LLM proxy: RAG, tools, memory
-        │   └── server-mcp.md               (38 lines)   MCP memory server: persistent per-user memory
-        ├── server/                                       Server-Side (Tokens)
-        │   ├── README.md                   (20 lines)   Token types, when tokens are needed
-        │   └── tokens.md                   (34 lines)   Token generation TOC + links to official docs
+        ├── doc-fetching.md         Two-tier lookup procedure (agent-facing)
+        ├── mcp-tools.md            MCP tool reference and graceful degradation
+        ├── rtc/                    RTC (Video/Voice SDK)
+        │   ├── README.md           Critical rules, encoder profiles, cross-platform notes
+        │   ├── web.md              agora-rtc-sdk-ng: client, tracks, events, screen share
+        │   ├── react.md            agora-rtc-react: hooks, custom patterns
+        │   ├── nextjs.md           Next.js / SSR dynamic import patterns
+        │   ├── ios.md              AgoraRtcEngineKit (Swift): setup, delegation
+        │   └── android.md          RtcEngine (Kotlin/Java): setup, callbacks
+        ├── rtm/                    RTM (Signaling / Messaging)
+        │   ├── README.md           Key concepts, platform links
+        │   └── web.md              agora-rtm v2: messaging, presence, stream channels
+        ├── conversational-ai/      Conversational AI (Voice AI Agents)
+        │   ├── README.md           Architecture, endpoints, auth, lifecycle, gotchas
+        │   ├── agent-samples.md    Backend, React clients, profiles, MLLM, deployment
+        │   ├── agent-toolkit.md    @agora/conversational-ai SDK: API, helpers, hooks
+        │   ├── agent-client-toolkit-react.md   React hooks: provider, transcript, state
+        │   ├── agent-ui-kit.md     @agora/agent-ui-kit React components
+        │   ├── server-custom-llm.md  Custom LLM proxy: RAG, tools, memory
+        │   └── server-mcp.md       MCP memory server: persistent per-user memory
+        ├── cloud-recording/        Cloud Recording (REST API)
+        │   └── README.md           acquire/start/query/stop lifecycle, storage config
+        ├── server-gateway/         Server Gateway (Linux SDK)
+        │   ├── README.md           Overview, use cases, critical notes
+        │   └── linux-cpp.md        C++ SDK: setup, callbacks, media pipeline
+        ├── server/                 Server-Side (Tokens)
+        │   ├── README.md           Token types, when tokens are needed
+        │   └── tokens.md           Token generation TOC + links to official docs
+        └── testing-guidance/       Testing Patterns
+            └── SKILL.md            ConvoAI and RTC test setup, mocking patterns
 ```
 
 ## Maintaining and Extending
