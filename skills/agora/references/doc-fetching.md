@@ -23,13 +23,21 @@ vendor-specific configs, language-specific quick-start code):
 If `llms.txt` is unreachable or the fetched URL returns no useful content, try these
 known markdown entry points directly:
 
-| Product | Markdown URL |
+| Product / Language | Markdown URL |
 |---|---|
-| RTC | https://docs-md.agora.io/en/video-calling/get-started/get-started-sdk.md |
-| RTM | https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart.md |
+| RTC (Web/general) | https://docs-md.agora.io/en/video-calling/get-started/get-started-sdk.md |
+| RTC (voice-only) | https://docs-md.agora.io/en/voice-calling/get-started/get-started-sdk.md |
+| RTM (Web/general) | https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart.md |
+| RTM (iOS) | https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart?platform=ios.md |
+| RTM (Android) | https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart?platform=android.md |
 | ConvoAI | https://docs-md.agora.io/en/conversational-ai/get-started/quickstart.md |
+| ConvoAI (TypeScript SDK) | https://docs-md.agora.io/en/conversational-ai/develop/integrate-sdk.md |
+| ConvoAI (Python SDK) | https://docs-md.agora.io/en/conversational-ai/develop/integrate-sdk?platform=python.md |
 | Cloud Recording | https://docs-md.agora.io/en/cloud-recording/get-started/getstarted.md |
-| Server Gateway | https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk.md |
+| Server Gateway (C++) | https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk.md |
+| Server Gateway (Java) | https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=java.md |
+| Server Gateway (Python) | https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=python.md |
+| Server Gateway (Go) | https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=go.md |
 | Tokens | https://docs-md.agora.io/en/video-calling/token-authentication/deploy-token-server.md |
 
 ## Agora MCP Server (optional)

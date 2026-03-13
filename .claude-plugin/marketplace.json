@@ -11,7 +11,7 @@
       "name": "agora",
       "source": "./",
       "description": "Real-time communication with Agora SDKs — RTC, RTM, Conversational AI, and token generation",
-      "version": "1.0.0"
+      "version": "1.1.0"
     }
   ]
 }

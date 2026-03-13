@@ -6,7 +6,7 @@ If you discover a security vulnerability in this project, please report it respo
 
 **Do not open a public issue.**
 
-Instead, use [GitHub's private vulnerability reporting](https://github.com/BenWeekes/skills/security/advisories/new) to submit your report. This ensures the issue can be assessed and addressed before public disclosure.
+Instead, use [GitHub's private vulnerability reporting](https://github.com/AgoraIO/skills/security/advisories/new) to submit your report. This ensures the issue can be assessed and addressed before public disclosure.
 
 For security issues in the broader Agora platform, please follow the reporting process at [https://www.agora.io/en/security](https://www.agora.io/en/security).
 

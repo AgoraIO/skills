@@ -67,10 +67,14 @@ Hardware minimum: 8-core CPU 1.8 GHz, 2 GB RAM (4 GB recommended).
 ## Platform Reference Files
 
 - **[linux-cpp.md](linux-cpp.md)** — C++ full implementation: init, senders, receivers, video mixing, shutdown sequence
-- **Java, Go, Python** — see the official documentation links below for each platform
+- **Java, Go, Python** — Level 2 fetch required; use [../doc-fetching.md](../doc-fetching.md) or fetch directly from the links below
 
-## Official Documentation
+## When to Fetch More
 
-- **[Product Overview](https://docs-md.agora.io/en/server-gateway/overview/product-overview.md)**
-- **[Integrate the SDK](https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk.md)** — covers C++, Java, Go (`github.com/AgoraIO-Extensions/Agora-Golang-Server-SDK`), Python
-- **[SDK Downloads](https://docs.agora.io/en/sdks)**
+Always use Level 2 fetch for Java, Go, and Python quick-starts, SDK download links, and any platform-specific method signatures. Direct fallback URLs:
+
+- **Java** — <https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=java.md>
+- **Go** — <https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=go.md>
+- **Python** — <https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=python.md>
+- **Product Overview** — <https://docs-md.agora.io/en/server-gateway/overview/product-overview.md>
+- **SDK Downloads** — <https://docs.agora.io/en/sdks>
