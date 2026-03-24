@@ -327,13 +327,14 @@ test('displays message when RTM message event fires', async () => {
   render(<ChatComponent client={client} />)
 
   // Simulate incoming message
+  const messageEvent = {
+    publisher: 'user-2',
+    channelName: 'test',
+    message: 'Hello!',
+    customType: 'chat.message',
+  }
   act(() => {
-    listeners['message']({
-      publisher: 'user-2',
-      channelName: 'test',
-      message: 'Hello!',
-      customType: 'chat.message',
-    })
+    listeners['message'](messageEvent)
   })
 
   expect(screen.getByText('Hello!')).toBeInTheDocument()
