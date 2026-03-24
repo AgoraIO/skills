@@ -3,12 +3,12 @@ name: agora
 description: Write code using Agora SDKs (agora.io) for real-time communication. Covers RTC (video/voice calling, live streaming, screen sharing), RTM (signaling, messaging, presence), Conversational AI (voice AI agents), Cloud Recording, Server Gateway, and server-side token generation. Use when the user wants to build real-time audio/video applications, integrate Agora SDKs (Web JS/TS, React, iOS Swift, Android Kotlin/Java, Go, Python), manage channels, tracks, tokens, use RTM for messaging/signaling, record RTC sessions, or build Conversational AI with the agent-toolkit. Triggers on mentions of Agora, agora.io, RTC, RTM, video calling, voice calling, real-time communication, screen share, screen sharing, record session, record calls, Cloud Recording, Server Gateway, Linux media SDK, agora-rtc-sdk-ng, agora-rtc-react, agora-rtm, conversational AI with Agora, Agora token generation, Agora authentication, agora-agent-client-toolkit, agora-agent-client-toolkit-react, agora-agent-server-sdk, AgoraVoiceAI, AgoraClient, useConversationalAI, useTranscript, useAgentState, agent transcript, agent state hook.
 metadata:
   author: agora
-  version: '1.1.0'
+  version: '1.2.0'
 ---
 
 # Agora (agora.io)
 
-Skill version: 1.1.0
+Skill version: 1.2.0
 
 Build real-time communication applications using Agora SDKs across Web, iOS, Android, and server-side platforms.
 
@@ -28,13 +28,13 @@ Read the README for the product the user needs. Only load what is needed.
 
 Real-time audio and video. Users join channels, publish local tracks, subscribe to remote tracks.
 
-**[references/rtc/README.md](references/rtc/README.md)** — Platforms: Web, React, iOS, Android
+**[references/rtc/README.md](references/rtc/README.md)** — Platforms: Web, React, Next.js, iOS, Android, React Native, Flutter. Windows/Electron/Unity exist but require Level 2 fetch — no inline reference files.
 
 ### RTM (Signaling / Messaging)
 
 Text messaging, signaling, presence, and metadata. Independent from RTC — channel namespaces are separate.
 
-**[references/rtm/README.md](references/rtm/README.md)** — Platforms: Web
+**[references/rtm/README.md](references/rtm/README.md)** — Platforms: Web, iOS, Android (all v2). RTM is a client-side SDK — there is no server-side or desktop (Electron/Windows) RTM variant.
 
 ### Conversational AI (Voice AI Agents)
 
@@ -59,6 +59,12 @@ Token generation and server utilities. Required for production authentication.
 Self-hosted Linux SDK for server-side audio/video stream transmission. Use when a server process needs to send or receive media in an Agora RTC channel (call centers, AI audio processing, network testing).
 
 **[references/server-gateway/README.md](references/server-gateway/README.md)** — C++, Java, Go, Python
+
+### Multi-Product Integration
+
+Initialization order, UID strategy, channel naming, token matrix, and cleanup sequence when combining RTC + RTM + ConvoAI.
+
+**[references/integration-patterns.md](references/integration-patterns.md)**
 
 ### Testing Guidance
 

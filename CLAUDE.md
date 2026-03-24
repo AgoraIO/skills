@@ -14,9 +14,10 @@ skills/
     └── references/
         ├── doc-fetching.md    ← two-tier lookup procedure (agent-facing)
         ├── mcp-tools.md       ← Agora MCP server install guide (user-facing)
-        ├── rtc/
-        ├── rtm/
-        ├── conversational-ai/
+        ├── integration-patterns.md  ← multi-product coordination (RTC+RTM+ConvoAI)
+        ├── rtc/               ← Web, React, Next.js, iOS, Android, React Native, Flutter
+        ├── rtm/               ← Web, iOS, Android (all v2)
+        ├── conversational-ai/ ← REST API, server SDKs, iOS/Android toolkits, React hooks
         ├── server/
         ├── cloud-recording/
         ├── server-gateway/
@@ -45,9 +46,13 @@ Before adding any inline content, ask: **will this still be correct in 6 months 
 |---|---|
 | RTC initialization, track management, event registration | Inline — `references/rtc/` |
 | RTM messaging and presence patterns | Inline — `references/rtm/` |
-| Token generation (RTC, RTM, AccessToken2) | Inline — `references/server/` |
-| ConvoAI gotchas, field-type rules, lifecycle | Inline — `references/conversational-ai/README.md` |
-| ConvoAI quick-start code (Python, Go, Java) | Level 2 fetch |
+| Token generation (RTC, RTM, AccessToken2) | Inline — `references/server/` (`server/` is token generation only — not ConvoAI SDKs) |
+| ConvoAI gotchas, field-type rules, REST API lifecycle | Inline — `references/conversational-ai/README.md` |
+| ConvoAI server SDK patterns (auth modes, state machine, session lifecycle, avatar+TTS) | Inline — `references/conversational-ai/server-sdks.md` |
+| ConvoAI auth flow (three-token distinction, sequence diagram) | Inline — `references/conversational-ai/auth-flow.md` |
+| ConvoAI Python SDK patterns (sync/async, deprecations, debug) | Inline — `references/conversational-ai/python-sdk.md` |
+| ConvoAI Go SDK patterns (context.Context, functional options, status constants) | Inline — `references/conversational-ai/go-sdk.md` |
+| ConvoAI quick-start code with vendor-specific imports (Python, Go, Java) | Level 2 fetch |
 | ConvoAI full request/response schemas | Level 2 fetch |
 | TTS / ASR / LLM vendor configs and model names | Level 2 fetch |
 | Cloud Recording REST API field details | Level 2 fetch |

@@ -2,8 +2,19 @@
 
 REST API-driven voice AI agents. Create agents that join RTC channels and converse with users via speech. Front-end clients connect via RTC+RTM.
 
-The TypeScript, Go, and Python SDKs are convenience wrappers around this REST API.
-For any other backend language (Java, Ruby, PHP, C#, etc.), call the REST API directly.
+## SDK vs. Direct REST API
+
+**Default to the SDK for the user's backend language.** The TypeScript, Go, and Python SDKs wrap the REST API and handle auth, token generation, and session lifecycle automatically.
+
+| Backend language | Path |
+|---|---|
+| TypeScript / Node.js | `agora-agent-server-sdk` — see [server-sdks.md](server-sdks.md) |
+| Python | `agora-agent` — see [python-sdk.md](python-sdk.md) |
+| Go | `agora-agent-server-sdk-go` — see [go-sdk.md](go-sdk.md) |
+| Java, Ruby, PHP, C#, other | Call the REST API directly — see [auth-flow.md](auth-flow.md) |
+
+Direct REST API use is fully supported for languages without an SDK. The [auth-flow.md](auth-flow.md) file covers the end-to-end auth and token flow for REST API implementors. If the user has an SDK available, start with that instead — the SDK eliminates the need to manually build tokens for the ConvoAI server.
+
 The live OpenAPI spec is the authoritative source for request/response schemas:
 
 ```
@@ -45,9 +56,11 @@ current and covers every endpoint and field:
 
 See [../doc-fetching.md](../doc-fetching.md) for the full procedure.
 
-## Authentication
+## Authentication (Direct REST API)
 
-Two methods are supported. **Token-based auth is preferred** — it avoids storing long-lived Customer Secret credentials on your server.
+This section covers auth for implementors calling the REST API directly (non-SDK languages). **If the user has a TypeScript/Python/Go SDK available, skip this — the SDK handles auth automatically in App Credentials mode.** See [server-sdks.md](server-sdks.md) instead.
+
+Two methods are supported for direct REST API calls. **Token-based auth is preferred** — it avoids storing long-lived Customer Secret credentials on your server.
 
 ### Option A: Agora Token (recommended)
 
@@ -114,6 +127,7 @@ Things the official docs don't emphasize that cause frequent mistakes:
 - **`/speak` priority enum** — `"INTERRUPT"` (immediate, default), `"APPEND"` (queued after current speech), `"IGNORE"` (skip if agent is busy). `interruptable: false` prevents users from cutting in.
 - **20 PCU default limit** — max 20 concurrent agents per App ID. Exceeding returns error on `/join`. Contact Agora support to increase.
 - **Event notifications require two flags** — `advanced_features.enable_rtm: true` AND `parameters.data_channel: "rtm"` in the join config. Without both, `onAgentStateChanged`/`onAgentMetrics`/`onAgentError` won't fire. Additionally: `parameters.enable_metrics: true` for metrics, `parameters.enable_error_message: true` for errors.
+- **RTM channel name matches the RTC channel name** — the agent publishes transcripts and state events to the RTM channel with the same name as the RTC channel it joined. Subscribe the RTM client to the same channel name you passed to the agent's `properties.channel`.
 - **Custom LLM interruptable metadata** — the first SSE chunk can be `{"object": "chat.completion.custom_metadata", "metadata": {"interruptable": false}}` to prevent user speech from interrupting critical responses (e.g., compliance disclaimers). Subsequent chunks use standard `chat.completion.chunk` format.
 - **Error response format** — non-200 responses return `{ "detail": "...", "reason": "..." }`.
 - **MLLM `location` not `region`** — use `params.location: "us-central1"`, not `region`. The field name is `location` at every level (join payload and backend env vars).
@@ -135,14 +149,22 @@ For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](
 
 ## Reference Files
 
-Each file maps to one repo in [AgoraIO-Conversational-AI](https://github.com/AgoraIO-Conversational-AI):
+Use the file that matches what the user is building:
 
-- **[agent-samples.md](agent-samples.md)** — Backend (simple-backend), React clients, profile system, MLLM/Gemini config, deployment
-- **[agent-toolkit.md](agent-toolkit.md)** — `agora-agent-client-toolkit` + `agora-agent-client-toolkit-react`: AgoraVoiceAI, events, transcript, sendText, interrupt, React hooks
-- **[agent-client-toolkit-react.md](agent-client-toolkit-react.md)** — React hooks detail: ConversationalAIProvider, useTranscript, useAgentState, useAgentError, useAgentMetrics, useConversationalAI
-- **[agent-ui-kit.md](agent-ui-kit.md)** — `@agora/agent-ui-kit` React components: voice, chat, video, settings
-- **[server-custom-llm.md](server-custom-llm.md)** — Custom LLM proxy: RAG, tool calling, conversation memory
-- **[server-mcp.md](server-mcp.md)** — MCP memory server: persistent per-user memory via tool calling
+| User's question / task | Read this file |
+|---|---|
+| Node.js/Python/Go backend — starting agent, auth, session lifecycle | [server-sdks.md](server-sdks.md) |
+| Python SDK specifics (async, deprecations, debug) | [python-sdk.md](python-sdk.md) |
+| Go SDK specifics (context, builder, status constants) | [go-sdk.md](go-sdk.md) |
+| Auth flow, token types, direct REST API (non-SDK languages) | [auth-flow.md](auth-flow.md) |
+| Full working demo app architecture, profiles, MLLM/Gemini | [agent-samples.md](agent-samples.md) |
+| Web/React client: transcripts, agent state, sendText, interrupt | [agent-toolkit.md](agent-toolkit.md) |
+| React hooks in depth (useTranscript, useAgentState, provider) | [agent-client-toolkit-react.md](agent-client-toolkit-react.md) |
+| React UI components (voice visualizer, chat UI, video) | [agent-ui-kit.md](agent-ui-kit.md) |
+| iOS client: ConversationalAIAPIImpl, Swift | [agent-toolkit-ios.md](agent-toolkit-ios.md) |
+| Android client: ConversationalAIAPIImpl, Kotlin | [agent-toolkit-android.md](agent-toolkit-android.md) |
+| Custom LLM backend: RAG, tool calling, conversation memory | [server-custom-llm.md](server-custom-llm.md) |
+| Persistent per-user memory via MCP | [server-mcp.md](server-mcp.md) |
 
 ## REST API Reference
 
@@ -156,6 +178,22 @@ Full request/response details for all endpoints — **always fetch these; do not
 - **[Broadcast Message (Speak)](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/speak.md)** — POST /speak: broadcast TTS
 - **[Interrupt Agent](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/interrupt.md)** — POST /interrupt
 - **[Conversation History](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/history.md)** — GET /history
+
+## Production: Platform Webhooks
+
+The ConvoAI platform can POST event notifications to your server endpoint when agent state changes. These are distinct from:
+- The SDK's in-process `session.on()` events (fire in your Node.js/Python/Go process)
+- The client toolkit's `AGENT_STATE_CHANGED` event (fires in the browser via RTM)
+
+Webhooks are the correct pattern for **production stateless deployments** where you do not hold the `AgentSession` object in memory between requests. Your server receives a POST when agent state changes, correlates using the agent ID (returned by `session.start()` / the `/join` response), and updates your application state accordingly.
+
+Webhook payload schemas and registration are REST API surface — do not rely on inline content here. Fetch from the Agora docs:
+
+```
+GET https://docs-md.agora.io/en/conversational-ai/rest-api/agent/join.md
+```
+
+or via MCP: search for "conversational AI webhook" in the Agora docs tool.
 
 ## Agent Configuration (join payload `properties` object)
 

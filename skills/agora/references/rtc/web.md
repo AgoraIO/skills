@@ -37,7 +37,7 @@ const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" })
 const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" })
 ```
 
-Codec options: `"vp8"`, `"vp9"`, `"h264"`. Use `"vp8"` for broadest browser support. Safari 12.1 and earlier does not support VP8.
+Codec options: `"vp8"`, `"vp9"`, `"h264"`, `"h265"`, `"av1"`. Use `"vp8"` for broadest browser support. Safari 12.1 and earlier does not support VP8. `"av1"` is available in newer SDK versions for modern browsers.
 
 ## Joining a Channel
 
@@ -175,7 +175,7 @@ client.on("connection-state-change", (curState, prevState, reason) => {
 
 // Network quality (fires every 2 seconds after joining)
 client.on("network-quality", (stats) => {
-  // uplinkNetworkQuality/downlinkNetworkQuality: 0-5 (0=unknown, 1=excellent, 5=bad)
+  // uplinkNetworkQuality/downlinkNetworkQuality: 0-6 (0=unknown, 1=excellent, 5=very bad, 6=disconnected)
 })
 
 // Stream messages from data channel (used by Conversational AI)
@@ -259,9 +259,9 @@ setInterval(() => {
 
 ```typescript
 client.on("network-quality", (stats) => {
-  // stats.uplinkNetworkQuality: 0-5
-  // stats.downlinkNetworkQuality: 0-5
-  // 0=unknown, 1=excellent, 2=good, 3=poor, 4=bad, 5=very bad
+  // stats.uplinkNetworkQuality: 0-6
+  // stats.downlinkNetworkQuality: 0-6
+  // 0=unknown, 1=excellent, 2=good, 3=poor, 4=bad, 5=very bad, 6=disconnected
 })
 
 // Get detailed stats

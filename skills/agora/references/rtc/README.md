@@ -6,11 +6,11 @@ Real-time audio and video communication. Users join channels, publish local trac
 
 1. **Register event handlers BEFORE joining** the channel, or you will miss events for users already present.
 2. **`user-published` fires separately** for audio and video. A user publishing both triggers two events — handle each.
-3. **Audio autoplay**: Browsers block audio autoplay. Require user interaction (click/tap) before playing remote audio.
-4. **Track cleanup**: Always `stop()` then `close()` local tracks before setting to null. Failure to clean up causes memory leaks and device locks.
-5. **HTTPS required** for Web SDK (except `localhost`).
-6. **Token management is mandatory in production**. Handle `token-privilege-will-expire` (Web) / `onTokenPrivilegeWillExpire` (native) to renew tokens. UID in token must match UID used to join.
-7. **Stream bombing prevention**: In production, generate tokens with subscriber role (`kRoleSubscriber` / `RtcRole.SUBSCRIBER`) for audience-only users to prevent unauthorized publishing.
+3. **Track cleanup**: Always `stop()` then `close()` local tracks before setting to null. Failure to clean up causes memory leaks and device locks. (React SDK hooks handle this automatically — see `react.md`.)
+4. **HTTPS required** for Web SDK (except `localhost`).
+5. **Token management is mandatory in production**. Handle `token-privilege-will-expire` (Web) / `onTokenPrivilegeWillExpire` (native) to renew tokens. UID in token must match UID used to join.
+6. **Stream bombing prevention**: In production, generate tokens with subscriber role (`kRoleSubscriber` / `RtcRole.SUBSCRIBER`) for audience-only users to prevent unauthorized publishing.
+7. **Audio autoplay (non-standard flows only)**: Browser autoplay policy is not an issue in typical RTC flows because the user has already clicked to join (satisfying the gesture requirement). However, if you auto-join on page load, trigger audio from a non-user event, or run in a headless/test environment, `audioTrack.play()` may be silently blocked. Wrap the join + publish sequence in a user gesture handler in these cases.
 
 ## Channel Profiles
 
@@ -76,7 +76,7 @@ Screen share typically uses a separate client instance to avoid replacing the ca
 
 When Web, iOS, and Android clients share the same channel:
 
-- **Codec**: Web defaults to `"vp8"` but native SDKs typically negotiate H.264. Use `codec: "h264"` on Web for best native interop. If codecs differ, Agora's server transcodes transparently (works but adds latency).
+- **Codec**: `"vp8"` and `"vp9"` scale better in multi-user calls — prefer these over `"h264"`, which does not scale well beyond small groups. If codecs differ between Web and native clients, Agora's server transcodes transparently (works but adds latency).
 - **UID types**: iOS uses `UInt` (unsigned 32-bit), Android uses `Int` (signed 32-bit), Web uses `number`. UIDs > 2,147,483,647 wrap to negative on Android. RTM uses **string UIDs** — use `String(rtcUid)` as a mapping convention.
 - **Audio profiles**: Align encoder settings across platforms to avoid one side sending stereo 128kbps while another expects mono. Use `"speech_standard"` (Web) / `AUDIO_PROFILE_DEFAULT` (native) for voice calls.
 - **Orientation**: Mobile uses adaptive orientation (rotates with device). Web cameras are typically landscape. Handle aspect ratio changes on the viewer side.
@@ -91,6 +91,8 @@ Read the file matching the user's platform:
 - **[nextjs.md](nextjs.md)** — Next.js / SSR dynamic import patterns (App Router + Pages Router)
 - **[ios.md](ios.md)** — `AgoraRtcEngineKit` (Swift): engine setup, delegation, permissions
 - **[android.md](android.md)** — `RtcEngine` (Kotlin/Java): engine setup, callbacks, permissions
+- **[react-native.md](react-native.md)** — `react-native-agora`: engine init, events, video views, complete example
+- **[flutter.md](flutter.md)** — `agora_rtc_engine` (Dart): engine init, events, AgoraVideoView, complete example
 - **[cross-platform-coordination.md](cross-platform-coordination.md)** — UID strategy, codec interop, screen sharing across platforms, audio routing, common cross-platform bugs
 
 For additional platforms and advanced features: <https://docs-md.agora.io/en/video-calling/get-started/get-started-sdk.md> — voice-only: <https://docs-md.agora.io/en/voice-calling/get-started/get-started-sdk.md>
@@ -99,4 +101,4 @@ For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](
 
 ## When to Fetch More
 
-Always use Level 2 fetch for: encoder profile parameter details, error code listings, release notes, Flutter/Windows/Electron/React Native platform quick-starts. See [../doc-fetching.md](../doc-fetching.md).
+Always use Level 2 fetch for: encoder profile parameter details, error code listings, release notes, Windows/Electron/Unity platform quick-starts. See [../doc-fetching.md](../doc-fetching.md).

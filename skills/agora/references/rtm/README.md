@@ -1,6 +1,6 @@
-# Agora RTM (Real-Time Messaging / Signaling)
+# Agora Signaling SDK (RTM)
 
-Signaling, text messaging, presence, and metadata — used alongside or independently from RTC. RTC and RTM are **independent systems**: RTC channels and RTM channels are separate namespaces.
+The Agora Signaling SDK (internally called RTM) provides signaling, text messaging, presence, and metadata — used alongside or independently from RTC. RTC and the Signaling SDK are **independent systems**: their channels are separate namespaces.
 
 ## When to Use RTM
 
@@ -35,7 +35,7 @@ RTM has two channel types with different semantics:
 
 - **UID type mismatch causes silent failures** — RTC UIDs are numbers; RTM UIDs are strings. Always use `String(rtcUid)` as the RTM user ID. Type mismatches don't throw errors — they silently break user lookups across both systems.
 - **Namespace isolation** — RTC channels and RTM channels are completely separate. Joining RTC channel `"meeting-1"` does NOT auto-subscribe you to RTM channel `"meeting-1"`. Subscribe both explicitly.
-- **Login before all operations** — `rtmClient.login()` must complete before any subscribe, publish, or presence call. Operations attempted before login resolves fail silently, not with an error.
+- **Login before all operations** — `rtmClient.login()` must complete (connection reaches `CONNECTED`) before any subscribe, publish, or presence call. Operations called while still connecting are not guaranteed to succeed.
 - **Subscribe before presence** — Presence events (joins/leaves) require an active channel subscription. Publishing to a channel without subscribing means you won't receive presence notifications or responses.
 - **RTM v2 API is a full rewrite** — Do NOT apply v1 patterns (`AgoraRTM.createInstance()`, `.createChannel()`) to v2. The APIs are incompatible. The Web reference (`web.md`) covers v2 only.
 - **ConvoAI transcript delivery requires two flags** — For AI agent transcripts to arrive via RTM, the ConvoAI `/join` payload must include both `advanced_features.enable_rtm: true` AND `parameters.data_channel: "rtm"`. One flag alone is not sufficient.
@@ -51,16 +51,26 @@ When pairing RTC and RTM in the same app:
 
 ```javascript
 // RTC join resolves with the assigned numeric UID
-const rtcUid = await rtcClient.join(appId, channelName, token, null);
+const rtcUid = await rtcClient.join(appId, channelName, rtcToken, null);
 
-// Mirror UID into RTM as a string — keeps both systems in sync
-await rtmClient.login({ uid: String(rtcUid) });
-const { status } = await rtmClient.subscribe(channelName);
+// uid is set in the RTM constructor; login only needs the token
+// new AgoraRTM.RTM(appId, String(rtcUid)) was already called at setup
+await rtmClient.login({ token: rtmToken }); // RTM token from your server
+await rtmClient.subscribe(channelName);
 ```
 
 RTM channel name does not need to match the RTC channel name, but using the same name is the conventional approach.
 
+## Platform Scope
+
+RTM is a **client-side SDK**. It runs in browsers, iOS apps, and Android apps. There is no server-side RTM SDK and no Electron/Windows/desktop variant. If a user needs server-to-channel messaging from a backend, they should use the ConvoAI REST API (`/speak`) or build their own signaling layer.
+
+All three platform files below document **RTM v2**. Do not apply v1 patterns (`AgoraRTM.createInstance()`, `.createChannel()`) to any of them — the APIs are incompatible.
+
 ## Platform Reference Files
 
-- **[web.md](web.md)** — `agora-rtm` v2 (JS/TS): client, messaging, presence, stream channels, v1 legacy notes
-- **iOS / Android** — Level 2 fetch required: use [doc-fetching.md](../doc-fetching.md) or fetch directly from <https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart.md>
+- **[web.md](web.md)** — `agora-rtm` v2 (JS/TS): client, messaging, presence, stream channels
+- **[ios.md](ios.md)** — `AgoraRtmClientKit` (Swift): init, login, subscribe, publish, delegate
+- **[android.md](android.md)** — `RtmClient` (Kotlin): init, login, subscribe, publish, event listener
+
+For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).

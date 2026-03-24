@@ -66,9 +66,18 @@ ai.subscribeMessage('CHANNEL');
 |-------|------|----------|-------------|
 | `rtcEngine` | `IAgoraRTCClient` | Yes | Your existing Agora RTC client |
 | `rtmConfig` | `{ rtmEngine: RTMClient }` | No | Pass your RTM client for sendText/interrupt |
-| `renderMode` | `TranscriptHelperMode` | No | `TEXT`, `WORD`, `CHUNK`, `AUTO` (default: `AUTO`) |
+| `renderMode` | `TranscriptHelperMode` | No | `TEXT`, `WORD`, `CHUNK`, `AUTO` (default: `AUTO`) — see table below |
 | `enableLog` | `boolean` | No | Debug logging (default: `false`) |
 | `enableAgoraMetrics` | `boolean` | No | Load `@agora-js/report` for usage metrics |
+
+### Render Modes
+
+| Mode | Update cadence | Word timing in metadata | PTS required | When to use |
+|------|---------------|------------------------|--------------|-------------|
+| `TEXT` | Per sentence (`final: true`) | No | No | Lowest overhead; subtitles |
+| `WORD` | Per word | Yes (`words[].start_ms`, `duration_ms`) | **Yes** (before RTC client creation) | Karaoke-style highlight |
+| `CHUNK` | When all parts reassembled | No | No | Fragmented transport |
+| `AUTO` | Detected from first message | Depends on detected mode | If WORD detected | Default; fine unless you need WORD and must pre-configure PTS |
 
 ## Events
 
@@ -136,13 +145,32 @@ await ai.sendText(agentUserId, {
 // Send image to the agent
 await ai.sendImage(agentUserId, {
   messageType: ChatMessageType.IMAGE,
-  uuid: crypto.randomUUID(),
-  url: 'https://example.com/image.png',
+  uuid: crypto.randomUUID(), // caller-generated unique ID for receipt correlation
+  url: 'https://example.com/image.png', // or: base64: '<inline data>'
 });
 
 // Interrupt the agent's current speech
 await ai.interrupt(agentUserId);
 ```
+
+### `ChatMessagePriority` values
+
+| Value | Behavior |
+|-------|----------|
+| `INTERRUPTED` | Sends the message and immediately interrupts any speech the agent is currently producing |
+| `APPEND` | Queues the message to be processed after the agent finishes its current speech turn |
+| `IGNORE` | Drops the message silently if the agent is busy — use for low-priority updates only relevant when idle |
+
+`responseInterruptable: boolean` on `ChatMessageText` — when `true`, the agent's response to this message can itself be interrupted by subsequent user input.
+
+### `ChatMessageImage` fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `messageType` | Yes | Must be `ChatMessageType.IMAGE` |
+| `uuid` | Yes | Caller-generated unique ID for receipt correlation via `MESSAGE_RECEIPT_UPDATED` |
+| `url` | One of url/base64 | Publicly accessible image URL |
+| `base64` | One of url/base64 | Inline image data |
 
 ## Cleanup
 
@@ -162,6 +190,7 @@ await rtmClient.logout(); // you manage RTM lifecycle
 5. **RTM is optional but required for several features** — `sendText`, `sendImage`, and `interrupt` throw `RTMRequiredError` without `rtmConfig`. `AGENT_STATE_CHANGED`, `MESSAGE_RECEIPT_UPDATED`, `MESSAGE_ERROR`, `MESSAGE_SAL_STATUS` only fire with RTM.
 6. **Agent start config flags are required for some events** — `AGENT_STATE_CHANGED` requires `advanced_features.enable_rtm: true` AND `parameters.data_channel: "rtm"`. `AGENT_METRICS` requires `parameters.enable_metrics: true`. `AGENT_ERROR` requires `parameters.enable_error_message: true`.
 7. **Toolkit does not wrap join/publish** — call `rtcClient.join()` and `rtcClient.publish()` yourself before `subscribeMessage()`.
+8. **WORD mode requires PTS metadata enabled before RTC client creation** — if `renderMode` is `TranscriptHelperMode.WORD`, call `AgoraRTC.setParameter('ENABLE_AUDIO_PTS_METADATA', true)` before calling `AgoraRTC.createClient()`. Setting it after client creation produces no error — word-level timing data simply never arrives. This also applies when using `AUTO` mode if WORD is detected; prefer explicit `WORD` mode when karaoke display is required so the pre-configuration step is obvious.
 
 ## React Hooks
 

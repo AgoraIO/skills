@@ -2,7 +2,8 @@
 name: agora-testing-guidance
 description: |
   Mocking patterns and testing requirements for Agora SDK integration code.
-  Covers RTC Web, RTC React, RTC iOS, RTC Android, and ConvoAI REST API.
+  Covers RTC Web, RTC React, RTC iOS, RTC Android, RTC React Native, RTC Flutter,
+  RTM Web, RTM iOS, RTM Android, and ConvoAI REST API.
   Use when generating tests for any Agora integration, or when reminding the user
   to add tests to an implementation.
 license: MIT
@@ -172,6 +173,361 @@ val mockEngine = mock(RtcEngineInterface::class.java)
 
 Add `testImplementation 'org.mockito:mockito-kotlin:5.+'` to `build.gradle`.
 
+### RTC React Native (`react-native-agora`)
+
+Mock at the module boundary using `jest.mock`. The engine is created via `createAgoraRtcEngine()` — mock the factory and capture the registered event handler so tests can fire callbacks.
+
+```javascript
+// __mocks__/react-native-agora.js
+const mockEngine = {
+  initialize: jest.fn().mockResolvedValue(undefined),
+  enableVideo: jest.fn().mockResolvedValue(undefined),
+  startPreview: jest.fn().mockResolvedValue(undefined),
+  joinChannel: jest.fn().mockResolvedValue(undefined),
+  leaveChannel: jest.fn().mockResolvedValue(undefined),
+  registerEventHandler: jest.fn(),
+  unregisterEventHandler: jest.fn(),
+  release: jest.fn().mockResolvedValue(undefined),
+};
+
+module.exports = {
+  createAgoraRtcEngine: jest.fn().mockReturnValue(mockEngine),
+  ChannelProfileType: { ChannelProfileCommunication: 1 },
+  ClientRoleType: { ClientRoleBroadcaster: 1, ClientRoleAudience: 2 },
+  RtcSurfaceView: 'RtcSurfaceView', // React Native components mock as strings
+};
+```
+
+In tests, capture the event handler to simulate callbacks:
+
+```javascript
+import { createAgoraRtcEngine } from 'react-native-agora'
+
+test('fires onUserJoined and renders remote view', async () => {
+  const engine = createAgoraRtcEngine()
+  // ... component renders, engine.registerEventHandler is called
+
+  // Get the handler the component registered
+  const handler = engine.registerEventHandler.mock.calls[0][0]
+
+  // Simulate a remote user joining
+  act(() => {
+    handler.onUserJoined({ channelId: 'test', localUid: 0 }, 42, 0)
+  })
+
+  expect(screen.getByTestId('remote-video-42')).toBeTruthy()
+})
+```
+
+`RtcSurfaceView` is a native component — render it as a string stub in Jest config (`moduleNameMapper`) or via the manual mock above.
+
+### RTC Flutter (`agora_rtc_engine`)
+
+Use the `mockito` package with `build_runner` to generate mocks. Inject the engine via constructor rather than calling `createAgoraRtcEngine()` directly — the factory cannot be mocked without injection.
+
+```yaml
+# pubspec.yaml
+dev_dependencies:
+  mockito: ^5.4.0
+  build_runner: ^2.4.0
+```
+
+```dart
+// test/mocks.dart
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:mockito/annotations.dart';
+
+@GenerateMocks([RtcEngine])
+void main() {}
+// Run: flutter pub run build_runner build
+```
+
+```dart
+// test/video_call_test.dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+import 'mocks.mocks.dart';
+
+void main() {
+  late MockRtcEngine mockEngine;
+
+  setUp(() {
+    mockEngine = MockRtcEngine();
+    // Stub async methods
+    when(mockEngine.initialize(any)).thenAnswer((_) async {});
+    when(mockEngine.enableVideo()).thenAnswer((_) async {});
+    when(mockEngine.joinChannel(
+      token: anyNamed('token'),
+      channelId: anyNamed('channelId'),
+      uid: anyNamed('uid'),
+      options: anyNamed('options'),
+    )).thenAnswer((_) async {});
+    when(mockEngine.leaveChannel(options: anyNamed('options')))
+        .thenAnswer((_) async {});
+    when(mockEngine.release()).thenAnswer((_) async {});
+    when(mockEngine.registerEventHandler(any)).thenReturn(null);
+  });
+
+  test('joins channel with correct parameters', () async {
+    // Inject mockEngine into your widget/service under test
+    await myService.join(engine: mockEngine, channel: 'test', token: null);
+
+    verify(mockEngine.joinChannel(
+      token: null,
+      channelId: 'test',
+      uid: 0,
+      options: anyNamed('options'),
+    )).called(1);
+  });
+}
+```
+
+To simulate event callbacks, capture the `RtcEngineEventHandler` passed to `registerEventHandler` and call its methods directly in tests.
+
+`AgoraVideoView` is a platform widget — wrap your widget under test in a `MaterialApp` and stub the view, or test logic separately from rendering.
+
+### RTM Web (`agora-rtm`)
+
+Mock at the module boundary. The `RTM` constructor can throw — the mock should reflect that. Capture `addEventListener` calls so tests can simulate incoming events.
+
+```javascript
+// __mocks__/agora-rtm.js
+const mockRtmClient = {
+  login: jest.fn().mockResolvedValue({}),
+  logout: jest.fn().mockResolvedValue({}),
+  subscribe: jest.fn().mockResolvedValue({}),
+  unsubscribe: jest.fn().mockResolvedValue({}),
+  publish: jest.fn().mockResolvedValue({}),
+  addEventListener: jest.fn(),
+};
+
+const AgoraRTM = {
+  RTM: jest.fn().mockImplementation(() => mockRtmClient),
+};
+
+module.exports = AgoraRTM;
+module.exports.default = AgoraRTM;
+```
+
+In tests, capture event listeners to simulate incoming messages:
+
+```javascript
+import AgoraRTM from 'agora-rtm'
+
+test('displays message when RTM message event fires', async () => {
+  const client = new AgoraRTM.RTM('app-id', 'user-1')
+
+  // ... component mounts, addEventListener is registered
+  const listeners = {}
+  client.addEventListener.mockImplementation((type, cb) => {
+    listeners[type] = cb
+  })
+
+  // Re-render to pick up the mock
+  render(<ChatComponent client={client} />)
+
+  // Simulate incoming message
+  const messageEvent = {
+    publisher: 'user-2',
+    channelName: 'test',
+    message: 'Hello!',
+    customType: 'chat.message',
+  }
+  act(() => {
+    listeners.message(messageEvent)
+  })
+
+  expect(screen.getByText('Hello!')).toBeInTheDocument()
+})
+```
+
+Test that `login` is awaited before `subscribe`:
+
+```javascript
+test('subscribes only after login resolves', async () => {
+  let resolveLogin
+  client.login.mockReturnValue(new Promise(r => { resolveLogin = r }))
+
+  render(<ChatComponent />)
+  expect(client.subscribe).not.toHaveBeenCalled()
+
+  resolveLogin({})
+  await waitFor(() => expect(client.subscribe).toHaveBeenCalledWith('test-channel', expect.any(Object)))
+})
+```
+
+### RTM iOS / Signaling (`AgoraRtmKit`)
+
+Use protocol-based injection. `AgoraRtmClientKit` is initialized with a delegate — define a protocol wrapping its interface and inject a mock in tests.
+
+```swift
+// RtmClientProtocol.swift
+protocol RtmClientProtocol: AnyObject {
+    func login(_ token: String?, completion: ((AgoraRtmErrorInfo?) -> Void)?)
+    func logout()
+    func subscribe(channelName: String, option: AgoraRtmSubscribeOptions?,
+                   completion: ((AgoraRtmErrorInfo?) -> Void)?)
+    func unsubscribe(_ channelName: String, completion: ((AgoraRtmErrorInfo?) -> Void)?)
+    func publish(channelName: String, message: String,
+                 option: AgoraRtmPublishOptions?,
+                 completion: ((AgoraRtmErrorInfo?) -> Void)?)
+    func destroy()
+}
+
+// Make real client conform
+extension AgoraRtmClientKit: RtmClientProtocol {}
+```
+
+```swift
+// MockRtmClient.swift (XCTest)
+class MockRtmClient: RtmClientProtocol {
+    var loginCallCount = 0
+    var subscribeCallCount = 0
+    var publishedMessages: [(channel: String, message: String)] = []
+    var loginShouldSucceed = true
+
+    func login(_ token: String?, completion: ((AgoraRtmErrorInfo?) -> Void)?) {
+        loginCallCount += 1
+        completion?(loginShouldSucceed ? nil : AgoraRtmErrorInfo())
+    }
+
+    func subscribe(channelName: String, option: AgoraRtmSubscribeOptions?,
+                   completion: ((AgoraRtmErrorInfo?) -> Void)?) {
+        subscribeCallCount += 1
+        completion?(nil)
+    }
+
+    func publish(channelName: String, message: String,
+                 option: AgoraRtmPublishOptions?,
+                 completion: ((AgoraRtmErrorInfo?) -> Void)?) {
+        publishedMessages.append((channel: channelName, message: message))
+        completion?(nil)
+    }
+
+    func unsubscribe(_ channelName: String, completion: ((AgoraRtmErrorInfo?) -> Void)?) {
+        completion?(nil)
+    }
+
+    func destroy() {}
+}
+```
+
+```swift
+// SignalingManagerTests.swift
+class SignalingManagerTests: XCTestCase {
+    func testSubscribesAfterLogin() {
+        let mock = MockRtmClient()
+        let manager = SignalingManager(rtmClient: mock)
+
+        manager.connect(token: "token", channel: "test")
+
+        XCTAssertEqual(mock.loginCallCount, 1)
+        XCTAssertEqual(mock.subscribeCallCount, 1)
+    }
+
+    func testPublishSendsToCorrectChannel() {
+        let mock = MockRtmClient()
+        let manager = SignalingManager(rtmClient: mock)
+
+        manager.sendMessage("Hello", to: "room-1")
+
+        XCTAssertEqual(mock.publishedMessages.first?.channel, "room-1")
+        XCTAssertEqual(mock.publishedMessages.first?.message, "Hello")
+    }
+}
+```
+
+Simulate delegate callbacks by calling them directly in tests — your `SignalingManager` should expose or accept a delegate reference for injection.
+
+### RTM Android / Signaling (`io.agora:agora-rtm`)
+
+Use Mockito. `RtmClient.create(config)` is a static factory — wrap it behind an interface to enable injection. Capture `ResultCallback` arguments to simulate async success/failure.
+
+```kotlin
+// RtmClientInterface.kt
+interface RtmClientInterface {
+    fun login(token: String, callback: ResultCallback<Void?>)
+    fun logout(callback: ResultCallback<Void?>)
+    fun subscribe(channelName: String, options: SubscribeOptions, callback: ResultCallback<Void?>)
+    fun unsubscribe(channelName: String, callback: ResultCallback<Void?>)
+    fun publish(channelName: String, message: String, options: PublishOptions, callback: ResultCallback<Void?>)
+    fun release()
+}
+
+// Adapter wrapping real RtmClient
+class RtmClientAdapter(private val client: RtmClient) : RtmClientInterface {
+    override fun login(token: String, callback: ResultCallback<Void?>) =
+        client.login(token, callback)
+    // ... delegate remaining methods
+}
+```
+
+```kotlin
+// SignalingManagerTest.kt
+@RunWith(MockitoJUnitRunner::class)
+class SignalingManagerTest {
+    @Mock lateinit var mockRtmClient: RtmClientInterface
+    @Mock lateinit var mockEventListener: RtmEventListener
+
+    private lateinit var manager: SignalingManager
+
+    @Before
+    fun setUp() {
+        manager = SignalingManager(rtmClient = mockRtmClient)
+    }
+
+    @Test
+    fun `subscribes only after login succeeds`() {
+        // Capture the ResultCallback passed to login
+        val callbackCaptor = argumentCaptor<ResultCallback<Void?>>()
+        manager.connect(token = "token", channel = "test")
+
+        verify(mockRtmClient).login(eq("token"), callbackCaptor.capture())
+        verify(mockRtmClient, never()).subscribe(any(), any(), any())
+
+        // Simulate login success
+        callbackCaptor.firstValue.onSuccess(null)
+
+        verify(mockRtmClient).subscribe(eq("test"), any(), any())
+    }
+
+    @Test
+    fun `publishes message to correct channel`() {
+        manager.sendMessage("Hello", channel = "room-1")
+
+        verify(mockRtmClient).publish(
+            eq("room-1"),
+            eq("Hello"),
+            any(),
+            any()
+        )
+    }
+}
+```
+
+Simulate `RtmEventListener` callbacks by calling them directly on the listener reference your manager holds:
+
+```kotlin
+@Test
+fun `updates UI when message event fires`() {
+    // Get the listener your manager registered
+    val listener = manager.getEventListener() // expose for testing
+
+    listener.onMessageEvent(MessageEvent().apply {
+        publisherId = "user-2"
+        // set message data
+    })
+
+    // Assert UI state updated
+}
+```
+
+Add to `build.gradle`:
+```groovy
+testImplementation 'org.mockito:mockito-kotlin:5.+'
+testImplementation 'org.mockito:mockito-core:5.+'
+```
+
 ### ConvoAI REST API
 
 Mock at the HTTP client layer. ConvoAI integration generates REST calls — mock the
@@ -222,6 +578,82 @@ test('createAgent sends correct request', async () => {
 
 If using `axios` instead of `fetch`, use `axios-mock-adapter` or mock `axios.post`
 with `jest.spyOn(axios, 'post')`.
+
+## Token Renewal
+
+Token renewal is a required production behavior on every platform. The event fires ~30 seconds before expiry.
+
+### Web (`token-privilege-will-expire`)
+
+```javascript
+test('renews token before expiry', async () => {
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ token: 'new-token-xyz' }),
+  })
+
+  // Trigger the expiry event
+  const handler = client.on.mock.calls.find(([e]) => e === 'token-privilege-will-expire')[1]
+  await handler()
+
+  expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/token'))
+  expect(client.renewToken).toHaveBeenCalledWith('new-token-xyz')
+})
+```
+
+### iOS (`onTokenPrivilegeWillExpire`)
+
+```swift
+func testRenewsTokenBeforeExpiry() {
+    let expectation = XCTestExpectation(description: "renewToken called")
+    mockEngine.renewTokenHandler = { token in
+        XCTAssertFalse(token.isEmpty)
+        expectation.fulfill()
+    }
+
+    // Call the delegate method directly
+    manager.rtcEngine(mockEngine, tokenPrivilegeWillExpire: "expiring-token")
+
+    wait(for: [expectation], timeout: 1.0)
+}
+```
+
+### Android (`onTokenPrivilegeWillExpire`)
+
+```kotlin
+@Test
+fun `renews token when privilege will expire`() {
+    val renewCaptor = argumentCaptor<String>()
+
+    // Trigger expiry via the event handler
+    val handler = manager.getRtcEventHandler()
+    handler.onTokenPrivilegeWillExpire("expiring-token")
+
+    verify(mockEngine, timeout(500)).renewToken(renewCaptor.capture())
+    assertThat(renewCaptor.firstValue).isNotEmpty()
+}
+```
+
+### RTM (`token-privilege-will-expire` / `onTokenPrivilegeWillExpire`)
+
+RTM tokens expire independently from RTC tokens. Both need renewal handlers:
+
+```javascript
+// Web RTM — status event carries token expiry
+test('handles RTM token expiry', async () => {
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ rtmToken: 'new-rtm-token' }),
+  })
+
+  const statusHandler = rtmClient.addEventListener.mock.calls
+    .find(([e]) => e === 'status')[1]
+
+  await statusHandler({ state: 'TOKEN_EXPIRED', reason: 'token expired' })
+
+  expect(rtmClient.login).toHaveBeenCalledWith({ token: 'new-rtm-token' })
+})
+```
 
 ## Completeness Gate
 
