@@ -1,6 +1,6 @@
-# Agora Server-Side
+# Agora Server-Side: Token Generation
 
-Server-side utilities for Agora — primarily token generation for secure authentication.
+Server-side token generation for Agora authentication.
 
 ## When Tokens Are Needed
 
@@ -14,58 +14,6 @@ Server-side utilities for Agora — primarily token generation for secure authen
 - **RTC Token**: Grants access to join a specific RTC channel with a specific UID. Required for Video/Voice SDK.
 - **RTM Token**: Grants access to RTM services for a specific user ID.
 - **AccessToken2**: Current token format. Supports privilege expiration per service and can bundle RTC + RTM privileges in a single token.
-
-## ConvoAI Agent Server SDKs
-
-The TypeScript, Go, and Python SDKs are convenience wrappers around the ConvoAI REST API.
-For any other backend language, call the REST API directly — fetch the live OpenAPI spec
-for the full schema: `https://docs-md.agora.io/api/conversational-ai-api-v2.x.yaml`
-
-Use these SDKs when building with TypeScript, Go, or Python to avoid writing REST boilerplate:
-
-### TypeScript — `agora-agent-server-sdk`
-
-```bash
-npm install agora-agent-server-sdk
-```
-
-Builder pattern — configure the AI pipeline then create sessions:
-
-```typescript
-import { AgoraClient, Agent, Area } from 'agora-agent-server-sdk';
-
-const client = new AgoraClient({
-  area: Area.US,
-  appId: process.env.AGORA_APP_ID,
-  appCertificate: process.env.AGORA_APP_CERTIFICATE,
-});
-
-const agent = new Agent({
-  name: `agent_${crypto.randomUUID().slice(0, 8)}`, // must be unique per project
-  instructions: 'You are a helpful voice assistant.',
-  greeting: 'Hello! How can I help you today?',
-})
-  .withStt(new DeepgramSTT({ apiKey: process.env.DEEPGRAM_API_KEY }))
-  .withLlm(new OpenAI({ apiKey: process.env.OPENAI_API_KEY }))
-  .withTts(new ElevenLabsTTS({ apiKey: process.env.ELEVENLABS_API_KEY }));
-
-// Start a session (joins the agent to a channel)
-const session = agent.createSession({ channel: 'my-channel', agentUid: 0 });
-const sessionId = await session.start();
-
-// Stop from the same process
-await session.stop();
-
-// Stop from a stateless server (e.g. a different request handler)
-await client.stopAgent(sessionId);
-```
-
-Token auth is handled automatically when `appCertificate` is provided. For vendor-specific STT/LLM/TTS import paths and MLLM (OpenAI Realtime, Gemini Live) config, see the [SDK README](https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-ts).
-
-### Go / Python
-
-- [agent-server-sdk-go](https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-go)
-- [agent-server-sdk-python](https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-python)
 
 ## Reference Files
 

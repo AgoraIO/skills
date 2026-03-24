@@ -134,6 +134,44 @@ const { metrics, agentUserId } = useAgentMetrics();
 
 Only fires when agent start config includes `parameters.enable_metrics: true`.
 
+## `useConversationalAI` — Batteries-Included Alternative
+
+For simple single-page apps or demos where all ConvoAI state is consumed in one component, `useConversationalAI` is a drop-in alternative to the full Provider + hooks pattern. If multiple components need transcript, agent state, or errors independently, use `ConversationalAIProvider` + standalone hooks instead.
+
+```tsx
+import { useConversationalAI } from 'agora-agent-client-toolkit-react';
+import { useMemo } from 'react';
+
+function VoiceSession() {
+  const config = useMemo(() => ({
+    channel: 'my-channel',
+    rtmConfig: { rtmEngine: rtmClient },
+  }), []);
+
+  const {
+    transcript,
+    agentState,
+    isConnected,
+    error,
+    interrupt,
+    sendMessage,
+    metrics,
+  } = useConversationalAI(config);
+
+  return (
+    <div>
+      <p>Agent: {agentState ?? 'idle'}</p>
+      <button onClick={() => interrupt(agentUserId)}>Interrupt</button>
+      <ul>{transcript.map((t) => <li key={t.turn_id}>{t.text}</li>)}</ul>
+    </div>
+  );
+}
+```
+
+**Config stability rule** — same as `ConversationalAIProvider`: wrap config in `useMemo`. The hook re-initializes if the config object identity changes.
+
+The hook internally calls `AgoraVoiceAI.init()`, `subscribeMessage()`, and `destroy()` automatically. No manual lifecycle management needed.
+
 ## Critical Rules
 
 1. **Wrap `config` in `useMemo`** — `ConversationalAIProvider` depends on `config.channel`. An inline object creates a new reference every render, causing unnecessary re-init cycles.

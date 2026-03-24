@@ -16,18 +16,12 @@ Agora handles codec negotiation automatically for most scenarios. What to know:
 
 | Codec | Notes |
 |-------|-------|
-| H.264 | Default on iOS and Android. Web supports it but may require software decode on low-end devices. |
-| VP8 | Web default. iOS/Android require transcoding — adds ~50–100ms latency. |
+| VP8 | Web default. Scales well in multi-user calls. Supported on Safari 13+. Recommended. |
+| VP9 | Better compression than VP8. Scales well on desktop. **iOS Safari: hardware-only** — requires iPhone 15 Pro / M3 Mac or newer; software fallback degrades battery significantly on older devices. |
+| H.264 | Default on iOS and Android native SDKs. Does not scale well beyond small groups — avoid for multi-user Web calls. |
 | H.265 (HEVC) | Not universally supported on Web; avoid for cross-platform channels. |
 
-**Recommendation**: Enable H.264 explicitly on Web clients when iOS/Android users are present. Transcoding introduces latency and is billed separately.
-
-```javascript
-// Web: force H.264 to match mobile clients
-AgoraRTC.setParameter('CODEC', 'h264');
-// or via client config:
-const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'h264' });
-```
+**Recommendation**: `'vp8'` is the safest default for multi-user Web calls — scales well and works on all modern Safari (13+). Use `'vp9'` only if you can ensure participants are on modern hardware. Avoid `'h264'` for multi-user Web scenarios. If codecs differ between Web and native clients, Agora's server transcodes transparently, which adds latency and is billed separately.
 
 ## Screen Sharing (Cross-Platform)
 

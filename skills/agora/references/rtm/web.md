@@ -1,4 +1,4 @@
-# Agora RTM (Real-Time Messaging / Signaling)
+# Agora Signaling SDK — Web (RTM)
 
 ## Table of Contents
 
@@ -36,13 +36,17 @@ npm install agora-rtm
 ```typescript
 import AgoraRTM from "agora-rtm"
 
-const rtmClient = new AgoraRTM.RTM("your-app-id", "user-id-string", {
-  logLevel: "debug", // "debug" | "info" | "warn" | "error"
-})
+let rtmClient: AgoraRTM.RTM;
+try {
+  rtmClient = new AgoraRTM.RTM("your-app-id", "user-id-string", {
+    logLevel: "debug", // "debug" | "info" | "warn" | "error"
+  });
+} catch (status) {
+  console.error("RTM init failed", status);
+}
 
-// Login (uses App ID for authentication, or token for production)
-await rtmClient.login()
-// With token: await rtmClient.login({ token: "your-rtm-token" })
+// Always login with a server-generated RTM token
+await rtmClient.login({ token: 'YOUR_RTM_TOKEN' })
 ```
 
 ### Channel Subscription
@@ -153,45 +157,6 @@ async function cleanupRTM() {
 }
 ```
 
-## RTM v1 (Legacy Web)
-
-Used in the multigrid project. Still functional but v2 is recommended for new projects.
-
-```typescript
-import AgoraRTM from "agora-rtm-sdk"
-
-// Initialize
-const rtmClient = AgoraRTM.createInstance("your-app-id", {
-  logFilter: AgoraRTM.LOG_FILTER_OFF,
-})
-
-// Login
-await rtmClient.login({ token: null, uid: "user-id" })
-
-// Create and join channel
-const rtmChannel = rtmClient.createChannel("channel-name")
-await rtmChannel.join()
-
-// Listen for channel messages
-rtmChannel.on("ChannelMessage", ({ text }, senderId) => {
-  console.log(`${senderId}: ${text}`)
-})
-
-// Listen for peer messages
-rtmClient.on("MessageFromPeer", ({ text }, senderId) => {
-  console.log(`Peer ${senderId}: ${text}`)
-})
-
-// Send channel message
-await rtmChannel.sendMessage({ text: "Hello" })
-
-// Send peer message
-await rtmClient.sendMessageToPeer({ text: "Hello" }, "target-user-id")
-
-// Cleanup
-await rtmChannel.leave()
-await rtmClient.logout()
-```
 
 ## Common Use Cases with RTC
 
@@ -344,9 +309,13 @@ rtmClient.addEventListener("storage", (event) => {
 - `presenceTimeout` can be configured during RTM initialization:
 
 ```typescript
-const rtmClient = new AgoraRTM.RTM(appId, userId, {
-  presenceTimeout: 30, // seconds (5-1800), default 5
-})
+try {
+  const rtmClient = new AgoraRTM.RTM(appId, userId, {
+    presenceTimeout: 30, // seconds (5-1800), default 5
+  });
+} catch (status) {
+  console.error("RTM init failed", status);
+}
 ```
 
 ## Connection Management

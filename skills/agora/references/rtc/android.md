@@ -35,6 +35,8 @@ Add permissions to `AndroidManifest.xml`:
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.BLUETOOTH" />
+<!-- Android 12+ (API 31+): required for Bluetooth audio headsets -->
+<uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 ```
 
 Request runtime permissions for `CAMERA` and `RECORD_AUDIO` before initializing.
@@ -112,11 +114,9 @@ agoraEngine.setupRemoteVideo(
 // Enable audio (enabled by default)
 agoraEngine.enableAudio()
 
-// Audio profile
-agoraEngine.setAudioProfile(
-    Constants.AUDIO_PROFILE_DEFAULT,
-    Constants.AUDIO_SCENARIO_DEFAULT
-)
+// Audio profile (SDK 4.x: set profile and scenario separately)
+agoraEngine.setAudioProfile(Constants.AUDIO_PROFILE_DEFAULT)
+agoraEngine.setAudioScenario(Constants.AUDIO_SCENARIO_DEFAULT)
 
 // Mute/unmute local audio
 agoraEngine.muteLocalAudioStream(true)   // mute
@@ -183,7 +183,7 @@ private val rtcEventHandler = object : IRtcEngineEventHandler() {
 
     // Network quality
     override fun onNetworkQuality(uid: Int, txQuality: Int, rxQuality: Int) {
-        // 0=unknown, 1=excellent, 2=good, 3=poor, 4=bad, 5=very bad
+        // 0=unknown, 1=excellent, 2=good, 3=poor, 4=bad, 5=very bad, 6=disconnected
     }
 }
 ```

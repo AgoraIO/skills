@@ -66,13 +66,14 @@ This repo contains markdown skill files that give AI coding assistants deep know
 
 **Products covered:**
 
-- **RTC (Video/Voice SDK)** — Web, React, Next.js, iOS (Swift), Android (Kotlin/Java)
-- **RTM (Signaling)** — Web (JS/TS) messaging, presence, metadata, stream channels
-- **Conversational AI** — REST API, agent config, Gemini Live + OpenAI Realtime MLLM, 6 recipe repos (agent-samples, agent-toolkit, agent-client-toolkit-react, agent-ui-kit, server-custom-llm, server-mcp)
+- **RTC (Video/Voice SDK)** — Web, React, Next.js, iOS (Swift), Android (Kotlin/Java), React Native, Flutter
+- **RTM (Signaling)** — Web (JS/TS), iOS (Swift), Android (Kotlin) — all v2; messaging, presence, metadata, stream channels
+- **Conversational AI** — REST API, agent config, Gemini Live + OpenAI Realtime MLLM, iOS/Android toolkits, 6 recipe repos (agent-samples, agent-toolkit, agent-client-toolkit-react, agent-ui-kit, server-custom-llm, server-mcp)
 - **Cloud Recording** — REST API acquire/start/query/stop lifecycle
 - **Server Gateway** — Linux SDK (C++) for server-side RTC
 - **Server-Side** — Token generation for Node.js, Python, Go
-- **Testing Guidance** — ConvoAI and RTC testing patterns
+- **Multi-Product Integration** — RTC + RTM + ConvoAI initialization order, UID strategy, codec selection, token matrix
+- **Testing Guidance** — Mocking patterns for all platforms (Web, React, iOS, Android, React Native, Flutter, RTM)
 
 ## Design — 4-Layer Progressive Disclosure
 
@@ -104,30 +105,42 @@ ConvoAI files are aligned 1:1 with repos in [AgoraIO-Conversational-AI](https://
 ```
 skills/
 └── agora/                          Skill root
-    ├── SKILL.md                    Entry point, product index
+    ├── SKILL.md                    Entry point, product index (v1.2.0)
     ├── intake/
     │   └── SKILL.md                Multi-product needs analysis router
     └── references/
         ├── doc-fetching.md         Two-tier lookup procedure (agent-facing)
         ├── mcp-tools.md            MCP tool reference and graceful degradation
+        ├── integration-patterns.md RTC+RTM+ConvoAI: init order, UID strategy, codec, tokens
         ├── rtc/                    RTC (Video/Voice SDK)
         │   ├── README.md           Critical rules, encoder profiles, cross-platform notes
         │   ├── web.md              agora-rtc-sdk-ng: client, tracks, events, screen share
-        │   ├── react.md            agora-rtc-react: hooks, custom patterns
+        │   ├── react.md            agora-rtc-react: hooks, codec interop, custom patterns
         │   ├── nextjs.md           Next.js / SSR dynamic import patterns
         │   ├── ios.md              AgoraRtcEngineKit (Swift): setup, delegation
-        │   └── android.md          RtcEngine (Kotlin/Java): setup, callbacks
-        ├── rtm/                    RTM (Signaling / Messaging)
-        │   ├── README.md           Key concepts, platform links
-        │   └── web.md              agora-rtm v2: messaging, presence, stream channels
+        │   ├── android.md          RtcEngine (Kotlin/Java): setup, callbacks
+        │   ├── react-native.md     react-native-agora: engine init, events, video views
+        │   ├── flutter.md          agora_rtc_engine (Dart): engine init, AgoraVideoView
+        │   └── cross-platform-coordination.md  UID strategy, codec interop, screen share
+        ├── rtm/                    RTM Signaling SDK v2
+        │   ├── README.md           Key concepts, gotchas, platform links
+        │   ├── web.md              agora-rtm v2: messaging, presence, stream channels
+        │   ├── ios.md              AgoraRtmClientKit (Swift): init, login, subscribe, publish
+        │   └── android.md          RtmClient (Kotlin): init, login, subscribe, publish
         ├── conversational-ai/      Conversational AI (Voice AI Agents)
         │   ├── README.md           Architecture, endpoints, auth, lifecycle, gotchas
         │   ├── agent-samples.md    Backend, React clients, profiles, MLLM, deployment
         │   ├── agent-toolkit.md    @agora/conversational-ai SDK: API, helpers, hooks
         │   ├── agent-client-toolkit-react.md   React hooks: provider, transcript, state
         │   ├── agent-ui-kit.md     @agora/agent-ui-kit React components
+        │   ├── agent-toolkit-ios.md    iOS ConversationalAIAPIImpl Swift toolkit
+        │   ├── agent-toolkit-android.md  Android ConversationalAIAPIImpl Kotlin toolkit
         │   ├── server-custom-llm.md  Custom LLM proxy: RAG, tools, memory
-        │   └── server-mcp.md       MCP memory server: persistent per-user memory
+        │   ├── server-mcp.md       MCP memory server: persistent per-user memory
+        │   ├── auth-flow.md        Three-token flow for direct REST API implementors
+        │   ├── python-sdk.md       agora-agent Python SDK patterns
+        │   ├── go-sdk.md           agora-agent-server-sdk-go patterns
+        │   └── server-sdks.md      TypeScript/Node.js server SDK patterns
         ├── cloud-recording/        Cloud Recording (REST API)
         │   └── README.md           acquire/start/query/stop lifecycle, storage config
         ├── server-gateway/         Server Gateway (Linux SDK)
@@ -137,7 +150,7 @@ skills/
         │   ├── README.md           Token types, when tokens are needed
         │   └── tokens.md           Token generation TOC + links to official docs
         └── testing-guidance/       Testing Patterns
-            └── SKILL.md            ConvoAI and RTC test setup, mocking patterns
+            └── SKILL.md            Mocking patterns: Web, React, iOS, Android, RN, Flutter, RTM
 ```
 
 ## Maintaining and Extending
