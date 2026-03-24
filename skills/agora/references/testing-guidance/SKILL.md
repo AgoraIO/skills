@@ -334,7 +334,7 @@ test('displays message when RTM message event fires', async () => {
     customType: 'chat.message',
   }
   act(() => {
-    listeners['message'](messageEvent)
+    listeners.message(messageEvent)
   })
 
   expect(screen.getByText('Hello!')).toBeInTheDocument()
