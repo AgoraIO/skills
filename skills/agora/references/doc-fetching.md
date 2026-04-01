@@ -11,6 +11,8 @@ rules. If the answer is here, stop — no fetch needed.
 When bundled references don't cover the detail needed (full request/response schemas,
 vendor-specific configs, language-specific quick-start code):
 
+If the Agora Docs MCP tool is available in the current tool/runtime, prefer it for Level 2 lookup. Otherwise use the HTTP fetch flow below. If MCP returns no useful result, fall back to HTTP fetch.
+
 1. Fetch the Agora docs sitemap:
    ```
    GET https://docs.agora.io/en/llms.txt

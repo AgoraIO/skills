@@ -29,11 +29,11 @@ RTM has two channel types with different semantics:
 - **Presence**: Track online users and their metadata per channel. Subscribe to `presence` events to detect joins, leaves, and state changes in real time.
 - **Storage**: Channel and user metadata — key-value store with versioning and compare-and-set (CAS) for conflict resolution.
 - **Lock**: Distributed locking for coordinating shared resources across users.
-- **RTM UIDs are strings** — not numeric like RTC. When using RTC and RTM together, use `String(rtcUid)` as the RTM user ID to keep both systems in sync.
+- **RTM UIDs are strings** — not numeric like RTC. When using RTC and RTM together, `String(rtcUid)` is the simplest default mapping, but it is a convention, not a protocol requirement.
 
 ## Gotchas & Critical Rules
 
-- **UID type mismatch causes silent failures** — RTC UIDs are numbers; RTM UIDs are strings. Always use `String(rtcUid)` as the RTM user ID. Type mismatches don't throw errors — they silently break user lookups across both systems.
+- **UID type mismatch causes silent failures** — RTC UIDs are numbers; RTM UIDs are strings. If your app maps the same person across both systems, convert explicitly and consistently. `String(rtcUid)` is the default convention. Type mismatches don't throw errors — they silently break user lookups across both systems.
 - **Namespace isolation** — RTC channels and RTM channels are completely separate. Joining RTC channel `"meeting-1"` does NOT auto-subscribe you to RTM channel `"meeting-1"`. Subscribe both explicitly.
 - **Login before all operations** — `rtmClient.login()` must complete (connection reaches `CONNECTED`) before any subscribe, publish, or presence call. Operations called while still connecting are not guaranteed to succeed.
 - **Subscribe before presence** — Presence events (joins/leaves) require an active channel subscription. Publishing to a channel without subscribing means you won't receive presence notifications or responses.
@@ -42,7 +42,7 @@ RTM has two channel types with different semantics:
 
 ## RTC + RTM Coordination Pattern
 
-When pairing RTC and RTM in the same app:
+When pairing RTC and RTM in the same app, the default recommendation is:
 
 1. Join RTC channel with numeric UID (or `0` for auto-assignment)
 2. After RTC join resolves, log in to RTM with `String(rtcUid)`
@@ -60,6 +60,8 @@ await rtmClient.subscribe(channelName);
 ```
 
 RTM channel name does not need to match the RTC channel name, but using the same name is the conventional approach.
+
+If your app already has a stable user identity independent of the RTC UID, you can log in to RTM earlier and keep a separate RTC↔RTM mapping. That pattern is useful when you want signaling or presence before media starts, but it adds coordination complexity.
 
 ## Platform Scope
 

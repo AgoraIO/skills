@@ -2,6 +2,17 @@
 
 REST API-driven voice AI agents. Create agents that join RTC channels and converse with users via speech. Front-end clients connect via RTC+RTM.
 
+## Start Here: New Projects
+
+**Building a new Conversational AI agent? Clone a quickstart repo — do not build from scratch.**
+
+| Path | Repo | Use when |
+|---|---|---|
+| **Full-stack Next.js** (default) | [agent-quickstart-nextjs](https://github.com/AgoraIO-Conversational-AI/agent-quickstart-nextjs) | Single repo: Next.js API routes + React UI |
+| **Python backend + React frontend** | [conversational-ai-quickstart](https://github.com/AgoraIO-Community/conversational-ai-quickstart) *(private)* | Separate Python server + standalone React client |
+
+See **[quickstarts.md](quickstarts.md)** for clone steps, env vars, and setup instructions.
+
 ## SDK vs. Direct REST API
 
 **Default to the SDK for the user's backend language.** The TypeScript, Go, and Python SDKs wrap the REST API and handle auth, token generation, and session lifecycle automatically.
@@ -14,7 +25,6 @@ REST API-driven voice AI agents. Create agents that join RTC channels and conver
 | Java, Ruby, PHP, C#, other | Call the REST API directly — see [auth-flow.md](auth-flow.md) |
 
 Direct REST API use is fully supported for languages without an SDK. The [auth-flow.md](auth-flow.md) file covers the end-to-end auth and token flow for REST API implementors. If the user has an SDK available, start with that instead — the SDK eliminates the need to manually build tokens for the ConvoAI server.
-
 The live OpenAPI spec is the authoritative source for request/response schemas:
 
 ```
@@ -87,7 +97,7 @@ const response = await fetch(
 );
 ```
 
-> **Note:** Token-based auth for ConvoAI REST API calls is not yet in official docs (pending release). The behavior is stable — `Authorization: agora token=<RTC+RTM token>` is accepted by the ConvoAI endpoint. Verify against official docs once published.
+> **Rule:** Use token auth (`Authorization: agora token=<RTC+RTM token>`) as the default for new direct REST implementations. Basic Auth remains available, but grants broader account-level access.
 
 See [../server/tokens.md](../server/tokens.md) for `buildTokenWithRtm` parameter reference.
 
@@ -122,7 +132,8 @@ Things the official docs don't emphasize that cause frequent mistakes:
 - **`agent_rtc_uid` is a string, not an int** — pass `"0"` (string) for auto-assignment, not `0`. Passing an integer will cause a type error at the API boundary.
 - **`remote_rtc_uids` is an array of strings** — use `["*"]` to subscribe to all users, not `"*"` or `["0"]`. The wildcard must be in array form.
 - **Agent name must be unique per project** — collisions return HTTP 409. Use a short UUID suffix: `agent_{uuid[:8]}`. On 409, generate a new name and retry; do not retry with the same name.
-- **Token auth is not in the official docs — use it for production.** The ConvoAI REST API accepts `Authorization: agora token=<token>` using a combined RTC + RTM token from `RtcTokenBuilder.buildTokenWithRtm`. This is **safer than Basic Auth**: tokens are scoped to a single App ID + channel, while Customer ID/Secret grants access to every project on the account. Default to token auth unless the user explicitly requires officially documented auth methods, in which case use Basic Auth. See [Authentication → Option A](#authentication) for the implementation.
+- **Use token auth as the default for new direct REST integrations.** The ConvoAI REST API accepts `Authorization: agora token=<token>` using a combined RTC + RTM token from `RtcTokenBuilder.buildTokenWithRtm`. This is **safer than Basic Auth**: tokens are scoped to a single App ID + channel, while Customer ID/Secret grants access to every project on the account. Use Basic Auth only when a user explicitly needs that mode.
+- **POST `/join` success does not mean the agent is already in the RTC channel** — the request was accepted and the agent is starting. The client should wait for the RTC `user-joined` event before expecting agent audio or querying media state.
 - **`/update` overwrites `params` entirely** — sending `{ "llm": { "params": { "max_tokens": 2048 } } }` erases `model` and everything else in `params`. Always send the full object.
 - **`/speak` priority enum** — `"INTERRUPT"` (immediate, default), `"APPEND"` (queued after current speech), `"IGNORE"` (skip if agent is busy). `interruptable: false` prevents users from cutting in.
 - **20 PCU default limit** — max 20 concurrent agents per App ID. Exceeding returns error on `/join`. Contact Agora support to increase.
@@ -153,6 +164,7 @@ Use the file that matches what the user is building:
 
 | User's question / task | Read this file |
 |---|---|
+| Starting a new project — which repo to clone, setup, env vars | [quickstarts.md](quickstarts.md) |
 | Node.js/Python/Go backend — starting agent, auth, session lifecycle | [server-sdks.md](server-sdks.md) |
 | Python SDK specifics (async, deprecations, debug) | [python-sdk.md](python-sdk.md) |
 | Go SDK specifics (context, builder, status constants) | [go-sdk.md](go-sdk.md) |
