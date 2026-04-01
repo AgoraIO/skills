@@ -5,15 +5,23 @@ This repository contains AI agent skills for building with [Agora](https://www.a
 ## Repository Structure
 
 ```
+scripts/
+└── validate-skills.sh              # Static validation
 skills/
-├── scripts/validate-skills.sh
-└── skills/
-    └── agora/                       # Skill root
-        ├── SKILL.md                 # Entry point, product index
-        ├── intake/SKILL.md          # Intake router for vague requests
-        └── references/
-            ├── mcp-tools.md         # MCP tool reference + freeze-forever table
-            ├── rtc/  rtm/  conversational-ai/  server/  cloud-recording/
+└── agora/                          # Skill root
+    ├── SKILL.md                    # Entry point, product index
+    ├── intake/SKILL.md             # Intake router for vague requests
+    └── references/
+        ├── doc-fetching.md         # Two-tier lookup procedure
+        ├── mcp-tools.md            # MCP tool reference + graceful degradation
+        ├── integration-patterns.md # RTC + RTM + ConvoAI coordination
+        ├── rtc/                    # RTC: Web, React, Next.js, iOS, Android, RN, Flutter
+        ├── rtm/                    # RTM v2: Web, iOS, Android
+        ├── conversational-ai/      # ConvoAI: REST, SDKs, toolkits, auth flow
+        ├── server/                 # Token generation
+        ├── cloud-recording/        # Cloud Recording REST API
+        ├── server-gateway/         # Linux Server Gateway
+        └── testing-guidance/       # Mocking patterns and test guidance
 ```
 
 ## 4-Layer Progressive Disclosure
@@ -27,7 +35,7 @@ skills/
 
 ## Freeze-Forever Rule
 
-Ask: **will this still be correct in 6 months without any updates?** If yes, put it inline. If no, route to MCP or an external link. See [`skills/agora/references/mcp-tools.md`](skills/agora/references/mcp-tools.md) for the full decision table.
+Ask: **will this still be correct in 6 months without any updates?** If yes, put it inline. If no, route to Level 2 docs lookup or an external link. MCP is preferred only when installed and supported in the current tool/runtime.
 
 ## Naming Conventions
 
@@ -48,3 +56,11 @@ Ask: **will this still be correct in 6 months without any updates?** If yes, put
 ```bash
 bash scripts/validate-skills.sh
 ```
+
+Validation covers:
+
+- frontmatter checks for all frontmatter-bearing markdown files under `skills/agora/`
+- duplicate skill names
+- broken relative links
+- absolute local path leakage (`/Users/...`)
+- blocklisted internal terms

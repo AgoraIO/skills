@@ -17,18 +17,19 @@ if not skills_root.exists():
 
 skill_files = sorted(skills_root.rglob("SKILL.md"))
 md_files = sorted(skills_root.rglob("*.md"))
+frontmatter_files = []
 
 errors = []
 skill_names = []
 
 # ── Hugo's original checks (ported verbatim) ───────────────────────────────
 
-for path in skill_files:
+for path in md_files:
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
     if len(lines) < 3 or lines[0].strip() != "---":
-        errors.append(f"{path}: missing YAML frontmatter")
         continue
+    frontmatter_files.append(path)
     end = None
     for i in range(1, len(lines)):
         if lines[i].strip() == "---":
@@ -54,6 +55,23 @@ for path in skill_files:
         errors.append(f"{path}: frontmatter missing 'metadata.author'")
     if not version_match:
         errors.append(f"{path}: frontmatter missing 'metadata.version'")
+
+    # Enforce frontmatter description length for any file that declares frontmatter.
+    if desc_match:
+        desc_start = desc_match.end()
+        first_line = desc_match.group(0).split(":", 1)[1].strip()
+        if first_line in {"|", ">-", ">"}:
+            desc_lines = []
+            for line in fm[desc_start:].splitlines():
+                if re.match(r"^[ \t]+", line):
+                    desc_lines.append(line.lstrip(" \t"))
+                else:
+                    break
+            description = "\n".join(desc_lines)
+        else:
+            description = first_line.strip().strip('"').strip("'")
+        if len(description) > 1024:
+            errors.append(f"{path}: frontmatter 'description' exceeds 1024 characters ({len(description)})")
 
 name_to_paths = {}
 for name, path in skill_names:
@@ -139,5 +157,8 @@ if errors:
         print(f"- {err}")
     sys.exit(1)
 
-print(f"Validation passed: {len(skill_files)} skills, {len(md_files)} markdown files checked.")
+print(
+    f"Validation passed: {len(skill_files)} skills, "
+    f"{len(frontmatter_files)} frontmatter files, {len(md_files)} markdown files checked."
+)
 PY
