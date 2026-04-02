@@ -1,6 +1,6 @@
 ---
 name: agora
-description: Write code using Agora SDKs (agora.io) for real-time communication. Covers RTC (video/voice calling, live streaming, screen sharing), RTM (signaling, messaging, presence), Conversational AI (voice AI agents), Cloud Recording, Server Gateway, and server-side token generation. Use when the user wants to build real-time audio/video applications, integrate Agora SDKs (Web JS/TS, React, iOS Swift, Android Kotlin/Java, Go, Python), manage channels, tracks, tokens, use RTM for messaging/signaling, record RTC sessions, or build Conversational AI with the agent-toolkit. Triggers on mentions of Agora, agora.io, RTC, RTM, video calling, voice calling, real-time communication, screen share, screen sharing, record session, record calls, Cloud Recording, Server Gateway, Linux media SDK, agora-rtc-sdk-ng, agora-rtc-react, agora-rtm, conversational AI with Agora, Agora token generation, Agora authentication, agora-agent-client-toolkit, agora-agent-client-toolkit-react, agora-agent-server-sdk, AgoraVoiceAI, AgoraClient, useConversationalAI, useTranscript, useAgentState, agent transcript, agent state hook.
+description: Write code using Agora SDKs (agora.io) for real-time communication. Covers RTC (video/voice, live streaming, screen sharing), RTM/signaling, Conversational AI voice agents, Cloud Recording, Server Gateway, and token generation. Use for Agora, RTC, RTM, video calling, voice calling, screen sharing, recording, tokens, signaling, or ConvoAI requests across Web, React, Next.js, iOS, Android, Go, and Python. Triggers include agora-rtc-sdk-ng, agora-rtc-react, agora-rtm, agora-agent-server-sdk, AgoraVoiceAI, AgoraClient, useConversationalAI, useTranscript, useAgentState, Cloud Recording, Server Gateway, and Agora authentication.
 metadata:
   author: agora
   version: '1.2.0'
@@ -40,7 +40,7 @@ Text messaging, signaling, presence, and metadata. Independent from RTC — chan
 
 REST API-driven voice AI agents. Create agents that join RTC channels and converse with users via speech. Front-end clients connect via RTC+RTM.
 
-**[references/conversational-ai/README.md](references/conversational-ai/README.md)** — REST API, agent config, 6 recipe repos (agent-samples, agent-toolkit, agent-client-toolkit-react, agent-ui-kit, server-custom-llm, server-mcp)
+**[references/conversational-ai/README.md](references/conversational-ai/README.md)** — Start here for new projects (quickstart repos to clone), REST API, agent config, recipe repos (agent-samples, agent-toolkit, agent-client-toolkit-react, agent-ui-kit, server-custom-llm, server-mcp)
 
 ### Cloud Recording
 

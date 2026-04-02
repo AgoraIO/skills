@@ -16,14 +16,32 @@ This file covers how RTC, RTM, and Conversational AI work together. For SDK-spec
 
 ### Initialization Order
 
-Always initialize both SDKs independently — they share no initialization path. The recommended order:
+Always initialize both SDKs independently — they share no initialization path.
+
+RTC UID and RTM user ID do **not** need to match. Using a shared identity is a coordination convention, not a platform requirement. The right initialization order depends on which identity strategy your app uses.
+
+#### Default pattern — auto-assigned RTC UID
+
+Use this when the RTC client joins with `uid: 0` / `null` and the SDK assigns the final RTC UID:
 
 1. Create and initialize the RTC engine/client
-2. Create and log in to the RTM client
+2. Join the RTC channel
+3. Read the assigned RTC UID from the join callback / resolved promise
+4. Create or log in to the RTM client with `String(rtcUid)`
+5. Subscribe to the RTM channel
+
+This is the safest default because it avoids guessing the RTM identity before the RTC UID is known.
+
+#### Advanced pattern — app-level stable identity
+
+Use this when your app already has a stable user identity independent of the RTC UID:
+
+1. Create and initialize the RTC engine/client
+2. Create and log in to the RTM client with your app-level user identity
 3. Subscribe to the RTM channel
 4. Join the RTC channel
 
-Subscribe to RTM **before** joining RTC so that presence events for peers already in the channel are not missed.
+This pattern is useful when you want signaling, presence, or pre-call state to arrive before media starts. It requires an explicit RTC↔RTM mapping in your app or backend.
 
 ### UID Strategy
 
@@ -36,7 +54,11 @@ RTC and RTM use different UID types:
 | RTC | Android | `Int` (signed 32-bit) |
 | RTM | All platforms | `String` |
 
-Use `String(rtcUid)` as the RTM `userId`. This is the standard convention across platform demos and toolkits. UIDs greater than 2,147,483,647 wrap to negative on Android RTC — avoid them if Android clients are present.
+Recommended default: use `String(rtcUid)` as the RTM `userId` when your RTC UID is auto-assigned and you want a simple 1:1 mapping between the two systems.
+
+Alternative: use a stable app-level string identity for RTM and maintain an explicit mapping from RTC UID → RTM user ID in your app/backend.
+
+UIDs greater than 2,147,483,647 wrap to negative on Android RTC — avoid them if Android clients are present.
 
 ### Channel Name Convention
 
@@ -81,6 +103,15 @@ App Server ── REST POST /join ──────► Agora ConvoAI API
 3. Subscribe to the RTM channel (to receive agent events)
 4. Call ConvoAI REST `POST /join` from your **app server** with `channelName`, `uid` (your user's RTC uid), and the RTM flags (see below)
 5. Join the RTC channel — the agent will already be there or will join shortly
+
+If your client uses auto-assigned RTC UIDs, adapt the order slightly:
+
+1. Initialize RTC
+2. Join RTC and wait for the assigned user UID
+3. Log in to RTM with `String(rtcUid)` and subscribe to the RTM channel
+4. Call `POST /join` from your app server
+
+The agent can publish transcripts/state through RTM only after the RTM client is logged in and subscribed.
 
 ### Required ConvoAI Flags for RTM Delivery
 
