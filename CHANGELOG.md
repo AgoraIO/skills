@@ -20,6 +20,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `references/conversational-ai/quickstarts.md`, `references/conversational-ai/python-sdk.md`, `references/conversational-ai/README.md`: now use the official current provider docs as the source of truth for provider matrices and vendor-specific configs, while keeping the local quickstart focused on the first-success default combo and sample-aligned env names
 - `references/conversational-ai/quickstarts.md`, `references/conversational-ai/README.md`: aligned the sequence with the state machine, made the MLLM vs cascading split explicit in the vendor gate, documented baseline-path rollback behavior, and clarified that Path B may require a private repo fallback
 - `references/conversational-ai/quickstarts.md`: softened the opening quickstart wording for user-facing conversations and added an explicit unsupported-provider prompt instead of implicit discouragement
+- `references/conversational-ai/quickstarts.md`, `references/conversational-ai/README.md`: added a Studio Agent ID branch so Agora ConvoAI can reuse agents configured in `https://console.agora.io/studio/agents` instead of rebuilding the provider stack during quickstart
+- `references/conversational-ai/conversational-ai-studio.md`: added a dedicated reference for the Agora Studio Agent ID path and clarified that it is different from the runtime `agent_id` returned by `/join`
+- `references/conversational-ai/conversational-ai-studio.md`, `references/conversational-ai/quickstarts.md`, `references/conversational-ai/README.md`: documented the confirmed mapping that the Agora Studio Agent ID is passed via the request field `pipeline_id`
+- `references/conversational-ai/conversational-ai-studio.md`: expanded the Studio path into a fixed request contract mirroring the preconfigured-agent flow, including field mapping, token separation, and response expectations
 
 ## [1.2.0]
 

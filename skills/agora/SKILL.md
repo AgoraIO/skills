@@ -84,6 +84,7 @@ Examples of clear requests:
 - "I want to build a demo that talks to an agent" → `references/conversational-ai/README.md`
 - "What providers does ConvoAI support?" → `references/conversational-ai/README.md`
 - "I want MLLM with Gemini" → `references/conversational-ai/README.md`
+- "I already have an Agent ID from Agora Studio" → `references/conversational-ai/README.md`
 - "Generate RTC token in Go" → `references/server/tokens.md`
 
 **Vague or multi-product request:** Route through `intake/SKILL.md`.

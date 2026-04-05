@@ -38,8 +38,9 @@ Follow this exact user-visible order:
 3. Project-readiness checkpoint
 4. Vendor-path confirmation
 5. Vendor selection, only if the user asks for the current provider list or chooses a non-default path
-6. Backend-path confirmation, only if a separate backend or existing-repo integration still needs it
-7. Structured quickstart spec
+6. Studio Agent ID confirmation, only if the user wants to reuse an agent configured in Agora Studio
+7. Backend-path confirmation, only if a separate backend or existing-repo integration still needs it
+8. Structured quickstart spec
 
 ## Interaction Rules
 
@@ -53,6 +54,7 @@ Follow this exact user-visible order:
 - Unless the user explicitly asks for a different provider stack or MLLM path, anchor on the Python SDK's documented first-success cascading combo first.
 - If `baseline_path=full-stack-nextjs`, keep the official sample's env var names. Do **not** rename them to generic provider-reference placeholders during quickstart.
 - For non-default provider selection, fetch the official current provider docs before confirming support or generating config details.
+- If the user already has an **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, treat that as a separate quickstart branch. Do not re-ask STT/LLM/TTS provider choices unless the user explicitly wants to replace the Studio-managed config.
 
 ## First-Success Vendor Defaults
 
@@ -116,8 +118,9 @@ The quickstart is a blocking state machine. While a state is unresolved, the onl
 | `intro` | Give a short plain-language intro to what ConvoAI is | Code, repo plans, framework recommendations | Product intro text | Intro delivered |
 | `baseline_path` | Ask which baseline path to use | Code, clone steps, provider discussions | Baseline-path prompt | User picks A/B/C or gives equivalent clear context |
 | `project_readiness` | Ask about App ID, App Certificate, and ConvoAI activation | Code, repo inspection, backend implementation | Readiness prompt | User confirms ready or asks where to find them |
-| `vendor_defaults` | Ask whether to use the default combo, show the current official provider list, or choose a non-default cascading / MLLM path | Code, implementation | Vendor-defaults prompt | User picks A/B/C or directly names a provider path |
+| `vendor_defaults` | Ask whether to use the default combo, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID | Code, implementation | Vendor-defaults prompt | User picks A/B/C/D or directly names a provider path / Studio Agent ID path |
 | `vendor_selection` | Collect only provider-mode and provider choices after checking the official current provider docs | Code, implementation, secret collection | Custom-provider prompt | Provider mode and provider names are resolved |
+| `studio_agent_id` | Collect the Agora Studio Agent ID and confirm the user wants Studio to remain the source of truth for agent config | Code, re-asking provider setup from scratch | Studio-Agent-ID prompt | The Studio Agent ID path is resolved |
 | `backend_path` | Ask for backend path only if still needed | Code, detailed implementation | Backend-path prompt | Backend path is clear or no longer needed |
 | `complete` | Emit structured spec and continue to the mapped reference file | Re-open resolved gates | None | Spec emitted |
 
@@ -136,6 +139,7 @@ Before every tool call or user-visible reply:
 - If a reply only partially resolves the current gate, ask a narrow follow-up for the missing field only.
 - If the user names a provider that is not in the current official provider docs, say this clearly: it is **not currently documented as supported in the official Agora ConvoAI provider docs**, so do not proceed as if it is supported. Offer the documented default combo or a live-doc verification path.
 - If the user asks to see the provider list, fetch the current official provider docs and stay in the vendor gate until they accept the default combo or choose a documented alternative.
+- If the user says they already have an Agora Studio Agent ID, switch to the `studio_agent_id` state and stop re-asking provider-vendor questions unless they explicitly say they want to replace the Studio-managed config.
 - If the user changes the baseline-path assumption later (for example, picks Path A first and later insists on a separate Python backend), return to `baseline_path` and re-confirm instead of silently drifting paths.
 - If the user chooses Path B but does not have access to the private repo, keep the quickstart state intact and continue with the public `agent-samples` fallback only after stating that the private baseline is unavailable.
 
@@ -206,6 +210,7 @@ Other provider paths explicitly shown in the current Python SDK docs:
 A. Use the default combo
 B. Show me the current official provider list first
 C. I want to choose a non-default cascading or MLLM path
+D. I already have an Agora Studio Agent ID and want to reuse that Studio-managed agent
 ```
 
 ### Custom Provider Prompt
@@ -223,6 +228,26 @@ Reply in one line, for example:
 - `TTS: Microsoft`
 - `MLLM: OpenAI Realtime`
 - `STT: Deepgram, LLM: OpenAI, TTS: Microsoft`
+```
+
+### Studio Agent ID Prompt
+
+Use only when the user picks `D` or directly says they already have an Agora Studio Agent ID.
+
+```text
+If you already configured the agent in Agora Studio, we can treat Studio as the source of truth for the agent configuration instead of rebuilding the provider stack here.
+
+Open `https://console.agora.io/studio/agents`, find the agent you want to reuse, and copy its **Agent ID**.
+
+Important:
+- This **Studio Agent ID** is different from the runtime `agent_id` returned by `/join`.
+- The Studio Agent ID identifies the Studio-managed agent configuration and maps to the request field `pipeline_id`.
+- The runtime `agent_id` identifies a live started session.
+
+Reply with one of these:
+A. I have the Studio Agent ID — here it is: `<agent-id>`
+B. I need to look it up in Studio first
+C. Go back — I want to use the default/provider path instead
 ```
 
 ### Unsupported Provider Prompt
@@ -259,12 +284,18 @@ providers:
   llm: [openai | user-specified-supported | unknown]
   tts: [elevenlabs | microsoft | user-specified-supported | unknown]
   mode: [cascading-default | user-specified-cascading | mllm | unknown]
+studio_agent:
+  use_existing_agent_id: [yes | no | unknown]
+  agent_id: [text | missing | unknown]
 config_style: [sample-aligned | custom-path | unknown]
 ```
 
 Notes:
 
 - `stt` is the SDK-facing name in this quickstart spec. Platform docs may call the same stage `ASR`.
+- `studio_agent.agent_id` means the **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, not the runtime `agent_id` returned by `/join`.
+- When this Studio path is used, that Studio Agent ID maps to the request field `pipeline_id`.
+- `AGORA_STUDIO_AGENT_ID` is the preferred config placeholder name for this path; the request field remains `pipeline_id`.
 - `config_style` is derived from the chosen baseline path unless the user explicitly overrides it later:
   `full-stack-nextjs` and `existing-app-integration` usually imply `sample-aligned`;
   fully custom provider configuration usually implies `custom-path`.
@@ -277,6 +308,7 @@ Route according to the completed spec:
 - `separate-backend-frontend` + `python` → use Path B below, then [python-sdk.md](python-sdk.md) for backend details.
 - `separate-backend-frontend` + `typescript-node` → use [agent-samples.md](agent-samples.md) for the decomposed app shape, then [server-sdks.md](server-sdks.md).
 - `separate-backend-frontend` + `go` → use [agent-samples.md](agent-samples.md) for client structure, then [go-sdk.md](go-sdk.md).
+- existing Agora Studio Agent ID → use [conversational-ai-studio.md](conversational-ai-studio.md).
 - provider selection or parameter confirmation → fetch the current official ConvoAI provider docs.
 - `direct-rest` → use [auth-flow.md](auth-flow.md).
 - `existing-app-integration` → keep changes sample-aligned with [agent-samples.md](agent-samples.md) until the first successful end-to-end ConvoAI session.

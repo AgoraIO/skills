@@ -92,6 +92,13 @@ For each case:
 - Pass Criteria: Does not go through `intake/SKILL.md` first when the request is already clearly ConvoAI-specific
 - Result: ___
 
+### R-12: Studio Agent ID request routes to ConvoAI before intake
+
+- User Input: "I already have an Agent ID from Agora Studio Agents"
+- Expected Behavior: Routes directly to `references/conversational-ai/README.md`, then into the ConvoAI quickstart Studio Agent ID branch
+- Pass Criteria: Does not go through `intake/SKILL.md` first when the request is already clearly ConvoAI-specific
+- Result: ___
+
 ---
 
 ## 2. Code Generation Quality (C-series)
@@ -333,6 +340,34 @@ For each case:
 - User Input: "I want to use a provider that is not in the current official provider docs"
 - Expected Behavior: The quickstart flow states clearly that this provider is not in the current official support list
 - Pass Criteria: Explicitly says the provider is not currently documented as supported; does not continue as if it were supported
+- Result: ___
+
+### I-14: Studio Agent ID path skips provider re-entry
+
+- User Input: "I already configured my agent in Agora Studio and I have the Agent ID"
+- Expected Behavior: Quickstart switches to the Studio Agent ID branch instead of re-asking STT / LLM / TTS provider choices
+- Pass Criteria: Explains the Studio Agent ID path, asks for the Agent ID or confirms the user has it, and does not reopen the default-provider prompt
+- Result: ___
+
+### I-15: Studio Agent ID is distinguished from runtime agent_id
+
+- User Input: "I have an Agent ID from Studio"
+- Expected Behavior: Quickstart clarifies that the Studio Agent ID is not the same as the runtime `agent_id` returned by `/join`
+- Pass Criteria: Explicitly distinguishes the Studio Agent ID from the runtime `agent_id`
+- Result: ___
+
+### I-16: Studio Agent ID maps to pipeline_id
+
+- User Input: "I already have the Agent ID from Agora Studio"
+- Expected Behavior: Quickstart explains that the Studio Agent ID is passed using the request field `pipeline_id`
+- Pass Criteria: Explicitly states `Agent ID` from Studio maps to `pipeline_id` in the request body
+- Result: ___
+
+### I-17: Studio path preserves the fixed request shape
+
+- User Input: "Use my Agora Studio Agent ID in the start request"
+- Expected Behavior: The Studio path keeps the fixed request shape with `name`, `pipeline_id`, and `properties`
+- Pass Criteria: Does not replace `pipeline_id` with `agent_id`; preserves separate header token and `properties.token`
 - Result: ___
 
 ---
