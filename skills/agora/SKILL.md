@@ -81,18 +81,34 @@ Examples of clear requests:
 
 - "RTC Web video call" → `references/rtc/web.md`
 - "ConvoAI Python" → `references/conversational-ai/README.md`
+- "I want to build a demo that talks to an agent" → `references/conversational-ai/README.md`
+- "What providers does ConvoAI support?" → `references/conversational-ai/README.md`
+- "I want MLLM with Gemini" → `references/conversational-ai/README.md`
 - "Generate RTC token in Go" → `references/server/tokens.md`
 
 **Vague or multi-product request:** Route through `intake/SKILL.md`.
+Only do this when the product is still genuinely unclear after checking for obvious
+ConvoAI / RTC / RTM / Cloud Recording / Server Gateway / token-server cues.
 Intake handles product identification, combination recommendations, and routing.
 
 ## Documentation Lookup
 
-Check bundled references first (Level 1). If they don't cover the detail needed,
+Check bundled references first (Level 1). Start with the most relevant local module file
+for the user's product and question. If the local reference does not cover the needed detail,
 fetch `https://docs.agora.io/en/llms.txt`, find the relevant URL, and fetch it (Level 2).
 See [references/doc-fetching.md](references/doc-fetching.md) for the full procedure, fallback URLs, and freeze-forever decision table.
 
-**Always fetch Level 2 before answering questions about**: TTS/ASR/LLM vendor configs, model names, full request/response schemas, error code listings, or release notes. These change frequently — do not answer from training data or memory.
+**Local-first rule:** never skip the relevant local module reference just because live docs exist.
+Read the local module first, then fetch Level 2 only if:
+
+- the local file does not cover the needed detail
+- the user asks for the complete latest matrix
+- the question is about exact current request/response schemas
+- the question is about error code listings or release notes
+
+For ConvoAI vendor/provider questions, route to `references/conversational-ai/README.md` first.
+That module decides whether the bundled ConvoAI references are enough or whether the official
+current provider docs must be fetched.
 
 **If MCP is unavailable or Level 2 fetch fails**: use the fallback URLs in `doc-fetching.md` to reach the official markdown docs directly. Never fabricate API parameters — always tell the user to verify against official docs if live fetch is unavailable.
 

@@ -8,7 +8,7 @@ description: |
 license: MIT
 metadata:
   author: agora
-  version: '1.0.0'
+  version: '1.1.0'
 ---
 
 # ConvoAI Server SDK — Python
@@ -70,6 +70,8 @@ async def main():
 
 asyncio.run(main())
 ```
+
+For the first-success default combo, use the quickstart guidance in [quickstarts.md](quickstarts.md). For the current provider matrix and vendor-specific configuration details, use the official live ConvoAI provider docs rather than maintaining a local copy in this SDK usage file.
 
 ## Naming Conventions
 

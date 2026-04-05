@@ -2,16 +2,28 @@
 
 REST API-driven voice AI agents. Create agents that join RTC channels and converse with users via speech. Front-end clients connect via RTC+RTM.
 
-## Start Here: New Projects
+## Routing: Classify the Request
 
-**Building a new Conversational AI agent? Clone a quickstart repo — do not build from scratch.**
+The key question: does the user already have a **working ConvoAI baseline**?
 
-| Path | Repo | Use when |
+- **Working baseline** = an Agora ConvoAI agent has already been started successfully end to end, and the client can join the same RTC channel and interact with it.
+- **Not a working baseline** = only RTC code exists, a sample repo is cloned but not proven, env vars are present, or the user only knows the target backend language.
+
+| Mode | When | Route to |
 |---|---|---|
-| **Full-stack Next.js** (default) | [agent-quickstart-nextjs](https://github.com/AgoraIO-Conversational-AI/agent-quickstart-nextjs) | Single repo: Next.js API routes + React UI |
-| **Python backend + React frontend** | [conversational-ai-quickstart](https://github.com/AgoraIO-Community/conversational-ai-quickstart) *(private)* | Separate Python server + standalone React client |
+| `quickstart` | Starting from scratch, first demo, wants the official baseline | [quickstarts.md](quickstarts.md) |
+| `integration` | Has an app or repo, but the ConvoAI path is not proven end to end yet | [quickstarts.md](quickstarts.md) |
+| `backend-implementation` | Working baseline confirmed, now needs server code or lifecycle/auth changes | [server-sdks.md](server-sdks.md), [python-sdk.md](python-sdk.md), [go-sdk.md](go-sdk.md), or [auth-flow.md](auth-flow.md) |
+| `client-customization` | Working baseline confirmed, now needs transcripts, hooks, UI, or mobile client work | [agent-toolkit.md](agent-toolkit.md), [agent-client-toolkit-react.md](agent-client-toolkit-react.md), [agent-ui-kit.md](agent-ui-kit.md), [agent-toolkit-ios.md](agent-toolkit-ios.md), [agent-toolkit-android.md](agent-toolkit-android.md) |
+| `advanced-feature` / `debugging` / `ops-hardening` | Working baseline confirmed, wants custom LLM, memory, webhooks, production hardening, or error diagnosis | Start in this file, then route to the relevant reference below |
 
-See **[quickstarts.md](quickstarts.md)** for clone steps, env vars, and setup instructions.
+### Routing Rules
+
+- If the user does **not** have a working baseline yet, read only this file and [quickstarts.md](quickstarts.md).
+- While quickstart is unresolved, do **not** generate `/join` payloads, propose a custom project structure, or jump straight into SDK code.
+- Existing RTC code or a checked-out repo is not enough to skip quickstart; the ConvoAI path must already work once.
+- If the user explicitly says the baseline already works, skip quickstart and route directly to the relevant implementation file.
+- If the user needs Java, Ruby, PHP, C#, or another non-SDK backend language, use [auth-flow.md](auth-flow.md) after the quickstart path is chosen.
 
 ## SDK vs. Direct REST API
 
@@ -51,14 +63,21 @@ ASR → LLM → TTS             Receives audio + transcripts
 ## Documentation Lookup
 
 The bundled references in this file cover gotchas, generation rules, and the stable
-behavioral contracts. For content that changes with doc updates, use Level 2:
+behavioral contracts. Read the relevant local ConvoAI reference first, then use Level 2 only
+if the local file does not cover the detail needed.
+
+For vendor/provider questions, use the official current provider docs as the source of truth
+once the question moves beyond the default quickstart combo. The bundled quickstart references
+are still the right source for the first-success default path, but the current provider matrix,
+vendor availability, beta status, and vendor-specific configs should come from live docs.
+
+For content that still needs live docs after the local check, use Level 2:
 
 1. Fetch `https://docs.agora.io/en/llms.txt`
 2. Scan for a URL matching your topic (e.g., `conversational-ai`, `quick-start`, `rest-api`)
 3. Fetch that URL
 
-Common topics to fetch via Level 2: quick-start code (Python, Go, Java), TTS/ASR/LLM
-vendor configs, error code listings.
+Common topics to fetch via Level 2 after the local reference check: quick-start code (Python, Go, Java), provider matrices, vendor-specific configs, full request/response schemas, newly changed vendor configs, error code listings.
 
 For full request/response schemas, fetch the OpenAPI spec directly — it is always
 current and covers every endpoint and field:
@@ -164,10 +183,11 @@ Use the file that matches what the user is building:
 
 | User's question / task | Read this file |
 |---|---|
-| Starting a new project — which repo to clone, setup, env vars | [quickstarts.md](quickstarts.md) |
+| No working ConvoAI baseline yet — choose the baseline path, setup order, and readiness gates | [quickstarts.md](quickstarts.md) |
 | Node.js/Python/Go backend — starting agent, auth, session lifecycle | [server-sdks.md](server-sdks.md) |
 | Python SDK specifics (async, deprecations, debug) | [python-sdk.md](python-sdk.md) |
 | Go SDK specifics (context, builder, status constants) | [go-sdk.md](go-sdk.md) |
+| Supported vendors and current vendor-specific configs | Fetch the official ConvoAI provider docs after reading this file |
 | Auth flow, token types, direct REST API (non-SDK languages) | [auth-flow.md](auth-flow.md) |
 | Full working demo app architecture, profiles, MLLM/Gemini | [agent-samples.md](agent-samples.md) |
 | Web/React client: transcripts, agent state, sendText, interrupt | [agent-toolkit.md](agent-toolkit.md) |
