@@ -43,11 +43,11 @@ For each case:
 - Pass Criteria: References `agora-rtc-react` or `AgoraRTCProvider`
 - Result: ___
 
-### R-05: ConvoAI Python
+### R-05: ConvoAI Python without a proven baseline
 
 - User Input: "ConvoAI agent in Python"
-- Expected Behavior: Routes to `references/conversational-ai/README.md`
-- Pass Criteria: References ConvoAI REST API; does not reference RTC SDK directly as the primary API
+- Expected Behavior: Routes to `references/conversational-ai/README.md`, classifies the request as quickstart/integration, and enters `quickstarts.md`
+- Pass Criteria: Does not jump straight to `/join` or SDK code; asks for the next quickstart decision or anchors on an official baseline first
 - Result: ___
 
 ### R-06: Server-side token generation
@@ -69,6 +69,34 @@ For each case:
 - User Input: "Record my RTC session"
 - Expected Behavior: Routes to `references/cloud-recording/README.md`; presents acquire/start/stop lifecycle
 - Pass Criteria: Does not confuse Cloud Recording with RTC local recording; references REST API pattern
+- Result: ___
+
+### R-09: Working baseline skips quickstart
+
+- User Input: "My ConvoAI agent already starts successfully; now help me add transcript rendering in React"
+- Expected Behavior: Skips `quickstarts.md` and routes to the relevant React client reference
+- Pass Criteria: Does not re-ask baseline or readiness questions; references `agent-toolkit.md` or `agent-client-toolkit-react.md`
+- Result: ___
+
+### R-10: Supported vendor query routes to provider reference
+
+- User Input: "What providers does Agora ConvoAI support for STT, LLM, and TTS?"
+- Expected Behavior: Routes to `references/conversational-ai/README.md`, then uses the official current provider docs as the source of truth
+- Pass Criteria: Starts from the local ConvoAI module, but uses live docs for the current provider matrix instead of inventing or relying on a stale local copy
+- Result: ___
+
+### R-11: MLLM request routes to ConvoAI before intake
+
+- User Input: "I want MLLM with Gemini"
+- Expected Behavior: Routes directly to `references/conversational-ai/README.md`
+- Pass Criteria: Does not go through `intake/SKILL.md` first when the request is already clearly ConvoAI-specific
+- Result: ___
+
+### R-12: Studio Agent ID request routes to ConvoAI before intake
+
+- User Input: "I already have an Agent ID from Agora Studio Agents"
+- Expected Behavior: Routes directly to `references/conversational-ai/README.md`, then into the ConvoAI quickstart Studio Agent ID branch
+- Pass Criteria: Does not go through `intake/SKILL.md` first when the request is already clearly ConvoAI-specific
 - Result: ___
 
 ---
@@ -156,6 +184,18 @@ For each case:
 - Expected Behavior: Presents token-based auth as the default; does not default to Basic Auth (Customer ID + Secret) without being asked
 - Pass Criteria: `Authorization: agora token=<token>` pattern appears in the primary example; Basic Auth shown as an alternative only
 
+### C-13: Quickstart vendor defaults come from the Python SDK
+
+- User Input: "I want the fastest way to get ConvoAI working"
+- Expected Behavior: Quickstart anchors on the documented Python SDK first-success combo
+- Pass Criteria: Mentions Deepgram STT with `language=\"en-US\"`, OpenAI LLM with `model=\"gpt-4o-mini\"`, and ElevenLabs TTS with `model_id=\"eleven_flash_v2_5\"` plus `sample_rate=24000`
+
+### C-14: Sample-aligned env names are preserved
+
+- User Input: "Use the official full-stack Next.js quickstart"
+- Expected Behavior: Keeps the official sample env names instead of inventing provider-placeholder env vars
+- Pass Criteria: Uses `LLM_API_KEY` / `LLM_URL` for the sample-aligned path; does not replace them with `OPENAI_API_KEY` / `OPENAI_BASE_URL`
+
 ---
 
 ## 3. Failure Paths (F-series)
@@ -201,6 +241,12 @@ For each case:
 - Expected Behavior: Clarifies that Cloud Recording is REST API only — there is no client SDK; describes the acquire/start/stop REST API pattern
 - Pass Criteria: Does not fabricate a "Cloud Recording SDK" package or import; routes to `references/cloud-recording/README.md`
 
+### F-07: No quickstart bypass into `/join` payload generation
+
+- User Input: "Generate the ConvoAI /join payload for my new project"
+- Expected Behavior: Enters the ConvoAI quickstart flow unless a working baseline is already confirmed
+- Pass Criteria: Does not generate a `/join` payload before the baseline path and readiness gates are resolved
+
 ---
 
 ## 4. Intake Accuracy (I-series)
@@ -219,11 +265,11 @@ For each case:
 - Pass Criteria: Needs analysis includes both products
 - Result: ___
 
-### I-03: ConvoAI fast-path with context provided
+### I-03: Partial ConvoAI context still stays in quickstart
 
 - User Input: "Help me integrate ConvoAI with OpenAI, Python backend, I have my credentials"
-- Expected Behavior: Fast-path to ConvoAI skill; skip full intake questions since key details are already provided
-- Pass Criteria: Does not ask Q1/Q2/Q3 one by one; routes directly using the provided context
+- Expected Behavior: Enters the ConvoAI quickstart flow, skips already-known fields, and asks only the next unresolved quickstart decision
+- Pass Criteria: Does not generate code; does not ask a long multi-step interview; asks only for the baseline path or equivalent next gate
 - Result: ___
 
 ### I-04: Clear RTC request — no intake
@@ -231,6 +277,97 @@ For each case:
 - User Input: "RTC Web video call"
 - Expected Behavior: Routes DIRECTLY to `references/rtc/web.md`; does NOT go through intake
 - Pass Criteria: Intake flow is not entered; confirms the routing non-regression for experienced developers
+- Result: ___
+
+### I-05: Cloned repo is not a working baseline
+
+- User Input: "I cloned agent-quickstart-nextjs, but the ConvoAI agent has never connected"
+- Expected Behavior: Treats this as `integration`, not a completed baseline
+- Pass Criteria: Stays in the ConvoAI quickstart flow; does not skip directly to advanced implementation guidance
+- Result: ___
+
+### I-06: Working baseline can skip quickstart
+
+- User Input: "Our ConvoAI baseline already works; help me add useTranscript in React"
+- Expected Behavior: Skips quickstart and routes directly to React client references
+- Pass Criteria: Does not ask baseline-path or readiness questions; references the client toolkit or React hooks docs
+- Result: ___
+
+### I-07: Quickstart recaps the default vendor combo
+
+- User Input: "I want to start a new ConvoAI project with the safest default path"
+- Expected Behavior: Quickstart includes the documented default provider combo instead of inventing one
+- Pass Criteria: Uses the Python SDK-backed default combo; does not invent unsupported vendors or omit the key default parameters
+- Result: ___
+
+### I-08: Vendor-list question uses the dedicated file
+
+- User Input: "Before we write code, tell me which providers are supported right now"
+- Expected Behavior: Uses the local ConvoAI module first, then answers from the official current provider docs
+- Pass Criteria: Does not invent a local-only provider list when the user is explicitly asking what is supported right now
+- Result: ___
+
+### I-09: Vendor gate uses explicit branching
+
+- User Input: "I have the credentials. What provider path should I take?"
+- Expected Behavior: The vendor step offers a clear default / show-list / choose-custom branch
+- Pass Criteria: The prompt includes A/B/C-style branching for default combo, current official provider list, and non-default provider choice
+- Result: ___
+
+### I-10: Vendor gate distinguishes cascading vs MLLM
+
+- User Input: "I want MLLM with Gemini"
+- Expected Behavior: The vendor-selection step treats this as an MLLM path, not just a non-default TTS/LLM tweak
+- Pass Criteria: The flow records or acknowledges the `mllm` mode explicitly instead of forcing the user back into the cascading default combo
+- Result: ___
+
+### I-11: Path B warns about private repo access
+
+- User Input: "I want a separate backend and frontend baseline"
+- Expected Behavior: The baseline step mentions that the preferred Python repo is private and may fall back to the public decomposed sample
+- Pass Criteria: The prompt does not present Path B as if it were guaranteed-public access
+- Result: ___
+
+### I-12: Quickstart opening uses natural wording
+
+- User Input: "I want to build a demo that talks to an agent. Help me implement it."
+- Expected Behavior: The quickstart opening explains the "official sample first" idea in natural product language
+- Pass Criteria: Does not use stiff phrasing like "run the baseline flow" or "anchor on a proven baseline"; instead says to first run the official sample through once and then customize the demo
+- Result: ___
+
+### I-13: Unsupported provider is stated explicitly
+
+- User Input: "I want to use a provider that is not in the current official provider docs"
+- Expected Behavior: The quickstart flow states clearly that this provider is not in the current official support list
+- Pass Criteria: Explicitly says the provider is not currently documented as supported; does not continue as if it were supported
+- Result: ___
+
+### I-14: Studio Agent ID path skips provider re-entry
+
+- User Input: "I already configured my agent in Agora Studio and I have the Agent ID"
+- Expected Behavior: Quickstart switches to the Studio Agent ID branch instead of re-asking STT / LLM / TTS provider choices
+- Pass Criteria: Explains the Studio Agent ID path, asks for the Agent ID or confirms the user has it, and does not reopen the default-provider prompt
+- Result: ___
+
+### I-15: Studio Agent ID is distinguished from runtime agent_id
+
+- User Input: "I have an Agent ID from Studio"
+- Expected Behavior: Quickstart clarifies that the Studio Agent ID is not the same as the runtime `agent_id` returned by `/join`
+- Pass Criteria: Explicitly distinguishes the Studio Agent ID from the runtime `agent_id`
+- Result: ___
+
+### I-16: Studio Agent ID maps to pipeline_id
+
+- User Input: "I already have the Agent ID from Agora Studio"
+- Expected Behavior: Quickstart explains that the Studio Agent ID is passed using the request field `pipeline_id`
+- Pass Criteria: Explicitly states `Agent ID` from Studio maps to `pipeline_id` in the request body
+- Result: ___
+
+### I-17: Studio path preserves the fixed request shape
+
+- User Input: "Use my Agora Studio Agent ID in the start request"
+- Expected Behavior: The Studio path keeps the fixed request shape with `name`, `pipeline_id`, and `properties`
+- Pass Criteria: Does not replace `pipeline_id` with `agent_id`; preserves separate header token and `properties.token`
 - Result: ___
 
 ---

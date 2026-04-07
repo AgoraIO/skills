@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+
+- ConvoAI quickstart gating regression cases in `tests/eval-cases.md` — working-baseline detection, no `/join` bypass, and quickstart-skip coverage
+- ConvoAI vendor-default coverage in `tests/eval-cases.md` — Python SDK-backed first-success provider combo and default-parameter checks
+
+### Changed
+
+- `SKILL.md`, `references/conversational-ai/README.md`: changed documentation lookup to a strict local-reference-first policy so ConvoAI requests consult bundled module references before any Level 2 live-doc fetch
+- `SKILL.md`: added stronger direct-routing cues for clearly ConvoAI-specific requests such as agent demos, provider questions, and MLLM requests instead of sending them to intake first
+- `references/conversational-ai/README.md`: added working-baseline routing so new-project and unproven integration requests enter a constrained quickstart path before code generation
+- `references/conversational-ai/quickstarts.md`: rewritten as a locked quickstart state machine with baseline-path, readiness, and backend-path gates; preserves the existing repo/setup references after the gates resolve
+- `references/conversational-ai/quickstarts.md`, `references/conversational-ai/python-sdk.md`, `references/conversational-ai/README.md`: now use the official current provider docs as the source of truth for provider matrices and vendor-specific configs, while keeping the local quickstart focused on the first-success default combo and sample-aligned env names
+- `references/conversational-ai/quickstarts.md`, `references/conversational-ai/README.md`: aligned the sequence with the state machine, made the MLLM vs cascading split explicit in the vendor gate, documented baseline-path rollback behavior, and clarified that Path B may require a private repo fallback
+- `references/conversational-ai/quickstarts.md`: softened the opening quickstart wording for user-facing conversations and added an explicit unsupported-provider prompt instead of implicit discouragement
+- `references/conversational-ai/quickstarts.md`, `references/conversational-ai/README.md`: added a Studio Agent ID branch so Agora ConvoAI can reuse agents configured in `https://console.agora.io/studio/agents` instead of rebuilding the provider stack during quickstart
+- `references/conversational-ai/conversational-ai-studio.md`: added a dedicated reference for the Agora Studio Agent ID path and clarified that it is different from the runtime `agent_id` returned by `/join`
+- `references/conversational-ai/conversational-ai-studio.md`, `references/conversational-ai/quickstarts.md`, `references/conversational-ai/README.md`: documented the confirmed mapping that the Agora Studio Agent ID is passed via the request field `pipeline_id`
+- `references/conversational-ai/conversational-ai-studio.md`: expanded the Studio path into a fixed request contract mirroring the preconfigured-agent flow, including field mapping, token separation, and response expectations
+
 ## [1.2.0]
 
 ### Added
