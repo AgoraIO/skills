@@ -52,26 +52,25 @@ Follow this exact user-visible order:
 - While quickstart is unresolved, do **not** generate `/join` payloads, SDK code, custom file structures, clone commands, or repo adaptation plans.
 - While quickstart is unresolved, read only this file and [README.md](README.md).
 - Existing-app requests stay in quickstart until the ConvoAI path is proven once.
-- Unless the user explicitly asks for BYOK (bring your own key) or a different provider stack, anchor on the reseller defaults first — no vendor API keys needed.
+- Unless the user explicitly asks for BYOK (bring your own key) or a different provider stack, anchor on the defaults first — no vendor API keys needed.
 - If `baseline_path=full-stack-nextjs`, keep the official sample's env var names. Do **not** rename them to generic provider-reference placeholders during quickstart.
 - For non-default provider selection, fetch the official current provider docs before confirming support or generating config details.
 - If the user already has an **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, treat that as a separate quickstart branch. Do not re-ask STT/LLM/TTS provider choices unless the user explicitly wants to replace the Studio-managed config.
 
 ## First-Success Vendor Defaults
 
-The official `agent-quickstart-nextjs` sample uses **reseller mode** by default.
-Vendor API calls (STT, LLM, TTS) are proxied through Agora — no vendor API keys needed.
-The user only needs Agora credentials.
+The official `agent-quickstart-nextjs` sample works out of the box with just Agora credentials.
+Vendor API calls (STT, LLM, TTS) go through Agora by default — no vendor API keys needed.
 
-Default reseller pipeline:
+Default pipeline:
 
-- **STT:** Deepgram nova-3 (reseller — no `apiKey`)
-- **LLM:** OpenAI gpt-4o-mini (reseller — no `apiKey`)
-- **TTS:** MiniMax speech_2_6_turbo (reseller — no `key`)
+- **STT:** Deepgram nova-3
+- **LLM:** OpenAI gpt-4o-mini
+- **TTS:** MiniMax speech_2_6_turbo
 
 BYOK (Bring Your Own Key) is supported but optional. The sample includes commented-out
-BYOK blocks for Deepgram, OpenAI, and ElevenLabs. Users who want BYOK can uncomment
-those blocks and provide their own vendor API keys.
+BYOK blocks for Deepgram, OpenAI, and ElevenLabs. Users who want to use their own vendor
+API keys can uncomment those blocks and provide them.
 
 BYOK provider families visible in the current sample and SDK docs:
 
@@ -82,7 +81,7 @@ BYOK provider families visible in the current sample and SDK docs:
 
 Use this rule during quickstart:
 
-- For the first end-to-end success path, prefer **reseller defaults** (no vendor keys).
+- For the first end-to-end success path, prefer the **default pipeline** (no vendor keys).
 - Only switch to BYOK during quickstart if the user explicitly asks for it or names a specific vendor key they want to use.
 - Only switch away from the default cascading pipeline if the user explicitly asks for MLLM.
 - For the current provider matrix or vendor-specific configs, fetch the official live docs before claiming support or listing parameters.
@@ -95,7 +94,7 @@ Use different rules depending on whether the user is staying sample-aligned or g
 
 Keep the official sample's env names as the source of truth.
 
-Reseller mode (default — no vendor keys needed):
+Default (no vendor keys needed):
 
 ```bash
 NEXT_PUBLIC_AGORA_APP_ID=
@@ -104,8 +103,6 @@ NEXT_AGORA_APP_CERTIFICATE=
 # NEXT_PUBLIC_AGENT_UID=123456
 # NEXT_AGENT_GREETING=
 ```
-
-> **`NEXT_PUBLIC_AGENT_UID` must be a numeric string** (e.g., `123456`). Non-numeric values like `Agent` will fail — the ConvoAI backend parses this as an integer internally. Use `0` for auto-assignment.
 
 BYOK mode (only if the user explicitly opts in):
 
@@ -143,7 +140,7 @@ The quickstart is a blocking state machine. While a state is unresolved, the onl
 | `intro` | Give a short plain-language intro to what ConvoAI is | Code, repo plans, framework recommendations | Product intro text | Intro delivered |
 | `baseline_path` | Ask which baseline path to use | Code, clone steps, provider discussions | Baseline-path prompt | User picks A/B/C or gives equivalent clear context |
 | `project_readiness` | Ask about App ID, App Certificate, and ConvoAI activation | Code, repo inspection, backend implementation | Readiness prompt | User confirms ready or asks where to find them |
-| `vendor_defaults` | Ask whether to use reseller defaults (no vendor keys), BYOK, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID. **Skip this gate entirely if the user has not mentioned BYOK, providers, or Studio Agent ID — reseller defaults apply automatically.** | Code, implementation | Vendor-defaults prompt | User picks A/B/C/D/E, directly names a provider path / Studio Agent ID path, or gate is auto-skipped |
+| `vendor_defaults` | Ask whether to use the defaults (no vendor keys), BYOK, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID. **Skip this gate entirely if the user has not mentioned BYOK, providers, or Studio Agent ID — defaults apply automatically.** | Code, implementation | Vendor-defaults prompt | User picks A/B/C/D/E, directly names a provider path / Studio Agent ID path, or gate is auto-skipped |
 | `vendor_selection` | Collect only provider-mode and provider choices after checking the official current provider docs | Code, implementation, secret collection | Custom-provider prompt | Provider mode and provider names are resolved |
 | `studio_agent_id` | Collect the Agora Studio Agent ID and confirm the user wants Studio to remain the source of truth for agent config | Code, re-asking provider setup from scratch | Studio-Agent-ID prompt | The Studio Agent ID path is resolved |
 | `backend_path` | Ask for backend path only if still needed | Code, detailed implementation | Backend-path prompt | Backend path is clear or no longer needed |
@@ -223,15 +220,14 @@ D. Another backend language / direct REST
 Use this only if the user has mentioned BYOK, vendor API keys, a specific provider, or a Studio Agent ID. If none of these were mentioned, skip this prompt entirely and use reseller defaults.
 
 ```text
-The official quickstart uses reseller mode by default — vendor API calls go through Agora,
-so you don't need Deepgram, OpenAI, or TTS API keys to get started.
+The official quickstart works out of the box with just Agora credentials — no vendor API keys needed.
 
-Default reseller pipeline:
+Default pipeline:
 - STT: Deepgram nova-3
 - LLM: OpenAI gpt-4o-mini
 - TTS: MiniMax speech_2_6_turbo
 
-A. Use the reseller defaults (no vendor keys needed — fastest path)
+A. Use the defaults (no vendor keys needed — fastest path)
 B. I want to use my own vendor API keys (BYOK)
 C. Show me the current official provider list first
 D. I want to choose a non-default cascading or MLLM path
@@ -303,13 +299,13 @@ project_readiness:
   app_id: [ready | missing | unknown]
   app_certificate: [ready | missing | unknown]
   convoai_activation: [ready | missing | unknown]
-key_mode: [reseller | byok | unknown]
+key_mode: [default | byok | unknown]
 providers:
   pipeline: [cascading | mllm | unknown]
   stt: [deepgram | user-specified-supported | unknown]
   llm: [openai | user-specified-supported | unknown]
   tts: [minimax | elevenlabs | microsoft | user-specified-supported | unknown]
-  mode: [reseller-default | byok-default | user-specified-cascading | mllm | unknown]
+  mode: [default | byok-default | user-specified-cascading | mllm | unknown]
 studio_agent:
   use_existing_agent_id: [yes | no | unknown]
   agent_id: [text | missing | unknown]
@@ -382,7 +378,7 @@ Open `http://localhost:3000`.
 
 ### Environment Variables
 
-Reseller mode (default — only Agora credentials needed):
+Default (only Agora credentials needed):
 
 ```bash
 # Required
