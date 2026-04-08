@@ -101,9 +101,11 @@ Reseller mode (default — no vendor keys needed):
 NEXT_PUBLIC_AGORA_APP_ID=
 NEXT_AGORA_APP_CERTIFICATE=
 # Optional:
-# NEXT_PUBLIC_AGENT_UID=Agent
+# NEXT_PUBLIC_AGENT_UID=123456
 # NEXT_AGENT_GREETING=
 ```
+
+> **`NEXT_PUBLIC_AGENT_UID` must be a numeric string** (e.g., `123456`). Non-numeric values like `Agent` will fail — the ConvoAI backend parses this as an integer internally. Use `0` for auto-assignment.
 
 BYOK mode (only if the user explicitly opts in):
 
@@ -388,7 +390,7 @@ NEXT_PUBLIC_AGORA_APP_ID=
 NEXT_AGORA_APP_CERTIFICATE=
 
 # Optional
-NEXT_PUBLIC_AGENT_UID=Agent
+NEXT_PUBLIC_AGENT_UID=123456
 NEXT_AGENT_GREETING=
 ```
 
