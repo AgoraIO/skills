@@ -36,7 +36,7 @@ Follow this exact user-visible order:
 1. Product intro in plain language
 2. Baseline-path confirmation
 3. Project-readiness checkpoint
-4. Vendor-path confirmation — **skip if the user has not mentioned BYOK, providers, or Studio Agent ID; reseller defaults apply automatically**
+4. Vendor-path confirmation — **skip if the user has not mentioned BYOK, providers, or Studio Agent ID; defaults apply automatically**
 5. Vendor selection, only if the user asks for the current provider list or chooses a non-default path
 6. Studio Agent ID confirmation, only if the user wants to reuse an agent configured in Agora Studio
 7. Backend-path confirmation, only if a separate backend or existing-repo integration still needs it
@@ -46,7 +46,7 @@ Follow this exact user-visible order:
 
 - One decision group per turn. Do not ask baseline, credentials, and backend path in the same reply.
 - Skip anything the user already answered.
-- **Auto-skip `vendor_defaults`**: if the user has not mentioned BYOK, vendor API keys, a specific provider, or a Studio Agent ID, skip the vendor gate entirely and use reseller defaults. Do not ask about providers when the user just wants the fastest path.
+- **Auto-skip `vendor_defaults`**: if the user has not mentioned BYOK, vendor API keys, a specific provider, or a Studio Agent ID, skip the vendor gate entirely and use the defaults. Do not ask about providers when the user just wants the fastest path.
 - Infer obvious context from the user's stack or repository description.
 - Mirror the user's language.
 - While quickstart is unresolved, do **not** generate `/join` payloads, SDK code, custom file structures, clone commands, or repo adaptation plans.
@@ -217,7 +217,7 @@ D. Another backend language / direct REST
 
 ### Vendor Defaults
 
-Use this only if the user has mentioned BYOK, vendor API keys, a specific provider, or a Studio Agent ID. If none of these were mentioned, skip this prompt entirely and use reseller defaults.
+Use this only if the user has mentioned BYOK, vendor API keys, a specific provider, or a Studio Agent ID. If none of these were mentioned, skip this prompt entirely and use the defaults.
 
 ```text
 The official quickstart works out of the box with just Agora credentials — no vendor API keys needed.
@@ -358,7 +358,7 @@ Single Next.js application covering token generation, agent lifecycle API routes
 - **Framework:** Next.js (TypeScript)
 - **UI:** Tailwind CSS + shadcn/ui
 - **Real-time:** Agora RTC + RTM
-- **Default pipeline (reseller):** Deepgram nova-3 (STT), OpenAI gpt-4o-mini (LLM), MiniMax speech_2_6_turbo (TTS)
+- **Default pipeline:** Deepgram nova-3 (STT), OpenAI gpt-4o-mini (LLM), MiniMax speech_2_6_turbo (TTS)
 - **BYOK option:** Deepgram (STT), OpenAI (LLM), ElevenLabs (TTS) — uncomment in `invite-agent/route.ts`
 
 ### Setup
