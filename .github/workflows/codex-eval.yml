@@ -19,6 +19,7 @@ on:
   pull_request:
     paths:
       - "skills/**/*.md"
+      - ".github/workflows/**"
 
 env:
   TARGET_ID: agora
@@ -207,11 +208,40 @@ jobs:
         uses: actions/github-script@v7
         env:
           REPORT_PATH: ${{ steps.artifacts.outputs.run_dir }}/report.md
+          RUN_DIR: ${{ steps.artifacts.outputs.run_dir }}
         with:
           github-token: ${{ github.token }}
           script: |
             const fs = require('fs');
-            const report = fs.readFileSync(process.env.REPORT_PATH, 'utf8');
+            const path = require('path');
+            let report = fs.readFileSync(process.env.REPORT_PATH, 'utf8');
+
+            const runDir = process.env.RUN_DIR;
+            const artifactsDir = path.join(runDir, 'case-artifacts');
+            if (fs.existsSync(artifactsDir)) {
+              const cases = fs.readdirSync(artifactsDir);
+              const screenshots = [];
+              for (const caseId of cases) {
+                const caseDir = path.join(artifactsDir, caseId);
+                if (!fs.statSync(caseDir).isDirectory()) continue;
+                for (const file of fs.readdirSync(caseDir)) {
+                  if (file.endsWith('.png') || file.endsWith('.jpg')) {
+                    const filePath = path.join(caseDir, file);
+                    const data = fs.readFileSync(filePath, { encoding: 'base64' });
+                    const ext = path.extname(file).slice(1);
+                    screenshots.push({ caseId, file, data, ext });
+                  }
+                }
+              }
+              if (screenshots.length > 0) {
+                report += '\n\n## Screenshots\n\n';
+                for (const s of screenshots) {
+                  report += `### ${s.caseId} / ${s.file}\n\n`;
+                  report += `<img src="data:image/${s.ext};base64,${s.data}" width="800" />\n\n`;
+                }
+              }
+            }
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
