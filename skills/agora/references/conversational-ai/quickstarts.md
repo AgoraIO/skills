@@ -36,7 +36,7 @@ Follow this exact user-visible order:
 1. Product intro in plain language
 2. Baseline-path confirmation
 3. Project-readiness checkpoint
-4. Vendor-path confirmation
+4. Vendor-path confirmation — **skip if the user has not mentioned BYOK, providers, or Studio Agent ID; defaults apply automatically**
 5. Vendor selection, only if the user asks for the current provider list or chooses a non-default path
 6. Studio Agent ID confirmation, only if the user wants to reuse an agent configured in Agora Studio
 7. Backend-path confirmation, only if a separate backend or existing-repo integration still needs it
@@ -46,35 +46,44 @@ Follow this exact user-visible order:
 
 - One decision group per turn. Do not ask baseline, credentials, and backend path in the same reply.
 - Skip anything the user already answered.
+- **Auto-skip `vendor_defaults`**: if the user has not mentioned BYOK, vendor API keys, a specific provider, or a Studio Agent ID, skip the vendor gate entirely and use the defaults. Do not ask about providers when the user just wants the fastest path.
 - Infer obvious context from the user's stack or repository description.
 - Mirror the user's language.
 - While quickstart is unresolved, do **not** generate `/join` payloads, SDK code, custom file structures, clone commands, or repo adaptation plans.
 - While quickstart is unresolved, read only this file and [README.md](README.md).
 - Existing-app requests stay in quickstart until the ConvoAI path is proven once.
-- Unless the user explicitly asks for a different provider stack or MLLM path, anchor on the Python SDK's documented first-success cascading combo first.
+- Unless the user explicitly asks for BYOK (bring your own key) or a different provider stack, anchor on the defaults first — no vendor API keys needed.
 - If `baseline_path=full-stack-nextjs`, keep the official sample's env var names. Do **not** rename them to generic provider-reference placeholders during quickstart.
 - For non-default provider selection, fetch the official current provider docs before confirming support or generating config details.
 - If the user already has an **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, treat that as a separate quickstart branch. Do not re-ask STT/LLM/TTS provider choices unless the user explicitly wants to replace the Studio-managed config.
 
 ## First-Success Vendor Defaults
 
-Use the current official Python SDK examples as the default provider policy for quickstart:
+The official `agent-quickstart-nextjs` sample works out of the box with just Agora credentials.
+Vendor API calls (STT, LLM, TTS) go through Agora by default — no vendor API keys needed.
 
-- **STT default:** `DeepgramSTT(api_key=..., language="en-US")`
-- **LLM default:** `OpenAI(api_key=..., model="gpt-4o-mini")`
-- **TTS default:** `ElevenLabsTTS(key=..., model_id="eleven_flash_v2_5", voice_id=..., sample_rate=24000)`
+Default pipeline:
 
-Documented provider families visible in the current Python SDK docs:
+- **STT:** Deepgram nova-3
+- **LLM:** OpenAI gpt-4o-mini
+- **TTS:** MiniMax speech_2_6_turbo
 
-- **STT:** Deepgram
-- **LLM:** OpenAI
-- **TTS:** ElevenLabs, Microsoft
+BYOK (Bring Your Own Key) is supported but optional. The sample includes commented-out
+BYOK blocks for Deepgram, OpenAI, and ElevenLabs. Users who want to use their own vendor
+API keys can uncomment those blocks and provide them.
+
+BYOK provider families visible in the current sample and SDK docs:
+
+- **STT:** Deepgram (BYOK)
+- **LLM:** OpenAI (BYOK)
+- **TTS:** ElevenLabs (BYOK), Microsoft
 - **MLLM:** OpenAI Realtime, Google Gemini Live
 
 Use this rule during quickstart:
 
-- For the first end-to-end success path, prefer **Deepgram + OpenAI + ElevenLabs**.
-- Only switch away from the default combo during quickstart if the user explicitly names another provider path or explicitly asks for MLLM.
+- For the first end-to-end success path, prefer the **default pipeline** (no vendor keys).
+- Only switch to BYOK during quickstart if the user explicitly asks for it or names a specific vendor key they want to use.
+- Only switch away from the default cascading pipeline if the user explicitly asks for MLLM.
 - For the current provider matrix or vendor-specific configs, fetch the official live docs before claiming support or listing parameters.
 
 ## Env Name Policy
@@ -83,19 +92,32 @@ Use different rules depending on whether the user is staying sample-aligned or g
 
 ### Sample-aligned path (`full-stack-nextjs`)
 
-Keep the official sample's env names as the source of truth:
+Keep the official sample's env names as the source of truth.
+
+Default (no vendor keys needed):
 
 ```bash
-AGORA_APP_ID=
-AGORA_APP_CERTIFICATE=
-LLM_URL=
-LLM_API_KEY=
-DEEPGRAM_API_KEY=
-ELEVENLABS_API_KEY=
-ELEVENLABS_VOICE_ID=
+NEXT_PUBLIC_AGORA_APP_ID=
+NEXT_AGORA_APP_CERTIFICATE=
+# Optional:
+# NEXT_PUBLIC_AGENT_UID=123456
+# NEXT_AGENT_GREETING=
 ```
 
-The provider defaults still apply, but they should map onto the sample's existing config shape rather than inventing `OPENAI_*` or `ELEVENLABS_MODEL_ID` variables during quickstart.
+BYOK mode (only if the user explicitly opts in):
+
+```bash
+NEXT_PUBLIC_AGORA_APP_ID=
+NEXT_AGORA_APP_CERTIFICATE=
+NEXT_DEEPGRAM_API_KEY=
+NEXT_OPENAI_API_KEY=
+NEXT_OPENAI_URL=
+NEXT_ELEVENLABS_API_KEY=
+NEXT_ELEVENLABS_VOICE_ID=
+```
+
+Do **not** prompt for vendor API keys unless the user explicitly asks for BYOK.
+Do **not** rename these env vars to a different custom scheme during quickstart.
 
 ### Custom-code path
 
@@ -118,7 +140,7 @@ The quickstart is a blocking state machine. While a state is unresolved, the onl
 | `intro` | Give a short plain-language intro to what ConvoAI is | Code, repo plans, framework recommendations | Product intro text | Intro delivered |
 | `baseline_path` | Ask which baseline path to use | Code, clone steps, provider discussions | Baseline-path prompt | User picks A/B/C or gives equivalent clear context |
 | `project_readiness` | Ask about App ID, App Certificate, and ConvoAI activation | Code, repo inspection, backend implementation | Readiness prompt | User confirms ready or asks where to find them |
-| `vendor_defaults` | Ask whether to use the default combo, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID | Code, implementation | Vendor-defaults prompt | User picks A/B/C/D or directly names a provider path / Studio Agent ID path |
+| `vendor_defaults` | Ask whether to use the defaults (no vendor keys), BYOK, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID. **Skip this gate entirely if the user has not mentioned BYOK, providers, or Studio Agent ID — defaults apply automatically.** | Code, implementation | Vendor-defaults prompt | User picks A/B/C/D/E, directly names a provider path / Studio Agent ID path, or gate is auto-skipped |
 | `vendor_selection` | Collect only provider-mode and provider choices after checking the official current provider docs | Code, implementation, secret collection | Custom-provider prompt | Provider mode and provider names are resolved |
 | `studio_agent_id` | Collect the Agora Studio Agent ID and confirm the user wants Studio to remain the source of truth for agent config | Code, re-asking provider setup from scratch | Studio-Agent-ID prompt | The Studio Agent ID path is resolved |
 | `backend_path` | Ask for backend path only if still needed | Code, detailed implementation | Backend-path prompt | Backend path is clear or no longer needed |
@@ -195,22 +217,21 @@ D. Another backend language / direct REST
 
 ### Vendor Defaults
 
-Use this after readiness unless the user has already made the provider choice obvious.
+Use this only if the user has mentioned BYOK, vendor API keys, a specific provider, or a Studio Agent ID. If none of these were mentioned, skip this prompt entirely and use the defaults.
 
 ```text
-For the fastest first successful run, stay on the Python SDK's documented default combo:
-- STT: Deepgram (`language="en-US"`)
-- LLM: OpenAI (`model="gpt-4o-mini"`)
-- TTS: ElevenLabs (`model_id="eleven_flash_v2_5"`, `sample_rate=24000`, plus a `voice_id`)
+The official quickstart works out of the box with just Agora credentials — no vendor API keys needed.
 
-Other provider paths explicitly shown in the current Python SDK docs:
-- TTS: Microsoft
-- MLLM: OpenAI Realtime, Google Gemini Live
+Default pipeline:
+- STT: Deepgram nova-3
+- LLM: OpenAI gpt-4o-mini
+- TTS: MiniMax speech_2_6_turbo
 
-A. Use the default combo
-B. Show me the current official provider list first
-C. I want to choose a non-default cascading or MLLM path
-D. I already have an Agora Studio Agent ID and want to reuse that Studio-managed agent
+A. Use the defaults (no vendor keys needed — fastest path)
+B. I want to use my own vendor API keys (BYOK)
+C. Show me the current official provider list first
+D. I want to choose a non-default cascading or MLLM path
+E. I already have an Agora Studio Agent ID and want to reuse that Studio-managed agent
 ```
 
 ### Custom Provider Prompt
@@ -278,12 +299,13 @@ project_readiness:
   app_id: [ready | missing | unknown]
   app_certificate: [ready | missing | unknown]
   convoai_activation: [ready | missing | unknown]
+key_mode: [default | byok | unknown]
 providers:
   pipeline: [cascading | mllm | unknown]
   stt: [deepgram | user-specified-supported | unknown]
   llm: [openai | user-specified-supported | unknown]
-  tts: [elevenlabs | microsoft | user-specified-supported | unknown]
-  mode: [cascading-default | user-specified-cascading | mllm | unknown]
+  tts: [minimax | elevenlabs | microsoft | user-specified-supported | unknown]
+  mode: [default | byok-default | user-specified-cascading | mllm | unknown]
 studio_agent:
   use_existing_agent_id: [yes | no | unknown]
   agent_id: [text | missing | unknown]
@@ -336,9 +358,8 @@ Single Next.js application covering token generation, agent lifecycle API routes
 - **Framework:** Next.js (TypeScript)
 - **UI:** Tailwind CSS + shadcn/ui
 - **Real-time:** Agora RTC + RTM
-- **ASR:** Deepgram
-- **TTS:** ElevenLabs
-- **LLM:** OpenAI-compatible endpoint (OpenAI, Anthropic, and similar providers)
+- **Default pipeline:** Deepgram nova-3 (STT), OpenAI gpt-4o-mini (LLM), MiniMax speech_2_6_turbo (TTS)
+- **BYOK option:** Deepgram (STT), OpenAI (LLM), ElevenLabs (TTS) — uncomment in `invite-agent/route.ts`
 
 ### Setup
 
@@ -346,8 +367,8 @@ Single Next.js application covering token generation, agent lifecycle API routes
 git clone https://github.com/AgoraIO-Conversational-AI/agent-quickstart-nextjs.git
 cd agent-quickstart-nextjs
 pnpm install
-# Copy the env template — check the repo for the exact filename (.env.local.example or .env.example)
-cp .env.local.example .env.local
+cp env.local.example .env.local
+# Edit .env.local — only NEXT_PUBLIC_AGORA_APP_ID and NEXT_AGORA_APP_CERTIFICATE are required
 pnpm dev
 ```
 
@@ -357,21 +378,31 @@ Open `http://localhost:3000`.
 
 ### Environment Variables
 
+Default (only Agora credentials needed):
+
 ```bash
-# Agora
-AGORA_APP_ID=
-AGORA_APP_CERTIFICATE=
+# Required
+NEXT_PUBLIC_AGORA_APP_ID=
+NEXT_AGORA_APP_CERTIFICATE=
 
-# LLM (OpenAI-compatible)
-LLM_URL=https://api.openai.com/v1/chat/completions
-LLM_API_KEY=
+# Optional
+NEXT_PUBLIC_AGENT_UID=123456
+NEXT_AGENT_GREETING=
+```
 
-# ASR
-DEEPGRAM_API_KEY=
+BYOK mode (uncomment the BYOK blocks in `app/api/invite-agent/route.ts` first):
 
-# TTS
-ELEVENLABS_API_KEY=
-ELEVENLABS_VOICE_ID=
+```bash
+# Required (same as above)
+NEXT_PUBLIC_AGORA_APP_ID=
+NEXT_AGORA_APP_CERTIFICATE=
+
+# Vendor keys (required for BYOK)
+NEXT_DEEPGRAM_API_KEY=
+NEXT_OPENAI_API_KEY=
+NEXT_OPENAI_URL=https://api.openai.com/v1/chat/completions
+NEXT_ELEVENLABS_API_KEY=
+NEXT_ELEVENLABS_VOICE_ID=
 ```
 
 > The App Certificate is required for token generation. Get both from [Agora Console](https://console.agora.io).
