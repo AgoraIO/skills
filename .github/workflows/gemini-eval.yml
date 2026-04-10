@@ -118,6 +118,7 @@ jobs:
         working-directory: agentic-evals
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_GEMINI_BASE_URL: ${{ secrets.GOOGLE_GEMINI_BASE_URL }}
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
           AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}

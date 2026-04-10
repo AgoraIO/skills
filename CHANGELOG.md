@@ -4,10 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [1.4.0]
 
 ### Added
 
+- Codex skill evaluation workflow (`codex-eval.yml`)
+- Gemini CLI skill evaluation workflow (`gemini-eval.yml`)
+- Skill quality review workflow (`skill-judge.yml`)
 - ConvoAI quickstart gating regression cases in `tests/eval-cases.md` — working-baseline detection, no `/join` bypass, and quickstart-skip coverage
 - ConvoAI vendor-default coverage in `tests/eval-cases.md` — Python SDK-backed first-success provider combo and default-parameter checks
 
