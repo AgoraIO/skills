@@ -1,0 +1,174 @@
+name: Skill Evaluation (Gemini CLI)
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite_ids:
+        description: "Comma-separated suite IDs, or 'all' for defaults"
+        required: false
+        default: "all"
+      case_id:
+        description: "Single case ID (leave empty for full suite)"
+        required: false
+        default: ""
+      model:
+        description: "Gemini model"
+        required: false
+        default: ""
+
+  pull_request:
+    paths:
+      - "skills/**/*.md"
+      - ".github/workflows/**"
+
+env:
+  TARGET_ID: agora
+  EVAL_REPO: Jiayi-Ye02/agentic-evals
+  EVAL_REF: main
+
+jobs:
+  evaluate:
+    runs-on: macos-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout skills repo
+        uses: actions/checkout@v5
+        with:
+          path: skills-repo
+
+      - name: Clone agentic-evals
+        run: git clone --depth 1 "https://github.com/${EVAL_REPO}.git" agentic-evals
+
+      - name: Copy skill into agentic-evals
+        run: |
+          rm -rf agentic-evals/.agents/skills/agora
+          mkdir -p agentic-evals/.agents/skills/agora
+          cp -r skills-repo/skills/agora/* agentic-evals/.agents/skills/agora/
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install pyyaml
+          npm install -g agent-browser @google/gemini-cli
+
+      - name: Write credentials
+        env:
+          AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
+          AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
+        run: |
+          printf 'export AGORA_APP_ID="%s"\nexport AGORA_APP_CERTIFICATE="%s"\n' \
+            "$AGORA_APP_ID" "$AGORA_APP_CERTIFICATE" > /tmp/agora-credentials.env
+          chmod 600 /tmp/agora-credentials.env
+
+      - name: Resolve cases
+        id: resolve
+        working-directory: agentic-evals
+        env:
+          SUITE_IDS: ${{ github.event.inputs.suite_ids || 'all' }}
+          CASE_ID: ${{ github.event.inputs.case_id || '' }}
+          IS_PR: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+        run: |
+          python3 - << 'PY'
+          import yaml, json, os, datetime
+          target_id = os.environ["TARGET_ID"]
+          suite_ids = os.environ.get("SUITE_IDS", "all")
+          case_id = os.environ.get("CASE_ID", "")
+          is_pr = os.environ.get("IS_PR", "false")
+          if is_pr == "true" and not case_id:
+              case_id = "convoai-e2e-first-success"
+              suite_ids = "workflow"
+          target = yaml.safe_load(open(f"targets/{target_id}/target.yaml"))
+          if suite_ids == "all":
+              suite_ids = target["default_suites"]
+          else:
+              suite_ids = [s.strip() for s in suite_ids.split(",")]
+          cases = []
+          for sid in suite_ids:
+              suite = yaml.safe_load(open(f"targets/{target_id}/cases/{sid}/suite.yaml"))
+              for cp in suite["cases"]:
+                  c = yaml.safe_load(open(cp))
+                  if case_id and c["case_id"] != case_id:
+                      continue
+                  cases.append({"case_id": c["case_id"], "path": cp, "user_prompt": c["input"]["user_prompt"]})
+          now = datetime.datetime.now(datetime.timezone.utc)
+          run_id = f"gemini-{now.strftime('%Y%m%dT%H%M%SZ')}"
+          run_dir = f"runs/{run_id}"
+          os.makedirs(f"{run_dir}/case-artifacts", exist_ok=True)
+          os.makedirs(f"{run_dir}/case-results", exist_ok=True)
+          manifest = {"run_mode": "single-run", "run_id": run_id, "runtime": "gemini-cli",
+                      "target_id": target_id, "suite_ids": suite_ids,
+                      "case_ids": [c["case_id"] for c in cases],
+                      "started_at": now.isoformat(), "evidence_mode": "gemini-cli-two-phase"}
+          json.dump(manifest, open(f"{run_dir}/manifest.json", "w"), indent=2)
+          json.dump(cases, open("/tmp/gemini-eval-cases.json", "w"))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"run_dir={run_dir}\n")
+          print(f"Resolved {len(cases)} cases -> {run_dir}")
+          PY
+
+      - name: Run two-phase evaluation
+        working-directory: agentic-evals
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
+          AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
+          RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
+          GEMINI_MODEL: ${{ github.event.inputs.model || '' }}
+        run: |
+          source /tmp/agora-credentials.env
+          python3 scripts/run_gemini_eval.py
+
+      - name: Generate report
+        if: always()
+        working-directory: agentic-evals
+        env:
+          RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
+        run: python3 scripts/generate_report.py
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-run-gemini-${{ env.TARGET_ID }}-${{ github.run_id }}
+          path: agentic-evals/${{ steps.resolve.outputs.run_dir }}
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Post report to job summary
+        if: always()
+        env:
+          RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
+        run: |
+          if [ -f "${RUN_DIR}/report.md" ]; then
+            echo "## Skill Eval Report (Gemini CLI)" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat "${RUN_DIR}/report.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        env:
+          RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const fs = require('fs');
+            const rp = `${process.env.RUN_DIR}/report.md`;
+            if (!fs.existsSync(rp)) return;
+            const report = fs.readFileSync(rp, 'utf8');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `## Skill Eval Report (Gemini CLI)\n\n${report}\n\n---\n[Download artifacts](${process.env.RUN_URL})`,
+            });
