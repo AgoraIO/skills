@@ -11,6 +11,7 @@ on:
   pull_request:
     paths:
       - "skills/**/*.md"
+      - ".github/workflows/**"
 
 env:
   EVAL_REPO: Jiayi-Ye02/agentic-evals
