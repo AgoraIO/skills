@@ -3,12 +3,12 @@ name: agora
 description: Write code using Agora SDKs (agora.io) for real-time communication. Covers RTC (video/voice, live streaming, screen sharing), RTM/signaling, Conversational AI voice agents, Cloud Recording, Server Gateway, and token generation. Use for Agora, RTC, RTM, video calling, voice calling, screen sharing, recording, tokens, signaling, or ConvoAI requests across Web, React, Next.js, iOS, Android, Go, and Python. Triggers include agora-rtc-sdk-ng, agora-rtc-react, agora-rtm, agora-agent-server-sdk, AgoraVoiceAI, AgoraClient, useConversationalAI, useTranscript, useAgentState, Cloud Recording, Server Gateway, and Agora authentication.
 metadata:
   author: agora
-  version: '1.3.0'
+  version: '1.4.0'
 ---
 
 # Agora (agora.io)
 
-Skill version: 1.3.0
+Skill version: 1.4.0
 
 Build real-time communication applications using Agora SDKs across Web, iOS, Android, and server-side platforms.
 

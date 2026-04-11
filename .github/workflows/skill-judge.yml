@@ -1,0 +1,118 @@
+name: Skill Quality Review
+
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+    inputs:
+      skill_path:
+        description: "Path to skill to evaluate (relative to skills-repo)"
+        required: false
+        default: "skills/agora"
+
+  pull_request:
+    paths:
+      - "skills/**/*.md"
+      - ".github/workflows/**"
+
+env:
+  EVAL_REPO: Jiayi-Ye02/agentic-evals
+
+jobs:
+  judge:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout skills repo
+        uses: actions/checkout@v5
+        with:
+          path: skills-repo
+
+      - name: Clone agentic-evals
+        run: git clone --depth 1 "https://github.com/${EVAL_REPO}.git" agentic-evals
+
+      - name: Copy skill into agentic-evals
+        run: |
+          rm -rf agentic-evals/.agents/skills/agora
+          mkdir -p agentic-evals/.agents/skills/agora
+          cp -r skills-repo/skills/agora/* agentic-evals/.agents/skills/agora/
+
+      - name: Build judge prompt
+        env:
+          SKILL_PATH: ${{ github.event.inputs.skill_path || 'skills/agora' }}
+        run: |
+          # Map skills-repo path to agentic-evals path
+          EVAL_SKILL_PATH="agentic-evals/.agents/skills/agora"
+
+          SKILL_FILES=$(find "$EVAL_SKILL_PATH" -name "SKILL.md" -type f | sort)
+          FILE_COUNT=$(echo "$SKILL_FILES" | grep -c . || echo 0)
+
+          cat > /tmp/judge-prompt.txt << HEREDOC
+          You have the skill-judge skill loaded. Use it now.
+
+          Evaluate ALL SKILL.md files under ${EVAL_SKILL_PATH}. There are ${FILE_COUNT} SKILL.md files.
+
+          For each SKILL.md:
+          1. Read the file completely.
+          2. Follow the skill-judge evaluation protocol (all 8 dimensions).
+          3. Generate the full structured report.
+
+          After evaluating each file, write a combined report to skill-judge-report.md with:
+          - Summary table of all skills with scores and grades.
+          - Individual evaluation reports.
+          - "Cross-Skill Observations" section.
+          - "Priority Improvements" with top 5 highest-impact changes.
+
+          Files to evaluate:
+          $(echo "$SKILL_FILES" | while read f; do echo "- $f"; done)
+
+          Write the report to skill-judge-report.md in the current directory.
+          HEREDOC
+
+      - name: Run Codex judge
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          responses-api-endpoint: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          prompt-file: /tmp/judge-prompt.txt
+          sandbox: danger-full-access
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skill-judge-report-${{ github.run_id }}
+          path: skill-judge-report.md
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Post report to job summary
+        if: always()
+        run: |
+          if [ -f skill-judge-report.md ]; then
+            echo "## Skill Quality Review" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat skill-judge-report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const fs = require('fs');
+            if (!fs.existsSync('skill-judge-report.md')) return;
+            const report = fs.readFileSync('skill-judge-report.md', 'utf8');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `## Skill Quality Review\n\n${report}\n\n---\n[View run](${process.env.RUN_URL})`,
+            });

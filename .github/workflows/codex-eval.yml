@@ -1,0 +1,240 @@
+name: Skill Evaluation
+
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+    inputs:
+      suite_ids:
+        description: "Comma-separated suite IDs, or 'all' for defaults"
+        required: false
+        default: "all"
+      case_id:
+        description: "Single case ID (leave empty for full suite)"
+        required: false
+        default: ""
+      model:
+        description: "Model for Codex"
+        required: false
+        default: ""
+
+  pull_request:
+    paths:
+      - "skills/**/*.md"
+      - ".github/workflows/**"
+
+env:
+  TARGET_ID: agora
+  EVAL_REPO: Jiayi-Ye02/agentic-evals
+  EVAL_REF: main
+
+jobs:
+  evaluate:
+    runs-on: macos-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout skills repo
+        uses: actions/checkout@v5
+        with:
+          path: skills-repo
+
+      - name: Clone agentic-evals
+        run: |
+          git clone --depth 1 "https://github.com/${EVAL_REPO}.git" agentic-evals
+
+      - name: Copy skill into agentic-evals
+        run: |
+          rm -rf agentic-evals/.agents/skills/agora
+          mkdir -p agentic-evals/.agents/skills/agora
+          cp -r skills-repo/skills/agora/* agentic-evals/.agents/skills/agora/
+          echo "Skill copied from skills-repo into agentic-evals/.agents/skills/agora/"
+
+      - name: Validate YAML
+        working-directory: agentic-evals
+        run: |
+          ruby -e '
+            require "yaml"
+            tid = "agora"
+            Dir["targets/#{tid}/cases/*/suite.yaml"].sort.each { |f| YAML.load_file(f) }
+            Dir["targets/#{tid}/cases/**/*.yaml"].sort.reject { |f| f.end_with?("suite.yaml") }.each { |f| YAML.load_file(f) }
+            YAML.load_file("targets/#{tid}/target.yaml")
+            puts "yaml-ok"
+          '
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime dependencies
+        run: |
+          pip install pyyaml
+          npm install -g agent-browser
+
+      - name: Write credentials file
+        env:
+          AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
+          AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
+        run: |
+          cat > /tmp/agora-credentials.env << EOF
+          AGORA_APP_ID=${AGORA_APP_ID}
+          AGORA_APP_CERTIFICATE=${AGORA_APP_CERTIFICATE}
+          EOF
+          chmod 600 /tmp/agora-credentials.env
+
+      - name: Build evaluator prompt
+        env:
+          SUITE_IDS: ${{ github.event.inputs.suite_ids || 'all' }}
+          CASE_ID: ${{ github.event.inputs.case_id || '' }}
+          IS_PR: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+        run: |
+          EFFECTIVE_CASE_ID="${CASE_ID}"
+          EFFECTIVE_SUITE_IDS="${SUITE_IDS}"
+          if [ "$IS_PR" = "true" ] && [ -z "$EFFECTIVE_CASE_ID" ]; then
+            EFFECTIVE_CASE_ID="convoai-e2e-first-success"
+            EFFECTIVE_SUITE_IDS="workflow"
+          fi
+
+          EVAL_DIR="$(pwd)/agentic-evals"
+
+          cat > /tmp/eval-prompt.txt << 'HEREDOC'
+          You are the skill-eval evaluator agent.
+
+          Instructions:
+          1. Read AGENT.md (canonical repo contract).
+          2. Read .agents/skills/skills-evaluation/SKILL.md (operational instructions).
+          3. Read docs/session-evidence.md (evidence contract).
+          4. Follow the SKILL.md workflow exactly.
+
+          Key rules:
+          - Use spawn_agent with fork_context: false for each case.
+          - Do NOT use codex exec as a substitute for per-case execution.
+          - Create isolated workspaces via the helper script:
+            bash .agents/skills/skills-evaluation/scripts/create_case_workspace.sh
+          - Collect evidence from ~/.codex/sessions/ after each sub-agent completes.
+          - Write all artifacts under runs/<run_id>/.
+
+          Timing requirements:
+          - Record wall-clock timestamps (ISO 8601 UTC) for each case.
+          - Track two phases separately:
+            - "Task execution": from agent receiving the prompt to delivering its final answer.
+            - "Verification": from evidence collection start to all artifacts written.
+          - In report.md, include a "## Timing" section with a human-readable table:
+            | case_id | task_execution | verification | total |
+            Use human-friendly durations like "3m 12s" instead of raw seconds.
+          - In each case-results/<case_id>.json, include timestamps and durations for both phases.
+
+          Report quality requirements:
+          - For each failed assertion, explain WHAT went wrong with specifics (quote actual commands/output).
+          - For each passed assertion, include a one-line evidence summary.
+          - "Suggested Next Fixes" must include concrete actions, not just file paths.
+          - If evaluator browser verification was skipped or degraded, note it but do not fail the case.
+          HEREDOC
+
+          echo "" >> /tmp/eval-prompt.txt
+          echo "Agora credentials file: /tmp/agora-credentials.env" >> /tmp/eval-prompt.txt
+          echo "Before spawning each sub-agent, source this file so AGORA_APP_ID and AGORA_APP_CERTIFICATE are exported." >> /tmp/eval-prompt.txt
+          echo "Do NOT echo or log the credential values." >> /tmp/eval-prompt.txt
+          echo "" >> /tmp/eval-prompt.txt
+          echo "Run parameters:" >> /tmp/eval-prompt.txt
+          echo "- test repo path: ${EVAL_DIR}" >> /tmp/eval-prompt.txt
+          echo "- target_id: ${TARGET_ID}" >> /tmp/eval-prompt.txt
+          echo "- run_mode: single-run" >> /tmp/eval-prompt.txt
+
+          if [ "$EFFECTIVE_SUITE_IDS" != "all" ]; then
+            echo "- suite_ids: ${EFFECTIVE_SUITE_IDS}" >> /tmp/eval-prompt.txt
+          else
+            echo "- suite_ids: use target defaults" >> /tmp/eval-prompt.txt
+          fi
+
+          if [ -n "$EFFECTIVE_CASE_ID" ]; then
+            echo "- case_id: ${EFFECTIVE_CASE_ID}" >> /tmp/eval-prompt.txt
+          fi
+
+          echo "" >> /tmp/eval-prompt.txt
+          echo "Begin the evaluation now." >> /tmp/eval-prompt.txt
+
+      - name: Run Codex evaluator
+        id: run_codex
+        uses: openai/codex-action@v1
+        env:
+          AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
+          AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          responses-api-endpoint: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          prompt-file: /tmp/eval-prompt.txt
+          working-directory: agentic-evals
+          sandbox: danger-full-access
+          model: ${{ github.event.inputs.model || '' }}
+
+      - name: Locate run artifacts
+        id: artifacts
+        run: |
+          LATEST_RUN=$(ls -td agentic-evals/runs/*/ 2>/dev/null | head -1)
+          if [ -z "$LATEST_RUN" ]; then
+            echo "::warning::No run directory found"
+            echo "run_found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "run_dir=${LATEST_RUN}" >> "$GITHUB_OUTPUT"
+          echo "run_found=true" >> "$GITHUB_OUTPUT"
+          [ -f "${LATEST_RUN}/report.md" ] \
+            && echo "report_exists=true" >> "$GITHUB_OUTPUT" \
+            || echo "report_exists=false" >> "$GITHUB_OUTPUT"
+
+      - name: Upload run artifacts
+        if: steps.artifacts.outputs.run_found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-run-${{ env.TARGET_ID }}-${{ github.run_id }}
+          path: ${{ steps.artifacts.outputs.run_dir }}
+          retention-days: 30
+
+      - name: Post report to job summary
+        if: steps.artifacts.outputs.report_exists == 'true'
+        run: |
+          echo "## Skill Eval Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          cat "${{ steps.artifacts.outputs.run_dir }}/report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Post report as PR comment
+        if: >
+          github.event_name == 'pull_request' &&
+          steps.artifacts.outputs.report_exists == 'true'
+        uses: actions/github-script@v7
+        env:
+          REPORT_PATH: ${{ steps.artifacts.outputs.run_dir }}/report.md
+          ARTIFACT_NAME: eval-run-${{ env.TARGET_ID }}-${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync(process.env.REPORT_PATH, 'utf8');
+            const artifactLink = `[📦 Download artifacts (screenshots included)](${process.env.RUN_URL})`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `## Skill Eval Report\n\n${report}\n\n---\n${artifactLink}`,
+            });
+
+      - name: Report results
+        if: steps.artifacts.outputs.run_found == 'true'
+        run: |
+          RUN_DIR="${{ steps.artifacts.outputs.run_dir }}"
+          RESULTS_DIR="${RUN_DIR}/case-results"
+          [ -d "$RESULTS_DIR" ] || { echo "::warning::No case-results"; exit 0; }
+          FAIL=$(grep -rl '"status": "fail"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
+          PASS=$(grep -rl '"status": "pass"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
+          BLOCKED=$(grep -rl '"status": "blocked"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
+          echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
+          if [ "$FAIL" -gt 0 ]; then
+            echo "::warning::${FAIL} case(s) failed — see report for details"
+          fi
