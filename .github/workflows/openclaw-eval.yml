@@ -1,4 +1,4 @@
-name: Skill Evaluation (Gemini CLI)
+name: Skill Evaluation (OpenClaw)
 
 on:
   schedule:
@@ -11,10 +11,6 @@ on:
         default: "all"
       case_id:
         description: "Single case ID (leave empty for full suite)"
-        required: false
-        default: ""
-      model:
-        description: "Gemini model"
         required: false
         default: ""
 
@@ -30,7 +26,7 @@ env:
 
 jobs:
   evaluate:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:
       contents: read
@@ -42,8 +38,13 @@ jobs:
         with:
           path: skills-repo
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Clone agentic-evals
-        run: git clone --depth 1 "https://github.com/${EVAL_REPO}.git" agentic-evals
+        run: git clone --depth 1 --branch "${EVAL_REF}" "https://github.com/${EVAL_REPO}.git" agentic-evals
 
       - name: Copy skill into agentic-evals
         run: |
@@ -59,7 +60,81 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pyyaml
-          npm install -g agent-browser @google/gemini-cli
+          npm install -g acpx@latest agent-browser @openai/codex
+          npm install -g openclaw@latest
+          openclaw --version
+          acpx --version
+
+      - name: Configure OpenClaw
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+        run: |
+          mkdir -p ~/.openclaw/agents/main/sessions
+          GATEWAY_TOKEN=$(openssl rand -hex 24)
+          BASE_URL="${RESPONSES_API_ENDPOINT%/v1/responses}"
+          BASE_URL="${BASE_URL%/}"
+
+          cat > ~/.openclaw/openclaw.json << EOF
+          {
+            "agents": {
+              "defaults": {
+                "maxConcurrent": 4,
+                "workspace": "$HOME/openclaw-workspace",
+                "model": { "primary": "openai/gpt-5.4" }
+              }
+            },
+            "tools": {
+              "profile": "coding",
+              "elevated": {
+                "enabled": true,
+                "allowFrom": { "acp": ["*"], "webchat": ["*"], "terminal": ["*"] }
+              }
+            },
+            "models": {
+              "providers": {
+                "openai": {
+                  "baseUrl": "${BASE_URL}",
+                  "apiKey": "${OPENAI_API_KEY}",
+                  "models": [
+                    { "id": "gpt-5.4", "name": "GPT-5.4", "api": "openai-responses", "contextWindow": 1000000 }
+                  ]
+                }
+              }
+            },
+            "gateway": {
+              "mode": "local",
+              "auth": { "mode": "token", "token": "${GATEWAY_TOKEN}" },
+              "port": 18789,
+              "bind": "loopback"
+            }
+          }
+          EOF
+
+          mkdir -p ~/openclaw-workspace ~/.acpx
+          cat > ~/.acpx/config.json << EOF
+          {
+            "defaultAgent": "openclaw",
+            "agents": {
+              "openclaw": {
+                "command": "openclaw acp --token ${GATEWAY_TOKEN} --session agent:main:main"
+              }
+            }
+          }
+          EOF
+
+      - name: Start OpenClaw gateway
+        run: |
+          export OPENCLAW_HIDE_BANNER=1
+          nohup openclaw gateway > /tmp/openclaw-gateway.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -s http://127.0.0.1:18789/ > /dev/null 2>&1; then
+              echo "Gateway ready after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+          curl -s -o /dev/null -w "Gateway HTTP: %{http_code}\n" http://127.0.0.1:18789/
 
       - name: Write credentials
         env:
@@ -74,19 +149,14 @@ jobs:
         id: resolve
         working-directory: agentic-evals
         env:
-          SUITE_IDS: ${{ github.event.inputs.suite_ids || 'all' }}
-          CASE_ID: ${{ github.event.inputs.case_id || '' }}
-          IS_PR: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+          SUITE_IDS: ${{ github.event.inputs.suite_ids || 'workflow' }}
+          CASE_ID: ${{ github.event.inputs.case_id || 'convoai-e2e-first-success' }}
         run: |
           python3 - << 'PY'
           import yaml, json, os, datetime
           target_id = os.environ["TARGET_ID"]
-          suite_ids = os.environ.get("SUITE_IDS", "all")
-          case_id = os.environ.get("CASE_ID", "")
-          is_pr = os.environ.get("IS_PR", "false")
-          if is_pr == "true" and not case_id:
-              case_id = "convoai-e2e-first-success"
-              suite_ids = "workflow"
+          suite_ids = os.environ.get("SUITE_IDS", "workflow")
+          case_id = os.environ.get("CASE_ID", "convoai-e2e-first-success")
           target = yaml.safe_load(open(f"targets/{target_id}/target.yaml"))
           if suite_ids == "all":
               suite_ids = target["default_suites"]
@@ -101,16 +171,16 @@ jobs:
                       continue
                   cases.append({"case_id": c["case_id"], "path": cp, "user_prompt": c["input"]["user_prompt"]})
           now = datetime.datetime.now(datetime.timezone.utc)
-          run_id = f"gemini-{now.strftime('%Y%m%dT%H%M%SZ')}"
+          run_id = f"openclaw-{now.strftime('%Y%m%dT%H%M%SZ')}"
           run_dir = f"runs/{run_id}"
           os.makedirs(f"{run_dir}/case-artifacts", exist_ok=True)
           os.makedirs(f"{run_dir}/case-results", exist_ok=True)
-          manifest = {"run_mode": "single-run", "run_id": run_id, "runtime": "gemini-cli",
+          manifest = {"run_mode": "single-run", "run_id": run_id, "runtime": "openclaw",
                       "target_id": target_id, "suite_ids": suite_ids,
                       "case_ids": [c["case_id"] for c in cases],
-                      "started_at": now.isoformat(), "evidence_mode": "gemini-cli-two-phase"}
+                      "started_at": now.isoformat(), "evidence_mode": "openclaw-acpx-two-phase"}
           json.dump(manifest, open(f"{run_dir}/manifest.json", "w"), indent=2)
-          json.dump(cases, open("/tmp/gemini-eval-cases.json", "w"))
+          json.dump(cases, open("/tmp/eval-cases.json", "w"))
           with open(os.environ["GITHUB_OUTPUT"], "a") as out:
               out.write(f"run_dir={run_dir}\n")
           print(f"Resolved {len(cases)} cases -> {run_dir}")
@@ -119,15 +189,14 @@ jobs:
       - name: Run two-phase evaluation
         working-directory: agentic-evals
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GOOGLE_GEMINI_BASE_URL: ${{ secrets.GOOGLE_GEMINI_BASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
           AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
-          GEMINI_MODEL: ${{ github.event.inputs.model || 'gemini-3-flash-preview' }}
         run: |
           source /tmp/agora-credentials.env
-          python3 scripts/run_gemini_eval.py
+          python3 scripts/run_openclaw_eval.py
 
       - name: Generate report
         if: always()
@@ -140,7 +209,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: eval-run-gemini-${{ env.TARGET_ID }}-${{ github.run_id }}
+          name: eval-run-openclaw-${{ env.TARGET_ID }}-${{ github.run_id }}
           path: agentic-evals/${{ steps.resolve.outputs.run_dir }}
           retention-days: 30
           if-no-files-found: warn
@@ -151,7 +220,7 @@ jobs:
           RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
         run: |
           if [ -f "${RUN_DIR}/report.md" ]; then
-            echo "## Skill Eval Report (Gemini CLI)" >> "$GITHUB_STEP_SUMMARY"
+            echo "## Skill Eval Report (OpenClaw)" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             cat "${RUN_DIR}/report.md" >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -173,7 +242,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.payload.pull_request.number,
-              body: `## Skill Eval Report (Gemini CLI)\n\n${report}\n\n---\n[Download artifacts](${process.env.RUN_URL})`,
+              body: `## Skill Eval Report (OpenClaw)\n\n${report}\n\n---\n[Download artifacts](${process.env.RUN_URL})`,
             });
 
       - name: Notify Feishu

@@ -116,3 +116,14 @@ jobs:
               issue_number: context.payload.pull_request.number,
               body: `## Skill Quality Review\n\n${report}\n\n---\n[View run](${process.env.RUN_URL})`,
             });
+
+      - name: Notify Feishu
+        if: always() && github.event_name != 'pull_request'
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_CHAT_ID: ${{ secrets.FEISHU_CHAT_ID }}
+          RUN_DIR: .
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+        run: python3 skills-repo/scripts/notify_feishu.py || true
