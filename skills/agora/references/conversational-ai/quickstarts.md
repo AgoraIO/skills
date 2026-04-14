@@ -3,6 +3,7 @@ name: conversational-ai-quickstarts
 description: |
   Locked quickstart flow for Agora Conversational AI. Use when no working baseline exists.
   BLOCKING: Do not write code, create files, scaffold projects, or propose custom architecture until the quickstart state machine reaches `complete`. Use the Agora CLI directly to verify and fix project readiness — do not ask the user to self-report. One decision group per turn. Before every reply, check: baseline_resolved? cli_readiness_done? vendor_gate_done? If any is false, stay in the current gate.
+  SAMPLE INTEGRITY: After cloning the official sample, the only allowed actions are: install dependencies, populate .env.local with CLI-extracted credentials, and start the app. Do NOT modify any sample source code, add files, change configs, or restructure the project unless the user explicitly requests it. The sample must run as-is for the first success gate.
 license: MIT
 metadata:
   author: agora
