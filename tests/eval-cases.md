@@ -99,6 +99,13 @@ For each case:
 - Pass Criteria: Does not go through `intake/SKILL.md` first when the request is already clearly ConvoAI-specific
 - Result: ___
 
+### R-13: Mixed CLI + ConvoAI onboarding request stays ConvoAI-first
+
+- User Input: "Help me use the CLI to fast onboard ConvoAI"
+- Expected Behavior: Routes to `references/conversational-ai/README.md` first, then uses the CLI references as a supporting readiness path
+- Pass Criteria: Does not route the whole request to the standalone CLI module first; keeps the conversation in the ConvoAI onboarding flow
+- Result: ___
+
 ---
 
 ## 2. Code Generation Quality (C-series)
@@ -368,6 +375,41 @@ For each case:
 - User Input: "Use my Agora Studio Agent ID in the start request"
 - Expected Behavior: The Studio path keeps the fixed request shape with `name`, `pipeline_id`, and `properties`
 - Pass Criteria: Does not replace `pipeline_id` with `agent_id`; preserves separate header token and `properties.token`
+- Result: ___
+
+### I-18: Fastest onboarding path can recommend CLI-assisted readiness
+
+- User Input: "I want the fastest way to get ConvoAI working"
+- Expected Behavior: Quickstart stays in the ConvoAI flow, but can recommend the Agora CLI as the fastest way to confirm login, project selection, feature enablement, and readiness before sample setup
+- Pass Criteria: Mentions the CLI-assisted readiness shortcut before code generation; still keeps the official sample as the first end-to-end baseline
+- Result: ___
+
+### I-19: CLI-assisted readiness does not replace the working baseline
+
+- User Input: "If `agora project doctor` is healthy, am I done with ConvoAI onboarding?"
+- Expected Behavior: Clarifies that CLI readiness is only preflight and does not replace the first successful end-to-end ConvoAI session
+- Pass Criteria: Explicitly says the CLI can verify readiness but cannot by itself prove the agent joins the RTC channel and completes a real conversation
+- Result: ___
+
+### I-20: Quickstart can spell out the full CLI + sample combo
+
+- User Input: "Give me the full fastest ConvoAI onboarding flow with CLI"
+- Expected Behavior: Quickstart provides a complete combined path rather than only linking out to CLI docs
+- Pass Criteria: Lists an ordered CLI preflight plus sample-run sequence such as login, project create or use, `feature enable convoai`, `project doctor`, then sample clone/env/run/verify
+- Result: ___
+
+### I-21: Full-flow combo still respects baseline-path gating
+
+- User Input: "Give me the full fastest onboarding flow"
+- Expected Behavior: If the baseline path is not already obvious, quickstart asks for the baseline path first instead of dumping every full-flow combination
+- Pass Criteria: Does not emit all path combinations when the request has not yet implied full-stack, separate backend/frontend, or existing-app integration
+- Result: ___
+
+### I-22: CLI shortcut does not overclaim App Certificate verification
+
+- User Input: "Can the CLI confirm my ConvoAI project is fully ready, including App Certificate?"
+- Expected Behavior: Clarifies the exact boundary of the CLI-assisted readiness step
+- Pass Criteria: Says the CLI can verify login, project context, feature readiness, App ID presence, and basic checks, but App Certificate availability still needs separate confirmation for the sample runtime path
 - Result: ___
 
 ---
