@@ -1,14 +1,14 @@
 ---
 name: agora
-description: Write code using Agora SDKs (agora.io) for real-time communication. Covers RTC (video/voice, live streaming, screen sharing), RTM/signaling, Conversational AI voice agents, Cloud Recording, Server Gateway, and token generation. Use for Agora, RTC, RTM, video calling, voice calling, screen sharing, recording, tokens, signaling, or ConvoAI requests across Web, React, Next.js, iOS, Android, Go, and Python. Triggers include agora-rtc-sdk-ng, agora-rtc-react, agora-rtm, agora-agent-server-sdk, AgoraVoiceAI, AgoraClient, useConversationalAI, useTranscript, useAgentState, Cloud Recording, Server Gateway, and Agora authentication.
+description: Write code and integration guidance using Agora products. Covers RTC (video/voice, live streaming, screen sharing), RTM/signaling, Conversational AI voice agents, Agora CLI project workflows, Cloud Recording, Server Gateway, and token generation. Use for Agora, RTC, RTM, ConvoAI, `agora` CLI, `agora login`, `agora project create`, `agora project doctor`, video calling, voice calling, screen sharing, recording, tokens, signaling, or ConvoAI requests across Web, React, Next.js, iOS, Android, Go, and Python.
 metadata:
   author: agora
-  version: '1.4.0'
+  version: '1.5.0'
 ---
 
 # Agora (agora.io)
 
-Skill version: 1.4.0
+Skill version: 1.5.0
 
 Build real-time communication applications using Agora SDKs across Web, iOS, Android, and server-side platforms.
 
@@ -41,6 +41,12 @@ Text messaging, signaling, presence, and metadata. Independent from RTC — chan
 REST API-driven voice AI agents. Create agents that join RTC channels and converse with users via speech. Front-end clients connect via RTC+RTM.
 
 **[references/conversational-ai/README.md](references/conversational-ai/README.md)** — Start here for new projects (quickstart repos to clone), REST API, agent config, recipe repos (agent-samples, agent-toolkit, agent-client-toolkit-react, agent-ui-kit, server-custom-llm, server-mcp)
+
+### Agora CLI
+
+Agora project and auth workflow through the installed `agora` command-line tool. Use when the request is about installing the CLI, logging in, creating or selecting projects, enabling `convoai`, or checking readiness with `project doctor`.
+
+**[references/cli/README.md](references/cli/README.md)** — Start here for `agoraio-cli`, `agora login`, `agora project create`, `agora project feature enable`, `agora project doctor`, config defaults, and script-safe `--json` usage
 
 ### Cloud Recording
 
@@ -85,6 +91,8 @@ Examples of clear requests:
 - "What providers does ConvoAI support?" → `references/conversational-ai/README.md`
 - "I want MLLM with Gemini" → `references/conversational-ai/README.md`
 - "I already have an Agent ID from Agora Studio" → `references/conversational-ai/README.md`
+- "How do I install agoraio-cli?" → `references/cli/README.md`
+- "Help me use agora project doctor" → `references/cli/README.md`
 - "Generate RTC token in Go" → `references/server/tokens.md`
 
 **Vague or multi-product request:** Route through `intake/SKILL.md`.
