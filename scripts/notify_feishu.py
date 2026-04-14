@@ -71,9 +71,11 @@ else:
 
     if report_path and report_path.exists():
         lines = report_path.read_text().splitlines()
+        # Try multiple patterns to find the summary line
         for line in lines:
-            if "pass" in line and "fail" in line and "cases" in line:
-                cases_summary = line.strip().lstrip("- ")
+            l = line.strip().lstrip("- ")
+            if ("pass" in l and "fail" in l) or ("cases:" in l) or ("pass:" in l):
+                cases_summary = l
                 break
         for i, line in enumerate(lines):
             if "task_execution" in line or "Timing" in line:
@@ -88,10 +90,15 @@ else:
         if cases_summary:
             if "0 fail" in cases_summary and "0 blocked" in cases_summary:
                 status = "✅ PASS"
-            elif "fail" in cases_summary:
+            elif "fail" in cases_summary and "0 fail" not in cases_summary:
                 status = "❌ FAIL"
-            else:
+            elif "blocked" in cases_summary and "0 blocked" not in cases_summary:
                 status = "⚠️ BLOCKED"
+            else:
+                status = "✅ PASS"
+        else:
+            status = "📊 完成"
+            cases_summary = "报告已生成"
 
     card = {
         "header": {
