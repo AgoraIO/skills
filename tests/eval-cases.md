@@ -372,6 +372,94 @@ For each case:
 
 ---
 
+## 5. CLI Skill Coverage (CLI-series)
+
+### CLI-01: Root routing for install and login
+
+- User Input: "How do I install agoraio-cli and log in?"
+- Expected Behavior: Routes to the top-level CLI module rather than RTC / ConvoAI / intake
+- Pass Criteria: Uses the CLI references, installs `agoraio-cli`, names the `agora` command, and includes `agora login`
+- Result: ___
+
+### CLI-02: Deprecated preview package migration
+
+- User Input: "I still have agora-cli-preview installed. What should I do?"
+- Expected Behavior: Explains the stable package migration path
+- Pass Criteria: Tells the user to uninstall `agora-cli-preview` and install `agoraio-cli`; does not present the preview package as current
+- Result: ___
+
+### CLI-03: Version-aware minimum support
+
+- User Input: "What CLI version should I use for this skill?"
+- Expected Behavior: Anchors guidance on the verified minimum version
+- Pass Criteria: States that the skill is verified against CLI `0.1.1` and written for `>=0.1.1`; does not hand-wave with "latest"
+- Result: ___
+
+### CLI-04: Project creation guidance stays within real command surface
+
+- User Input: "Create an Agora project for RTC and ConvoAI with the CLI"
+- Expected Behavior: Uses the documented project workflow
+- Pass Criteria: References `agora project create <name> --feature rtc --feature convoai`; does not invent unsupported flags or subcommands
+- Result: ___
+
+### CLI-05: Feature enable guidance uses real feature values
+
+- User Input: "How do I enable ConvoAI in the CLI?"
+- Expected Behavior: Uses the project feature subcommands
+- Pass Criteria: Uses `agora project feature enable convoai`; only references valid features `rtc`, `rtm`, or `convoai`
+- Result: ___
+
+### CLI-06: Doctor guidance includes actual recovery commands
+
+- User Input: "agora project doctor says my project is not ready. What next?"
+- Expected Behavior: Uses the CLI doctor workflow and suggested remediations
+- Pass Criteria: Mentions `agora login`, `agora project use <project>`, or `agora project feature enable convoai` where applicable; does not invent automatic healing behavior
+- Result: ___
+
+### CLI-07: Doctor deep mode is version-aware
+
+- User Input: "What does `agora project doctor --deep` do?"
+- Expected Behavior: Describes the currently verified behavior instead of promising future runtime checks
+- Pass Criteria: States that deep mode exists, but in CLI `0.1.1` runtime preflight is not available and is reported as skipped
+- Result: ___
+
+### CLI-08: Agent automation prefers JSON output
+
+- User Input: "I want an agent to call the CLI safely from scripts"
+- Expected Behavior: Recommends machine-readable output and stable parsing boundaries
+- Pass Criteria: Recommends `--json` or persisted JSON output mode; does not tell agents to parse pretty output by default
+- Result: ___
+
+### CLI-09: Config defaults and override locations are accurate
+
+- User Input: "Where does the Agora CLI keep its config, and can I override it?"
+- Expected Behavior: Explains the config directory and override mechanism
+- Pass Criteria: References the default Agora CLI config directory and `AGORA_HOME`; does not invent unrelated env vars
+- Result: ___
+
+### CLI-10: Failure path does not hallucinate missing commands
+
+- User Input: "Can I run `agora convoai init`?"
+- Expected Behavior: Rejects the invented command and routes to the real command set
+- Pass Criteria: Explicitly says this is not part of the verified CLI surface; redirects to actual `auth`, `config`, `project`, `project feature`, or `project doctor` commands
+- Result: ___
+
+### CLI-11: Root routing bypasses intake for clear CLI requests
+
+- User Input: "Help me use `agora project doctor`"
+- Expected Behavior: Routes directly to the CLI module
+- Pass Criteria: Does not go through `agora-intake`; treats the request as a CLI usage question first
+- Result: ___
+
+### CLI-12: ConvoAI onboarding prep points to CLI doctor without pretending onboarding is complete
+
+- User Input: "Before I integrate Conversational AI, what can the CLI verify for me?"
+- Expected Behavior: Positions the CLI as a readiness tool, not as the whole ConvoAI workflow
+- Pass Criteria: Mentions login, project selection, feature status, and `project doctor`; does not claim the CLI alone completes end-to-end ConvoAI onboarding
+- Result: ___
+
+---
+
 ## Evaluation Log
 
 | Date | Skill Version | Pass | Fail | Failed Cases | Fix Actions |
