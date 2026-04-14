@@ -1,11 +1,8 @@
 ---
 name: conversational-ai-quickstarts
 description: |
-  Locked quickstart flow for Agora Conversational AI when the user does not yet have a proven
-  working baseline. Use for new projects and integrations where the ConvoAI path has not been
-  proven end to end. Restricts the model to one decision group per turn: baseline path,
-  project readiness, then backend path only if needed. Do not generate code or custom
-  architecture before the quickstart gates are resolved.
+  Locked quickstart flow for Agora Conversational AI. Use when no working baseline exists.
+  BLOCKING: Do not write code, create files, scaffold projects, or propose custom architecture until the quickstart state machine reaches `complete`. Use the Agora CLI directly to verify and fix project readiness — do not ask the user to self-report. One decision group per turn. Before every reply, check: baseline_resolved? cli_readiness_done? vendor_gate_done? If any is false, stay in the current gate.
 license: MIT
 metadata:
   author: agora

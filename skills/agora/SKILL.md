@@ -88,12 +88,17 @@ Examples of clear requests:
 - "RTC Web video call" → `references/rtc/web.md`
 - "ConvoAI Python" → `references/conversational-ai/README.md`
 - "I want to build a demo that talks to an agent" → `references/conversational-ai/README.md`
+- "I want to build a voice chat demo with an AI agent" → `references/conversational-ai/README.md`
+- "Help me set up a voice AI assistant" → `references/conversational-ai/README.md`
+- "I want a conversational AI voice app" → `references/conversational-ai/README.md`
 - "What providers does ConvoAI support?" → `references/conversational-ai/README.md`
 - "I want MLLM with Gemini" → `references/conversational-ai/README.md`
 - "I already have an Agent ID from Agora Studio" → `references/conversational-ai/README.md`
 - "How do I install agoraio-cli?" → `references/cli/README.md`
 - "Help me use agora project doctor" → `references/cli/README.md`
 - "Generate RTC token in Go" → `references/server/tokens.md`
+
+> **Routing constraint:** When a request matches ConvoAI and the user does not have a proven working baseline, go to `references/conversational-ai/README.md` which will route to `quickstarts.md`. Do NOT go through `intake/SKILL.md` for clear ConvoAI requests. Do NOT skip the quickstart gates by jumping directly into code generation or project scaffolding.
 
 **Vague or multi-product request:** Route through `intake/SKILL.md`.
 Only do this when the product is still genuinely unclear after checking for obvious
