@@ -199,14 +199,14 @@ jobs:
           python3 scripts/run_openclaw_eval.py
 
       - name: Generate report
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         working-directory: agentic-evals
         env:
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
         run: python3 scripts/generate_report.py
 
       - name: Upload artifacts
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: eval-run-openclaw-${{ env.TARGET_ID }}-${{ github.run_id }}
@@ -215,7 +215,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Post report to job summary
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         env:
           RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
         run: |
@@ -246,7 +246,7 @@ jobs:
             });
 
       - name: Notify Feishu
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}

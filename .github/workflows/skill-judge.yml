@@ -82,7 +82,7 @@ jobs:
           sandbox: danger-full-access
 
       - name: Upload report
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: skill-judge-report-${{ github.run_id }}
@@ -91,7 +91,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Post report to job summary
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         run: |
           if [ -f skill-judge-report.md ]; then
             echo "## Skill Quality Review" >> "$GITHUB_STEP_SUMMARY"
@@ -118,7 +118,7 @@ jobs:
             });
 
       - name: Notify Feishu
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
