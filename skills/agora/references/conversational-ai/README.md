@@ -2,6 +2,8 @@
 
 REST API-driven voice AI agents. Create agents that join RTC channels and converse with users via speech. Front-end clients connect via RTC+RTM.
 
+> **HARD GATE:** If the user does not have a working ConvoAI baseline, route to [quickstarts.md](quickstarts.md) and stay there. Do not generate code, scaffold projects, propose custom architecture, or write files until the quickstart state machine reaches `complete`. This is not a suggestion — it is a blocking constraint.
+
 ## Routing: Classify the Request
 
 The key question: does the user already have a **working ConvoAI baseline**?
