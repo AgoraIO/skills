@@ -103,11 +103,9 @@ else:
     card = {
         "header": {
             "title": {"tag": "plain_text", "content": f"{status} {WORKFLOW}"},
-            "template": "green" if "PASS" in status else ("red" if "FAIL" in status else "orange")
+            "template": "blue"
         },
-        "elements": [
-            {"tag": "markdown", "content": f"**结果:** {cases_summary}" if cases_summary else "**结果:** 未生成报告"},
-        ]
+        "elements": []
     }
     if timing:
         card["elements"].append({"tag": "markdown", "content": f"**耗时:** {timing}"})

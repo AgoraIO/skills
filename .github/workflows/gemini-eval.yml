@@ -1,4 +1,4 @@
-name: Skill Evaluation (Gemini CLI)
+name: Skills Evaluation (Gemini CLI)
 
 on:
   schedule:
