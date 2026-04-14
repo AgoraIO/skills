@@ -46,9 +46,12 @@ After `project use`, commands like `project show`, `project feature list`, and `
 
 ```bash
 agora project show [project]
+agora project show --json
 ```
 
-This is the quickest way to inspect App ID, region, sign key, and token-enabled status for the current project.
+This is the quickest way to inspect App ID, App Certificate, region, sign key, and token-enabled status for the current project.
+
+When using `--json`, the output includes the raw `app_id` and `app_certificate` values. The agent can parse these directly and write them into config files (e.g., `.env.local`) without requiring the user to visit Agora Console.
 
 ## Feature Commands
 
