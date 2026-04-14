@@ -1,4 +1,4 @@
-name: Skill Evaluation
+name: Skills Evaluation (Codex)
 
 on:
   schedule:
@@ -245,7 +245,7 @@ jobs:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           FEISHU_CHAT_ID: ${{ secrets.FEISHU_CHAT_ID }}
-          RUN_DIR: agentic-evals/${{ steps.artifacts.outputs.run_dir }}
+          RUN_DIR: ${{ steps.artifacts.outputs.run_dir }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           WORKFLOW_NAME: ${{ github.workflow }}
         run: python3 skills-repo/scripts/notify_feishu.py || true

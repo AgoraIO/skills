@@ -33,48 +33,88 @@ if resp.get("code") != 0:
     sys.exit(1)
 token = resp["tenant_access_token"]
 
-status = "⚠️ No report"
-cases_summary = ""
-timing = ""
-report_path = Path(RUN_DIR) / "report.md" if RUN_DIR else None
-
-if report_path and report_path.exists():
-    lines = report_path.read_text().splitlines()
-    for line in lines:
-        if "pass" in line and "fail" in line and "cases" in line:
-            cases_summary = line.strip().lstrip("- ")
+# Find report file
+report_path = None
+if RUN_DIR:
+    p = Path(RUN_DIR) / "report.md"
+    if p.exists():
+        report_path = p
+if not report_path:
+    for candidate in ["skill-judge-report.md", "report.md"]:
+        if Path(candidate).exists():
+            report_path = Path(candidate)
             break
-    for i, line in enumerate(lines):
-        if "task_execution" in line or "Timing" in line:
-            for j in range(i+1, min(i+5, len(lines))):
-                if lines[j].strip().startswith("|") and "---" not in lines[j]:
-                    timing = lines[j].strip()
-                    break
-            break
-    if "0 fail" in cases_summary and "0 blocked" in cases_summary:
-        status = "✅ PASS"
-    elif "fail" in cases_summary:
-        status = "❌ FAIL"
-    else:
-        status = "⚠️ BLOCKED"
 
-card = {
-    "header": {
-        "title": {"tag": "plain_text", "content": f"{status} {WORKFLOW}"},
-        "template": "green" if "PASS" in status else ("red" if "FAIL" in status else "orange")
-    },
-    "elements": [
-        {"tag": "markdown", "content": f"**结果:** {cases_summary}"},
-    ]
-}
-if timing:
-    card["elements"].append({"tag": "markdown", "content": f"**耗时:** {timing}"})
-card["elements"].append({
-    "tag": "action", "actions": [
-        {"tag": "button", "text": {"tag": "plain_text", "content": "查看详情"},
-         "url": RUN_URL, "type": "primary"}
-    ]
-})
+# Detect if this is a judge workflow (different format)
+is_judge = "judge" in WORKFLOW.lower() or "quality" in WORKFLOW.lower()
+
+if is_judge:
+    # Simple notification for judge — just link
+    found = report_path and report_path.exists()
+    card = {
+        "header": {
+            "title": {"tag": "plain_text", "content": f"📋 {WORKFLOW} {'完成' if found else '未生成报告'}"},
+            "template": "blue" if found else "orange"
+        },
+        "elements": [
+            {"tag": "action", "actions": [
+                {"tag": "button", "text": {"tag": "plain_text", "content": "查看详情"},
+                 "url": RUN_URL, "type": "primary"}
+            ]}
+        ]
+    }
+else:
+    # Eval workflow — extract summary + timing
+    status = "⚠️ No report"
+    cases_summary = ""
+    timing = ""
+
+    if report_path and report_path.exists():
+        lines = report_path.read_text().splitlines()
+        # Try multiple patterns to find the summary line
+        for line in lines:
+            l = line.strip().lstrip("- ")
+            if ("pass" in l and "fail" in l) or ("cases:" in l) or ("pass:" in l):
+                cases_summary = l
+                break
+        for i, line in enumerate(lines):
+            if "task_execution" in line or "Timing" in line:
+                for j in range(i+1, min(i+10, len(lines))):
+                    l = lines[j].strip()
+                    if l.startswith("|") and "---" not in l and "task_execution" not in l and "case_id" not in l:
+                        parts = [p.strip() for p in l.split("|") if p.strip()]
+                        if len(parts) >= 4:
+                            timing = f"{parts[0]}: 执行 {parts[1]}, 验收 {parts[2]}, 总计 {parts[3]}"
+                        break
+                break
+        if cases_summary:
+            if "0 fail" in cases_summary and "0 blocked" in cases_summary:
+                status = "✅ PASS"
+            elif "fail" in cases_summary and "0 fail" not in cases_summary:
+                status = "❌ FAIL"
+            elif "blocked" in cases_summary and "0 blocked" not in cases_summary:
+                status = "⚠️ BLOCKED"
+            else:
+                status = "✅ PASS"
+        else:
+            status = "📊 完成"
+            cases_summary = "报告已生成"
+
+    card = {
+        "header": {
+            "title": {"tag": "plain_text", "content": f"{status} {WORKFLOW}"},
+            "template": "blue"
+        },
+        "elements": []
+    }
+    if timing:
+        card["elements"].append({"tag": "markdown", "content": f"**耗时:** {timing}"})
+    card["elements"].append({
+        "tag": "action", "actions": [
+            {"tag": "button", "text": {"tag": "plain_text", "content": "查看详情"},
+             "url": RUN_URL, "type": "primary"}
+        ]
+    })
 
 result = api_post(
     "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id",
