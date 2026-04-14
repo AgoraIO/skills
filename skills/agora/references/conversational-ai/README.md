@@ -26,6 +26,27 @@ The key question: does the user already have a **working ConvoAI baseline**?
 - If the user explicitly says the baseline already works, skip quickstart and route directly to the relevant implementation file.
 - If the user explicitly says they already have an **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, treat that as a dedicated ConvoAI path rather than re-running the provider-choice flow.
 - If the user needs Java, Ruby, PHP, C#, or another non-SDK backend language, use [auth-flow.md](auth-flow.md) after the quickstart path is chosen.
+- If the user asks to use the CLI to speed up ConvoAI onboarding, keep the request in the ConvoAI path first. Use the CLI only as a readiness helper for login, project selection, feature enablement, and `project doctor`, then continue the ConvoAI quickstart.
+
+## Fast Onboarding With Agora CLI
+
+For `quickstart` and `integration` mode, the fastest first-mile path is often:
+
+1. use the Agora CLI to verify login, current project, `convoai` feature readiness, and other basic project checks such as App ID presence
+2. run `project doctor` to catch missing setup early
+3. then continue the official ConvoAI sample path until the agent joins a real RTC channel and completes one end-to-end conversation
+
+Use the CLI references as the source of truth for command details:
+
+- [../cli/README.md](../cli/README.md)
+- [../cli/projects.md](../cli/projects.md)
+- [../cli/doctor.md](../cli/doctor.md)
+
+Important:
+
+- a healthy CLI readiness check does **not** replace a working ConvoAI baseline
+- the CLI can help verify login, project context, feature readiness, and basic project config, but it does **not** by itself prove the App Certificate is available for the sample runtime path
+- for the full combined onboarding flow, use the matching path in [quickstarts.md](quickstarts.md) once the baseline path is clear
 
 ## SDK vs. Direct REST API
 

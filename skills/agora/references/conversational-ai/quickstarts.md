@@ -9,7 +9,7 @@ description: |
 license: MIT
 metadata:
   author: agora
-  version: '1.1.0'
+  version: '1.2.0'
 ---
 
 # Conversational AI Quickstart
@@ -51,11 +51,124 @@ Follow this exact user-visible order:
 - Mirror the user's language.
 - While quickstart is unresolved, do **not** generate `/join` payloads, SDK code, custom file structures, clone commands, or repo adaptation plans.
 - While quickstart is unresolved, read only this file and [README.md](README.md).
+- If the user asks to use the CLI to speed up onboarding, keep the request inside this quickstart flow. Use the CLI only to resolve readiness faster, then return here for the official baseline path.
+- If the user explicitly asks for the full fastest onboarding flow, full checklist, or a complete CLI + sample sequence, you may give one matching full-flow combination only when the baseline path is already obvious from the request or has already been resolved. Otherwise ask the baseline-path prompt first.
 - Existing-app requests stay in quickstart until the ConvoAI path is proven once.
 - Unless the user explicitly asks for BYOK (bring your own key) or a different provider stack, anchor on the defaults first — no vendor API keys needed.
 - If `baseline_path=full-stack-nextjs`, keep the official sample's env var names. Do **not** rename them to generic provider-reference placeholders during quickstart.
 - For non-default provider selection, fetch the official current provider docs before confirming support or generating config details.
 - If the user already has an **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, treat that as a separate quickstart branch. Do not re-ask STT/LLM/TTS provider choices unless the user explicitly wants to replace the Studio-managed config.
+
+## CLI-Assisted Readiness Shortcut
+
+When the user wants the fastest onboarding path, is unsure whether the project is ready, or explicitly asks to use the CLI, use the Agora CLI as a helper during `project_readiness`.
+
+Use it only for:
+
+- login / auth status
+- current project selection
+- `convoai` feature enablement
+- App ID presence and other basic project checks
+- `agora project doctor` readiness checks
+
+The CLI shortcut does **not** prove that the App Certificate is available for the sample runtime path. That still needs to be confirmed from the project setup or Console before the sample can generate tokens.
+
+Do **not** treat the CLI as a separate quickstart mode. Do **not** treat a healthy doctor result as a proven ConvoAI baseline.
+
+For command details, route to the CLI references:
+
+- [../cli/README.md](../cli/README.md)
+- [../cli/projects.md](../cli/projects.md)
+- [../cli/doctor.md](../cli/doctor.md)
+
+After the CLI readiness step is resolved, return to this quickstart and continue from the same readiness checkpoint.
+
+## Fast Onboarding Combinations
+
+Use this section only in explicit full-flow response mode: the user asks for the whole fastest onboarding flow, full checklist, or complete CLI + sample sequence, and the baseline path is already obvious or already resolved.
+
+If the baseline path is still unclear, do **not** dump all combinations. Ask the baseline-path prompt first.
+
+### 1. Recommended: CLI preflight + full-stack Next.js quickstart
+
+Use this for most new demos and proofs of concept.
+
+1. Runtime prerequisites
+   1.1 Use Node.js 22.x+
+   1.2 Use pnpm 8.x+
+2. CLI preflight
+   2.1 Log in: `agora login`
+   2.2 Create a project or select an existing one:
+   `agora project create <name> --feature rtc --feature convoai`
+   or `agora project use <project>`
+   2.3 Ensure ConvoAI is enabled: `agora project feature enable convoai`
+   2.4 Check readiness: `agora project doctor`
+   2.5 If doctor is not `healthy` or `warning`, fix the reported issue before continuing
+3. Official sample baseline
+   3.1 Clone `agent-quickstart-nextjs`
+   3.2 Run `pnpm install`
+   3.3 Copy `env.local.example` to `.env.local`
+   3.4 Set `NEXT_PUBLIC_AGORA_APP_ID`
+   3.5 Set `NEXT_AGORA_APP_CERTIFICATE`
+   3.6 Start the app with `pnpm dev`
+4. Success gate
+   4.1 The app starts locally
+   4.2 The agent joins the RTC channel
+   4.3 The user can speak to the agent and hear TTS back
+   4.4 Only after this counts as a working baseline
+
+### 2. CLI preflight + separate backend/frontend baseline
+
+Use this when the user explicitly wants a decomposed server + client shape.
+
+1. CLI preflight
+   1.1 `agora login`
+   1.2 `agora project create <name> --feature rtc --feature convoai` or `agora project use <project>`
+   1.3 `agora project feature enable convoai`
+   1.4 `agora project doctor`
+   1.5 If doctor is not `healthy` or `warning`, fix the reported issue before continuing
+2. Baseline repo path
+   2.1 If the private Python baseline is available, use that
+   2.2 Otherwise fall back to `agent-samples`
+3. Public fallback steps for `agent-samples`
+   3.1 Clone `agent-samples`
+   3.2 Run `nvm install`
+   3.3 In `simple-backend`, create the venv, install requirements, and copy `.env.example` to `.env`
+   3.4 Configure the backend env with Agora credentials and the chosen sample profile
+   3.5 Start `simple-backend`
+   3.6 Start `react-voice-client` for the first success path
+4. Success gate
+   4.1 Backend can start the agent
+   4.2 Frontend joins the same channel
+   4.3 The conversation succeeds once before customization
+
+### 3. CLI preflight + existing app integration
+
+Use this when the user already has an app or repo but ConvoAI has not worked yet.
+
+1. CLI preflight
+   1.1 `agora login`
+   1.2 `agora project use <project>` or create/select the target project first
+   1.3 `agora project feature enable convoai`
+   1.4 `agora project doctor`
+   1.5 If doctor is not `healthy` or `warning`, fix the reported issue before continuing
+2. Existing app alignment
+   2.1 Keep the app sample-aligned for the first success path
+   2.2 Do not jump straight into custom `/join` payloads or bespoke architecture
+   2.3 Reuse the official full-stack sample or `agent-samples` flow until the agent works once
+   2.4 Confirm App ID and App Certificate are wired through the same sample-aligned token path
+3. Success gate
+   3.1 The existing app reaches the same end-to-end baseline as the official sample
+   3.2 Only then move to custom structure or advanced SDK usage
+
+### Combination Selection Rule
+
+- If the user wants the fastest default path, use Combination 1.
+- If they explicitly want a separate backend and frontend, use Combination 2.
+- If they already have an app or repo, use Combination 3.
+- In all three combinations, the CLI is the preflight layer and the sample-aligned baseline is the proof layer.
+- In all three combinations, App Certificate availability still needs separate confirmation before the sample runtime path can generate tokens.
+- If the user asks for command detail beyond these combinations, route to the CLI references.
 
 ## First-Success Vendor Defaults
 
@@ -139,7 +252,7 @@ The quickstart is a blocking state machine. While a state is unresolved, the onl
 |---|---|---|---|---|
 | `intro` | Give a short plain-language intro to what ConvoAI is | Code, repo plans, framework recommendations | Product intro text | Intro delivered |
 | `baseline_path` | Ask which baseline path to use | Code, clone steps, provider discussions | Baseline-path prompt | User picks A/B/C or gives equivalent clear context |
-| `project_readiness` | Ask about App ID, App Certificate, and ConvoAI activation | Code, repo inspection, backend implementation | Readiness prompt | User confirms ready or asks where to find them |
+| `project_readiness` | Ask about App ID, App Certificate, and ConvoAI activation, or offer the CLI shortcut to check and fix readiness faster | Code, repo inspection, backend implementation | Readiness prompt | User confirms ready, asks where to find them, or chooses the CLI shortcut |
 | `vendor_defaults` | Ask whether to use the defaults (no vendor keys), BYOK, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID. **Skip this gate entirely if the user has not mentioned BYOK, providers, or Studio Agent ID — defaults apply automatically.** | Code, implementation | Vendor-defaults prompt | User picks A/B/C/D/E, directly names a provider path / Studio Agent ID path, or gate is auto-skipped |
 | `vendor_selection` | Collect only provider-mode and provider choices after checking the official current provider docs | Code, implementation, secret collection | Custom-provider prompt | Provider mode and provider names are resolved |
 | `studio_agent_id` | Collect the Agora Studio Agent ID and confirm the user wants Studio to remain the source of truth for agent config | Code, re-asking provider setup from scratch | Studio-Agent-ID prompt | The Studio Agent ID path is resolved |
@@ -159,6 +272,8 @@ Before every tool call or user-visible reply:
 - If the user says they cloned a repo but never got an agent running, stay in quickstart.
 - If the user asks for code before quickstart resolves, answer with the next gate instead of generating code.
 - If a reply only partially resolves the current gate, ask a narrow follow-up for the missing field only.
+- If the user asks for the fastest onboarding path or mentions the CLI during setup, offer the CLI-assisted readiness shortcut and then return to the quickstart once readiness is confirmed.
+- If the user asks for the full fastest onboarding flow before the baseline path is clear, ask the baseline-path prompt first instead of dumping all full-flow combinations.
 - If the user names a provider that is not in the current official provider docs, say this clearly: it is **not currently documented as supported in the official Agora ConvoAI provider docs**, so do not proceed as if it is supported. Offer the documented default combo or a live-doc verification path.
 - If the user asks to see the provider list, fetch the current official provider docs and stay in the vendor gate until they accept the default combo or choose a documented alternative.
 - If the user says they already have an Agora Studio Agent ID, switch to the `studio_agent_id` state and stop re-asking provider-vendor questions unless they explicitly say they want to replace the Studio-managed config.
@@ -201,7 +316,19 @@ Before we continue, confirm these prerequisites:
 
 A. All ready
 B. Not yet — tell me where to get them
+C. Use the Agora CLI to check the parts it can verify first
 ```
+
+If the user picks `C` or explicitly asks for the CLI shortcut, route them to the CLI references for the command details, keep the conversation in quickstart, and then resume this readiness gate after the CLI step:
+
+- [../cli/README.md](../cli/README.md)
+- [../cli/projects.md](../cli/projects.md)
+- [../cli/doctor.md](../cli/doctor.md)
+
+Important:
+
+- the CLI can help verify login, project context, feature readiness, App ID presence, and other basic project checks
+- the CLI does **not** by itself prove the App Certificate is ready for the sample runtime path
 
 ### Backend Path
 
