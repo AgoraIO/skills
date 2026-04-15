@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+
+- `skills/agora/references/cli/env.md` — dedicated Agora CLI `project env` reference covering export formats, `AGORA_` variable names, secret opt-in behavior, managed-block writes, and default `.env*` target selection
+- CLI eval coverage in `tests/eval-cases.md` for `project env` export-first semantics, `--with-secrets`, default write-target safety, and OAuth loopback redirect mismatch guidance
+
+### Changed
+
+- `skills/agora/references/cli/README.md`, `skills/agora/SKILL.md`: updated CLI routing and examples to include `agora project env` and `agora project env write` as first-class workflows
+- `skills/agora/references/cli/automation.md`, `skills/agora/references/cli/projects.md`: shifted env guidance from `project show --json` toward `project env` / `project env write`, while keeping `project show --json` as metadata inspection
+- `skills/agora/references/cli/install-auth.md`: documented the verified OAuth loopback rule that authorize and token-exchange `redirect_uri` values must match exactly, with `localhost` vs `127.0.0.1` mismatch called out explicitly
+- `skills/agora/references/cli/README.md`, `skills/agora/references/cli/automation.md`, `skills/agora/references/cli/projects.md`, `skills/agora/references/cli/install-auth.md`, `skills/agora/references/cli/doctor.md`: raised the verified CLI baseline from `0.1.1` to `0.1.3`
+
 ## [1.4.0]
 
 ### Added
