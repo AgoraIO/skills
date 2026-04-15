@@ -1,0 +1,255 @@
+name: Skills Evaluation (Hermes Agent)
+
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+    inputs:
+      suite_ids:
+        description: "Comma-separated suite IDs, or 'all' for all suites"
+        required: false
+        default: "workflow"
+      case_id:
+        description: "Single case ID (leave empty for full suite)"
+        required: false
+        default: "convoai-e2e-first-success"
+      hermes_model:
+        description: "Hermes model (e.g. openai/gpt-4o)"
+        required: false
+        default: ""
+
+  pull_request:
+    paths:
+      - "skills/**/*.md"
+      - ".github/workflows/**"
+
+env:
+  TARGET_ID: agora
+  EVAL_REPO: Jiayi-Ye02/agentic-evals
+  EVAL_REF: main
+
+jobs:
+  evaluate:
+    runs-on: macos-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout skills repo
+        uses: actions/checkout@v5
+        with:
+          path: skills-repo
+
+      - name: Clone agentic-evals
+        run: |
+          git clone --depth 1 -b fix/eval-defaults-and-assertions "https://github.com/${EVAL_REPO}.git" agentic-evals
+
+      - name: Copy skill into agentic-evals
+        run: |
+          rm -rf agentic-evals/.agents/skills/agora
+          mkdir -p agentic-evals/.agents/skills/agora
+          cp -r skills-repo/skills/agora/* agentic-evals/.agents/skills/agora/
+          echo "Skill copied from skills-repo into agentic-evals/.agents/skills/agora/"
+
+      - name: Validate YAML
+        working-directory: agentic-evals
+        run: |
+          ruby -e '
+            require "yaml"
+            tid = "agora"
+            Dir["targets/#{tid}/cases/*/suite.yaml"].sort.each { |f| YAML.load_file(f) }
+            Dir["targets/#{tid}/cases/**/*.yaml"].sort.reject { |f| f.end_with?("suite.yaml") }.each { |f| YAML.load_file(f) }
+            YAML.load_file("targets/#{tid}/target.yaml")
+            puts "yaml-ok"
+          '
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install runtime dependencies
+        run: |
+          pip install pyyaml
+          npm install -g agent-browser @openai/codex
+
+      - name: Install Hermes Agent
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup
+          source ~/.bashrc || source ~/.zshrc || true
+          export PATH="$HOME/.local/bin:$PATH"
+          hermes version
+
+      - name: Configure Hermes
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          HERMES_MODEL: ${{ github.event.inputs.hermes_model || '' }}
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          mkdir -p ~/.hermes
+
+          # Derive base URL from RESPONSES_API_ENDPOINT (strip /v1/responses suffix)
+          BASE_URL="${RESPONSES_API_ENDPOINT%/v1/responses}"
+          BASE_URL="${BASE_URL%/}/v1"
+
+          # Determine model
+          MODEL="${HERMES_MODEL:-openai/gpt-4o}"
+
+          # Configure via hermes config set (proven working approach)
+          hermes config set model.provider custom
+          hermes config set model.base_url "${BASE_URL}"
+          hermes config set model.model "${MODEL}"
+          hermes config set agent.max_turns 90
+          hermes config set tools.profile coding
+          hermes config set terminal.backend local
+
+          # Write .env for API key
+          echo "OPENAI_API_KEY=${OPENAI_API_KEY}" > ~/.hermes/.env
+
+          echo "Hermes configured: provider=custom, base_url=${BASE_URL}, model=${MODEL}"
+
+      - name: Write credentials file
+        env:
+          AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
+          AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
+        run: |
+          printf 'export AGORA_APP_ID="%s"\nexport AGORA_APP_CERTIFICATE="%s"\n' \
+            "$AGORA_APP_ID" "$AGORA_APP_CERTIFICATE" > /tmp/agora-credentials.env
+          chmod 600 /tmp/agora-credentials.env
+
+      - name: Resolve cases
+        id: resolve
+        working-directory: agentic-evals
+        env:
+          SUITE_IDS: ${{ github.event.inputs.suite_ids || 'workflow' }}
+          CASE_ID: ${{ github.event.inputs.case_id || 'convoai-e2e-first-success' }}
+        run: |
+          python3 - << 'PY'
+          import yaml, json, os, datetime
+          target_id = os.environ["TARGET_ID"]
+          suite_ids = os.environ.get("SUITE_IDS", "workflow")
+          case_id = os.environ.get("CASE_ID", "convoai-e2e-first-success")
+          target = yaml.safe_load(open(f"targets/{target_id}/target.yaml"))
+          if suite_ids == "all":
+              suite_ids = target["default_suites"]
+          else:
+              suite_ids = [s.strip() for s in suite_ids.split(",")]
+          cases = []
+          for sid in suite_ids:
+              suite = yaml.safe_load(open(f"targets/{target_id}/cases/{sid}/suite.yaml"))
+              for cp in suite["cases"]:
+                  c = yaml.safe_load(open(cp))
+                  if case_id and c["case_id"] != case_id:
+                      continue
+                  cases.append({"case_id": c["case_id"], "path": cp, "user_prompt": c["input"]["user_prompt"]})
+          now = datetime.datetime.now(datetime.timezone.utc)
+          run_id = f"hermes-{now.strftime('%Y%m%dT%H%M%SZ')}"
+          run_dir = f"runs/{run_id}"
+          os.makedirs(f"{run_dir}/case-artifacts", exist_ok=True)
+          os.makedirs(f"{run_dir}/case-results", exist_ok=True)
+          manifest = {"run_mode": "single-run", "run_id": run_id, "runtime": "hermes-agent",
+                      "target_id": target_id, "suite_ids": suite_ids,
+                      "case_ids": [c["case_id"] for c in cases],
+                      "started_at": now.isoformat(), "evidence_mode": "hermes-two-phase"}
+          json.dump(manifest, open(f"{run_dir}/manifest.json", "w"), indent=2)
+          json.dump(cases, open("/tmp/hermes-eval-cases.json", "w"))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"run_dir={run_dir}\n")
+          print(f"Resolved {len(cases)} cases -> {run_dir}")
+          PY
+
+      - name: Run two-phase evaluation
+        working-directory: agentic-evals
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
+          AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
+          RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
+          HERMES_MODEL: ${{ github.event.inputs.hermes_model || '' }}
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          source /tmp/agora-credentials.env
+          python3 scripts/run_hermes_eval.py
+
+      - name: Generate report
+        if: always()
+        working-directory: agentic-evals
+        env:
+          RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
+        run: python3 scripts/generate_report.py
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-run-hermes-${{ env.TARGET_ID }}-${{ github.run_id }}
+          path: agentic-evals/${{ steps.resolve.outputs.run_dir }}
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Post report to job summary
+        if: always()
+        env:
+          RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
+        run: |
+          if [ -f "${RUN_DIR}/report.md" ]; then
+            echo "## Skill Eval Report (Hermes Agent)" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat "${RUN_DIR}/report.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Post report as PR comment
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        env:
+          RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const fs = require('fs');
+            const rp = `${process.env.RUN_DIR}/report.md`;
+            if (!fs.existsSync(rp)) return;
+            const report = fs.readFileSync(rp, 'utf8');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `## Skill Eval Report (Hermes Agent)\n\n${report}\n\n---\n[Download artifacts](${process.env.RUN_URL})`,
+            });
+
+      - name: Report results
+        if: always()
+        env:
+          RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
+        run: |
+          RESULTS_DIR="${RUN_DIR}/case-results"
+          [ -d "$RESULTS_DIR" ] || { echo "::warning::No case-results"; exit 0; }
+          FAIL=$(grep -rl '"status": "fail"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
+          PASS=$(grep -rl '"status": "pass"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
+          BLOCKED=$(grep -rl '"status": "blocked"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
+          echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
+          if [ "$FAIL" -gt 0 ]; then
+            echo "::warning::${FAIL} case(s) failed — see report for details"
+          fi
+
+      - name: Notify Feishu
+        if: always() && github.event_name != 'pull_request'
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_CHAT_ID: ${{ secrets.FEISHU_CHAT_ID }}
+          RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+        run: python3 skills-repo/scripts/notify_feishu.py || true
