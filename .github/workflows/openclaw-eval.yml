@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       suite_ids:
-        description: "Comma-separated suite IDs, or 'all' for defaults"
+        description: "Comma-separated suite IDs, or 'all' for all suites"
         required: false
-        default: "all"
+        default: "workflow"
       case_id:
         description: "Single case ID (leave empty for full suite)"
         required: false
-        default: ""
+        default: "convoai-e2e-first-success"
 
   pull_request:
     paths:

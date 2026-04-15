@@ -8,7 +8,7 @@ Use this sequence for most CLI project tasks:
 
 ```bash
 agora login
-agora project create my-agent-demo --feature rtc --feature convoai
+agora project create my-agent-demo --feature rtc --feature rtm --feature convoai
 agora project use my-agent-demo
 agora project show
 agora project feature list

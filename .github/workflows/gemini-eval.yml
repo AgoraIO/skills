@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       suite_ids:
-        description: "Comma-separated suite IDs, or 'all' for defaults"
+        description: "Comma-separated suite IDs, or 'all' for all suites"
         required: false
-        default: "all"
+        default: "workflow"
       case_id:
         description: "Single case ID (leave empty for full suite)"
         required: false
-        default: ""
+        default: "convoai-e2e-first-success"
       model:
         description: "Gemini model"
         required: false
@@ -74,19 +74,15 @@ jobs:
         id: resolve
         working-directory: agentic-evals
         env:
-          SUITE_IDS: ${{ github.event.inputs.suite_ids || 'all' }}
-          CASE_ID: ${{ github.event.inputs.case_id || '' }}
+          SUITE_IDS: ${{ github.event.inputs.suite_ids || 'workflow' }}
+          CASE_ID: ${{ github.event.inputs.case_id || 'convoai-e2e-first-success' }}
           IS_PR: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
         run: |
           python3 - << 'PY'
           import yaml, json, os, datetime
           target_id = os.environ["TARGET_ID"]
-          suite_ids = os.environ.get("SUITE_IDS", "all")
-          case_id = os.environ.get("CASE_ID", "")
-          is_pr = os.environ.get("IS_PR", "false")
-          if is_pr == "true" and not case_id:
-              case_id = "convoai-e2e-first-success"
-              suite_ids = "workflow"
+          suite_ids = os.environ.get("SUITE_IDS", "workflow")
+          case_id = os.environ.get("CASE_ID", "convoai-e2e-first-success")
           target = yaml.safe_load(open(f"targets/{target_id}/target.yaml"))
           if suite_ids == "all":
               suite_ids = target["default_suites"]
