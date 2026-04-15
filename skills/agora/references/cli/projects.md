@@ -1,6 +1,6 @@
 # Agora CLI Projects
 
-Verified against Agora CLI `0.1.1`.
+Verified against Agora CLI `0.1.3`.
 
 ## Core Workflow
 
@@ -10,7 +10,7 @@ Use this sequence for most CLI project tasks:
 agora login
 agora project create my-agent-demo --feature rtc --feature rtm --feature convoai
 agora project use my-agent-demo
-agora project show
+agora project env
 agora project feature list
 ```
 
@@ -51,11 +51,19 @@ agora project show --json
 
 This is the quickest way to inspect App ID, App Certificate, region, sign key, and token-enabled status for the current project.
 
-When using `--json`, the output includes the raw `app_id` and `app_certificate` values. The agent can parse these directly and write them into config files (e.g., `.env.local`) without requiring the user to visit Agora Console.
+Use `project show --json` for project metadata inspection.
+
+If the user wants exported env vars or a dotenv workflow, route to [env.md](env.md) and use:
+
+```bash
+agora project env
+agora project env --json
+agora project env write
+```
 
 ## Feature Commands
 
-Valid verified feature names in `0.1.1`:
+Valid verified feature names in `0.1.3`:
 
 - `rtc`
 - `rtm`

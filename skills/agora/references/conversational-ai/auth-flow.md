@@ -143,6 +143,8 @@ const ai = await AgoraVoiceAI.init({
 await rtcClient.join(appId, channel, rtcToken, uid);  // RTC token here
 ```
 
+**Identity rule:** the RTM client identity must match the identity the RTM token was minted for. If your backend minted `rtmToken` for `String(uid)`, do not create the RTM client with a different random user ID. In first-success paths, this kind of mismatch can surface as generic startup failures rather than a clear token error.
+
 ## App Credentials Shortcut
 
 With `appId + appCertificate` passed to `AgoraClient`, the SDK generates the ConvoAI token per request. The developer only needs to manage the two client-side tokens (RTC + RTM). This is the recommended path for production.

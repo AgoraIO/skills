@@ -409,7 +409,42 @@ For each case:
 
 - User Input: "Can the CLI confirm my ConvoAI project is fully ready, including App Certificate?"
 - Expected Behavior: Clarifies the exact boundary of the CLI-assisted readiness step
-- Pass Criteria: Says the CLI can verify login, project context, feature readiness, App ID presence, and basic checks, but App Certificate availability still needs separate confirmation for the sample runtime path
+- Pass Criteria: Says the CLI can verify login, project context, feature readiness, App ID presence, and App Certificate presence at the control-plane layer, but cannot by itself prove RTM runtime readiness or sample-ready status
+- Result: ___
+
+### I-23: Unspecified project prefers current project only if it is directly usable
+
+- User Input: "Use the CLI to get ConvoAI working for me. I didn't specify a project."
+- Expected Behavior: Quickstart checks the current selected project first, but only keeps it if it satisfies the first-success conditions
+- Pass Criteria: Does not blindly continue with the current project when it lacks the required certificate / token-ready path / features
+- Result: ___
+
+### I-24: Unspecified project avoids retrofitting arbitrary old projects
+
+- User Input: "I didn't name a project. Just get me to the fastest first-success path."
+- Expected Behavior: Quickstart prefers a directly usable project or creates a dedicated new one
+- Pass Criteria: Does not default to repairing arbitrary historical projects when the user did not ask for a specific one
+- Result: ___
+
+### I-25: Specified project is repaired first, then can fall back to a new project
+
+- User Input: "Use project `my-old-project` if possible."
+- Expected Behavior: Quickstart inspects and repairs the named project first, then falls back to a dedicated new project only if it still cannot satisfy first-success requirements
+- Pass Criteria: Preserves the repair-first behavior for user-specified projects instead of immediately abandoning them
+- Result: ___
+
+### I-26: RTM enablement delay is treated as runtime readiness, not instant failure
+
+- User Input: "I just enabled RTM and the first run still fails."
+- Expected Behavior: Quickstart distinguishes control-plane enablement from runtime usability
+- Pass Criteria: Mentions bounded wait/retry for RTM availability instead of treating the first failed run as proof of permanent misconfiguration
+- Result: ___
+
+### I-27: Proven sample bug allows minimal upstream workaround
+
+- User Input: "The official sample starts but a bug inside the sample itself blocks first success."
+- Expected Behavior: Quickstart stays on the official sample path but allows a minimal upstream-shaped workaround
+- Pass Criteria: Does not jump to a self-built replacement implementation; allows only the minimal fix needed to restore the official path
 - Result: ___
 
 ---
@@ -434,7 +469,7 @@ For each case:
 
 - User Input: "What CLI version should I use for this skill?"
 - Expected Behavior: Anchors guidance on the verified minimum version
-- Pass Criteria: States that the skill is verified against CLI `0.1.1` and written for `>=0.1.1`; does not hand-wave with "latest"
+- Pass Criteria: States that the skill is verified against CLI `0.1.3` and written for `>=0.1.3`; does not hand-wave with "latest"
 - Result: ___
 
 ### CLI-04: Project creation guidance stays within real command surface
@@ -462,7 +497,7 @@ For each case:
 
 - User Input: "What does `agora project doctor --deep` do?"
 - Expected Behavior: Describes the currently verified behavior instead of promising future runtime checks
-- Pass Criteria: States that deep mode exists, but in CLI `0.1.1` runtime preflight is not available and is reported as skipped
+- Pass Criteria: States that deep mode exists, but in CLI `0.1.3` runtime preflight is not available and is reported as skipped
 - Result: ___
 
 ### CLI-08: Agent automation prefers JSON output
@@ -498,6 +533,62 @@ For each case:
 - User Input: "Before I integrate Conversational AI, what can the CLI verify for me?"
 - Expected Behavior: Positions the CLI as a readiness tool, not as the whole ConvoAI workflow
 - Pass Criteria: Mentions login, project selection, feature status, and `project doctor`; does not claim the CLI alone completes end-to-end ConvoAI onboarding
+- Result: ___
+
+### CLI-13: Project env is export-first
+
+- User Input: "How do I get dotenv-style env vars from the Agora CLI?"
+- Expected Behavior: Routes to the dedicated CLI env workflow and uses `agora project env` as the primary command
+- Pass Criteria: Says `agora project env` prints dotenv lines to `stdout` by default and does not claim it writes `.env.local`
+- Result: ___
+
+### CLI-14: Secrets require explicit opt-in
+
+- User Input: "How do I get the app certificate from `agora project env`?"
+- Expected Behavior: Explains the secret boundary for env export
+- Pass Criteria: Requires `--with-secrets` before `AGORA_APP_CERTIFICATE` is exported; does not imply secrets are included by default
+- Result: ___
+
+### CLI-15: Env write chooses safe default targets
+
+- User Input: "If I run `agora project env write` without a path, where does it write?"
+- Expected Behavior: Describes the verified default target selection order
+- Pass Criteria: Prefers existing managed blocks, then `.env.local`, then `.env`, then other runtime `.env.*`, and explicitly excludes `.env.example`, `.env.sample`, and `.env.template`
+- Result: ___
+
+### CLI-16: OAuth loopback redirect mismatch guidance is host-aware
+
+- User Input: "Agora CLI login fails with `redirect_uri mismatch`. What should I check?"
+- Expected Behavior: Uses the verified loopback OAuth rule
+- Pass Criteria: Mentions exact `redirect_uri` matching across authorize and token exchange, and warns not to mix `localhost` with `127.0.0.1`
+- Result: ___
+
+### CLI-17: CLI doctor is framed as control-plane readiness only
+
+- User Input: "If `agora project doctor` is healthy, can I assume the sample will work now?"
+- Expected Behavior: Keeps the CLI doctor boundary narrow
+- Pass Criteria: Says `doctor` proves control-plane readiness only, not RTM runtime availability or sample-ready status
+- Result: ___
+
+### CLI-18: Undocumented CLI bootstrap shortcuts are rejected
+
+- User Input: "Can I use `agora convoai quickstart init` or `agora project doctor all`?"
+- Expected Behavior: Rejects invented CLI shortcuts
+- Pass Criteria: Explicitly says these are not part of the verified CLI surface and routes the user back to real `auth`, `project`, `project env`, `project feature`, and `project doctor` commands
+- Result: ___
+
+### CLI-19: Repo README teaches explicit skill prompting
+
+- User Input: "How do I tell my agent to use the Agora skill and not self-build?"
+- Expected Behavior: Points to explicit prompt templates or gives equivalent wording
+- Pass Criteria: Tells the user to explicitly instruct the agent to use the Agora skill, follow the official sample-first path, and avoid undocumented CLI commands or self-built first-success flows
+- Result: ___
+
+### C-15: RTM token subject and RTM login identity stay aligned
+
+- User Input: "Show me a ConvoAI browser/client setup with RTC + RTM."
+- Expected Behavior: Keeps RTM login identity aligned with the RTM token subject
+- Pass Criteria: Does not mint an RTM token for one identity and log RTM in as another random user ID; if the flow uses the RTC-resolved UID, the RTM identity uses `String(rtcUid)`
 - Result: ___
 
 ---

@@ -60,6 +60,34 @@ cp -r ~/agora-skills/skills/agora .claude/skills/agora
 
 ---
 
+## Prompting Your Agent
+
+If you want an agent to follow the Agora path instead of inventing its own flow, be explicit.
+
+Copy-paste templates:
+
+```text
+Use the Agora skill for this task. If this is a ConvoAI first-success flow, follow the official sample path first. Do not invent undocumented CLI commands. Do not build a custom implementation before the official sample works once.
+```
+
+If your tool supports explicit skill naming:
+
+```text
+Please use $agora and follow the official ConvoAI sample-first path. Do not self-build a demo until the official sample works end to end.
+```
+
+If you want to control project selection:
+
+```text
+If I do not specify a project, prefer a directly usable project for first success. If none exists, create a new dedicated token-ready project. If I specify a project, try to repair it first, then fall back to a new project only if needed.
+```
+
+If you want to avoid CLI hallucinations:
+
+```text
+Use only documented Agora CLI commands from the Agora skill. Do not invent commands like `agora convoai init` or other unofficial shortcuts.
+```
+
 ## What This Is
 
 This repo contains markdown skill files that give AI coding assistants deep knowledge of Agora's platform. When a developer asks for help with Agora, the assistant loads the relevant reference material — from high-level product overviews down to platform-specific code examples and API details.

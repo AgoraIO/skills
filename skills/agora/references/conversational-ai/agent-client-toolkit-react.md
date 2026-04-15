@@ -44,7 +44,7 @@ import {
 } from 'agora-agent-client-toolkit-react';
 
 const rtcClient = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
-const rtmClient = new AgoraRTM.RTM('APP_ID', 'USER_ID');
+const rtmClient = new AgoraRTM.RTM('APP_ID', 'RTM_USER_ID'); // must match the RTM token subject; often String(rtcUid)
 await rtmClient.login({ token: 'RTM_TOKEN' });
 
 function App() {
@@ -179,3 +179,4 @@ The hook internally calls `AgoraVoiceAI.init()`, `subscribeMessage()`, and `dest
 3. **All standalone hooks require `ConversationalAIProvider`** — `useTranscript`, `useAgentState`, `useAgentError`, and `useAgentMetrics` won't receive events without it.
 4. **Use `agora-rtc-react` for RTC primitives** — mic tracks, camera, remote users, join, and publish are handled by `agora-rtc-react` hooks. This package covers ConvoAI concerns only.
 5. **RTM must be logged in before passing to config** — call `rtmClient.login()` before passing `rtmEngine` into the provider config. The provider does not manage RTM login/logout.
+6. **RTM userId must match the RTM token subject** — if your server minted the RTM token for `String(rtcUid)`, do not construct `new AgoraRTM.RTM(appId, ...)` with a different user ID. In first-success flows, identity mismatches can bubble up as generic startup failures instead of a clean RTM auth error.

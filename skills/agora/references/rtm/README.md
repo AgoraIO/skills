@@ -34,11 +34,13 @@ RTM has two channel types with different semantics:
 ## Gotchas & Critical Rules
 
 - **UID type mismatch causes silent failures** — RTC UIDs are numbers; RTM UIDs are strings. If your app maps the same person across both systems, convert explicitly and consistently. `String(rtcUid)` is the default convention. Type mismatches don't throw errors — they silently break user lookups across both systems.
+- **RTM token subject and RTM login userId must match** — if your server minted an RTM token for `String(rtcUid)` (or any other identity), the RTM client must log in with that exact same string. Logging in RTM with a different random identity can look like a generic startup failure instead of a clear auth error.
 - **Namespace isolation** — RTC channels and RTM channels are completely separate. Joining RTC channel `"meeting-1"` does NOT auto-subscribe you to RTM channel `"meeting-1"`. Subscribe both explicitly.
 - **Login before all operations** — `rtmClient.login()` must complete (connection reaches `CONNECTED`) before any subscribe, publish, or presence call. Operations called while still connecting are not guaranteed to succeed.
 - **Subscribe before presence** — Presence events (joins/leaves) require an active channel subscription. Publishing to a channel without subscribing means you won't receive presence notifications or responses.
 - **RTM v2 API is a full rewrite** — Do NOT apply v1 patterns (`AgoraRTM.createInstance()`, `.createChannel()`) to v2. The APIs are incompatible. The Web reference (`web.md`) covers v2 only.
 - **ConvoAI transcript delivery requires two flags** — For AI agent transcripts to arrive via RTM, the ConvoAI `/join` payload must include both `advanced_features.enable_rtm: true` AND `parameters.data_channel: "rtm"`. One flag alone is not sufficient.
+- **Recent enablement can lag behind runtime availability** — if RTM or a related capability was just enabled at the control-plane layer, allow bounded wait/retry for up to about 5 minutes before concluding the runtime path is still broken.
 
 ## RTC + RTM Coordination Pattern
 
