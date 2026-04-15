@@ -45,7 +45,7 @@ jobs:
 
       - name: Clone agentic-evals
         run: |
-          git clone --depth 1 -b fix/eval-defaults-and-assertions "https://github.com/${EVAL_REPO}.git" agentic-evals
+          git clone --depth 1 "https://github.com/${EVAL_REPO}.git" agentic-evals
 
       - name: Copy skill into agentic-evals
         run: |
