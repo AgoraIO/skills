@@ -4,6 +4,8 @@ REST API-driven voice AI agents. Create agents that join RTC channels and conver
 
 > **HARD GATE:** If the user does not have a working ConvoAI baseline, route to [quickstarts.md](quickstarts.md) and stay there. Do not generate code, scaffold projects, propose custom architecture, or write files until the quickstart state machine reaches `complete`. This is not a suggestion — it is a blocking constraint.
 
+> **OFFICIAL DEMO FIRST:** When the user wants to try ConvoAI, build a demo, or prototype a voice AI agent, always clone and run the official sample repo first. Use the official repo and the official documented startup commands unchanged for the first-success gate. Do not implement from scratch. Do not use web search for Agora integration details — use only the skill reference files.
+
 ## Routing: Classify the Request
 
 The key question: does the user already have a **working ConvoAI baseline**?
@@ -29,6 +31,7 @@ The key question: does the user already have a **working ConvoAI baseline**?
 - If the user explicitly says they already have an **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, treat that as a dedicated ConvoAI path rather than re-running the provider-choice flow.
 - If the user needs Java, Ruby, PHP, C#, or another non-SDK backend language, use [auth-flow.md](auth-flow.md) after the quickstart path is chosen.
 - If the user asks to use the CLI to speed up ConvoAI onboarding, keep the request in the ConvoAI path first. Use the CLI only as a readiness helper for login, project selection, feature enablement, and `project doctor`, then continue the ConvoAI quickstart.
+- For the first-success gate, treat the sample README commands as exact. If a documented command fails because of sandbox, permission, port-binding, filesystem, or network restrictions, re-run the exact documented command with escalation if available. Do not add flags, host overrides, alternate entrypoints, or equivalent replacement commands.
 
 ## Fast Onboarding With Agora CLI
 

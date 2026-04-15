@@ -3,7 +3,7 @@ name: conversational-ai-quickstarts
 description: |
   Locked quickstart flow for Agora Conversational AI. Use when no working baseline exists.
   BLOCKING: Do not write code, create files, scaffold projects, or propose custom architecture until the quickstart state machine reaches `complete`. Use the Agora CLI directly to verify and fix project readiness — do not ask the user to self-report. One decision group per turn. Before every reply, check: baseline_resolved? cli_readiness_done? vendor_gate_done? If any is false, stay in the current gate.
-  SAMPLE INTEGRITY: After cloning the official sample, the only allowed actions are: install dependencies, populate .env.local with CLI-extracted credentials, and start the app. Do NOT modify any sample source code, add files, change configs, or restructure the project unless the user explicitly requests it. The sample must run as-is for the first success gate.
+  SAMPLE INTEGRITY: After cloning the official sample, the only allowed actions are: install dependencies, populate env with CLI-extracted credentials, and start the app using the commands documented in the sample's README. Do NOT modify source code, add files, change configs, or substitute your own startup commands. If a documented command is blocked by sandbox or permissions, re-run that exact command with escalation if available; otherwise stop and report an environment constraint. The sample must run as the author intended for the first success gate.
 license: MIT
 metadata:
   author: agora
@@ -56,6 +56,38 @@ Follow this exact user-visible order:
 - If `baseline_path=full-stack-nextjs`, keep the official sample's env var names. Do **not** rename them to generic provider-reference placeholders during quickstart.
 - For non-default provider selection, fetch the official current provider docs before confirming support or generating config details.
 - If the user already has an **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, treat that as a separate quickstart branch. Do not re-ask STT/LLM/TTS provider choices unless the user explicitly wants to replace the Studio-managed config.
+
+## Command Integrity Under Environment Restrictions
+
+For the first-success gate, treat the sample README commands as exact.
+
+If a documented command fails because of sandbox, permission, port-binding, filesystem, or network restrictions:
+
+1. Do **not** replace the command with an equivalent variant.
+2. Do **not** add flags, env vars, host overrides, alternate entrypoints, or custom wrappers.
+3. Re-run the exact documented command with required escalation or approval if available.
+4. If escalation is unavailable or denied, stop and report that the baseline is blocked by the execution environment, not by the sample itself.
+5. Do **not** continue to customization until the sample has been validated with the documented command.
+
+Forbidden substitutions include:
+
+- `pnpm dev` → `pnpm exec next dev ...`
+- `npm run dev` → `next dev ...`
+- README clone/start commands → custom shell variants that change the command semantics
+
+## Failure Attribution
+
+If the documented sample command fails before app code runs and the error indicates a local execution restriction, classify it as an environment constraint.
+
+Typical signals include:
+
+- `EPERM`
+- `EACCES`
+- blocked `listen` / `bind`
+- blocked `chmod` / filesystem permission errors
+- sandbox-denied network or local resource access
+
+Do **not** reinterpret these failures as sample misconfiguration and do **not** change the command to work around them.
 
 ## CLI-Driven Readiness Check
 
