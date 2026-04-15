@@ -3,11 +3,11 @@ name: conversational-ai-quickstarts
 description: |
   Locked quickstart flow for Agora Conversational AI. Use when no working baseline exists.
   BLOCKING: Do not write code, create files, scaffold projects, or propose custom architecture until the quickstart state machine reaches `complete`. Use the Agora CLI directly to verify and fix project readiness — do not ask the user to self-report. One decision group per turn. Before every reply, check: baseline_resolved? cli_readiness_done? vendor_gate_done? If any is false, stay in the current gate.
-  SAMPLE INTEGRITY: After cloning the official sample, the only allowed actions are: install dependencies, populate env with CLI-extracted credentials, and start the app using the commands documented in the sample's README. Do NOT modify source code, add files, change configs, or substitute your own startup commands. If a documented command is blocked by sandbox or permissions, re-run that exact command with escalation if available; otherwise stop and report an environment constraint. The sample must run as the author intended for the first success gate.
+  SAMPLE INTEGRITY: After cloning the official sample, the default allowed actions are: install dependencies, populate env with CLI-extracted credentials, and start the app using the commands documented in the sample's README. Do NOT substitute your own startup commands or replace the sample with a self-built implementation. If a documented command is blocked by sandbox or permissions, re-run that exact command with escalation if available; otherwise stop and report an environment constraint. If the failure is localized to the official sample itself, a minimal upstream-shaped workaround is allowed, but not a custom architecture or repo rewrite.
 license: MIT
 metadata:
   author: agora
-  version: '1.2.0'
+  version: '1.3.0'
 ---
 
 # Conversational AI Quickstart
@@ -89,6 +89,16 @@ Typical signals include:
 
 Do **not** reinterpret these failures as sample misconfiguration and do **not** change the command to work around them.
 
+## First-Success Readiness Layers
+
+Use three readiness layers during quickstart:
+
+- **Control-plane ready** — login works, the project resolves, App ID exists, App Certificate can be exported through the verified CLI surface, required features are enabled, and `agora project doctor` is not blocking.
+- **Runtime ready** — services are actually usable. In practice, RTM enablement may lag behind control-plane state; after enablement, allow bounded wait/retry for up to about 5 minutes before deciding the project still needs intervention.
+- **Sample ready** — the official sample installs, env is populated, the app starts, the browser can open, the user can press `Try it now`, the agent joins the RTC channel, and the frontend does not crash.
+
+`agora project doctor` only proves **control-plane ready**. It does not prove runtime or sample readiness.
+
 ## CLI-Driven Readiness Check
 
 The project readiness step requires the agent to directly execute Agora CLI commands to verify and fix prerequisites. Do not ask the user to run CLI commands themselves, do not offer manual alternatives, and do not present choices. The agent checks, the agent fixes.
@@ -97,11 +107,12 @@ The CLI covers:
 
 - login / auth status
 - current project selection
-- `convoai` feature enablement
-- App ID presence and other basic project checks
+- project env export
+- feature enablement
+- App ID presence, App Certificate presence, and other basic project checks
 - `agora project doctor` readiness checks
 
-The CLI readiness check returns both App ID and App Certificate values via `project show --json`. The agent should extract these values and write them directly into the sample's `.env.local` — no manual Console visit needed.
+Use `agora project env --with-secrets --json` as the primary source of truth for App ID and App Certificate during quickstart. Use `project show --json` only when project metadata inspection is needed.
 
 Do **not** treat a healthy doctor result as a proven ConvoAI baseline.
 
@@ -128,12 +139,12 @@ Use this for most new demos and proofs of concept.
    1.2 Use pnpm 8.x+
 2. CLI preflight
    2.1 Log in: `agora login`
-   2.2 Create a project or select an existing one:
-   `agora project create <name> --feature rtc --feature convoai`
-   or `agora project use <project>`
-   2.3 Ensure ConvoAI is enabled: `agora project feature enable convoai`
-   2.4 Check readiness: `agora project doctor`
-   2.5 If doctor is not `healthy` or `warning`, fix the reported issue before continuing
+   2.2 Prefer the current selected project only if it is directly usable for first-success
+   2.3 Otherwise select another directly usable project or create a new dedicated token-ready project
+   2.4 Ensure `rtc`, `rtm`, and `convoai` are enabled for the first-success path
+   2.5 Export App ID + App Certificate with `agora project env --with-secrets --json`
+   2.6 Check `agora project doctor`
+   2.7 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
 3. Official sample baseline
    3.1 Clone `agent-quickstart-nextjs`
    3.2 Run `pnpm install`
@@ -143,9 +154,12 @@ Use this for most new demos and proofs of concept.
    3.6 Start the app with `pnpm dev`
 4. Success gate
    4.1 The app starts locally
-   4.2 The agent joins the RTC channel
-   4.3 The user can speak to the agent and hear TTS back
-   4.4 Only after this counts as a working baseline
+   4.2 The browser can open the sample
+   4.3 The user can click `Try it now`
+   4.4 The agent joins the RTC channel
+   4.5 The frontend does not crash
+   4.6 The user can speak to the agent and hear TTS back
+   4.7 Only after this counts as a working baseline
 
 ### 2. CLI preflight + separate backend/frontend baseline
 
@@ -153,10 +167,11 @@ Use this when the user explicitly wants a decomposed server + client shape.
 
 1. CLI preflight
    1.1 `agora login`
-   1.2 `agora project create <name> --feature rtc --feature convoai` or `agora project use <project>`
-   1.3 `agora project feature enable convoai`
-   1.4 `agora project doctor`
-   1.5 If doctor is not `healthy` or `warning`, fix the reported issue before continuing
+   1.2 Prefer a directly usable project; otherwise create a new dedicated token-ready project
+   1.3 Ensure `rtc`, `rtm`, and `convoai` are enabled
+   1.4 Export App ID + App Certificate with `agora project env --with-secrets --json`
+   1.5 `agora project doctor`
+   1.6 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
 2. Baseline repo path
    2.1 If the private Python baseline is available, use that
    2.2 Otherwise fall back to `agent-samples`
@@ -178,10 +193,12 @@ Use this when the user already has an app or repo but ConvoAI has not worked yet
 
 1. CLI preflight
    1.1 `agora login`
-   1.2 `agora project use <project>` or create/select the target project first
-   1.3 `agora project feature enable convoai`
-   1.4 `agora project doctor`
-   1.5 If doctor is not `healthy` or `warning`, fix the reported issue before continuing
+   1.2 Inspect the specified or current target project first
+   1.3 If it is not first-success ready, repair it with documented CLI commands
+   1.4 If it still cannot satisfy first-success requirements, create a new dedicated token-ready project
+   1.5 Export App ID + App Certificate with `agora project env --with-secrets --json`
+   1.6 `agora project doctor`
+   1.7 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
 2. Existing app alignment
    2.1 Keep the app sample-aligned for the first success path
    2.2 Do not jump straight into custom `/join` payloads or bespoke architecture
@@ -197,7 +214,7 @@ Use this when the user already has an app or repo but ConvoAI has not worked yet
 - If they explicitly want a separate backend and frontend, use Combination 2.
 - If they already have an app or repo, use Combination 3.
 - In all three combinations, the CLI is the preflight layer and the sample-aligned baseline is the proof layer.
-- In all three combinations, App Certificate availability still needs separate confirmation before the sample runtime path can generate tokens.
+- In all three combinations, `doctor` only proves control-plane readiness; runtime/sample readiness still needs explicit confirmation.
 - If the user asks for command detail beyond these combinations, route to the CLI references.
 
 ## First-Success Vendor Defaults
@@ -282,7 +299,7 @@ The quickstart is a blocking state machine. While a state is unresolved, the onl
 |---|---|---|---|---|
 | `intro` | Give a short plain-language intro to what ConvoAI is | Code, repo plans, framework recommendations | Product intro text | Intro delivered |
 | `baseline_path` | Ask which baseline path to use | Code, clone steps, provider discussions | Baseline-path prompt | User picks A/B/C or gives equivalent clear context |
-| `project_readiness` | Execute CLI commands directly to verify auth, App ID, App Certificate, ConvoAI activation, and fix any missing prerequisites on the spot. Extract credentials from CLI output for later env auto-population. Do not ask the user to visit Console or choose a verification method | Code, repo inspection, backend implementation | Readiness prompt | CLI doctor passes and App ID + App Certificate are captured from CLI output |
+| `project_readiness` | Execute CLI commands directly to verify auth, direct-use project suitability, App ID, App Certificate, feature activation, and fix missing prerequisites on the spot. Extract credentials from CLI env output for later env auto-population. Do not ask the user to visit Console or choose a verification method | Code, repo inspection, backend implementation | Readiness prompt | Control-plane readiness is confirmed and App ID + App Certificate are captured from CLI env output |
 | `vendor_defaults` | Ask whether to use the defaults (no vendor keys), BYOK, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID. **Skip this gate entirely if the user has not mentioned BYOK, providers, or Studio Agent ID — defaults apply automatically.** | Code, implementation | Vendor-defaults prompt | User picks A/B/C/D/E, directly names a provider path / Studio Agent ID path, or gate is auto-skipped |
 | `vendor_selection` | Collect only provider-mode and provider choices after checking the official current provider docs | Code, implementation, secret collection | Custom-provider prompt | Provider mode and provider names are resolved |
 | `studio_agent_id` | Collect the Agora Studio Agent ID and confirm the user wants Studio to remain the source of truth for agent config | Code, re-asking provider setup from scratch | Studio-Agent-ID prompt | The Studio Agent ID path is resolved |
@@ -343,7 +360,7 @@ Do not ask the user to self-report readiness or choose between manual and CLI pa
 Tell the user what you are about to check, then execute the commands yourself:
 
 ```text
-Let me check your project readiness — I'll use the Agora CLI to verify login, project, App ID, App Certificate, and ConvoAI activation. If anything is missing I'll fix it directly. Once everything checks out I'll grab the credentials and fill in .env.local for you automatically.
+Let me check your project readiness — I'll use the Agora CLI to verify login, project, App ID, App Certificate, and ConvoAI activation. If anything is missing I'll fix it directly. Once the control-plane checks out I'll grab the credentials and fill in .env.local for you automatically.
 ```
 
 #### Agent execution sequence
@@ -353,22 +370,37 @@ Run these commands in order. Use `--json` where available so you can parse the o
 1. **Auth check** — `agora auth status --json`
    - If not logged in → run `agora login` and wait for the user to complete the browser OAuth flow.
 
-2. **Project context** — `agora project show --json`
-   - If no project is selected or the project does not exist yet → ask the user for a project name, then run `agora project create <name> --feature rtc --feature convoai` to create one with the required features already enabled. After creation, run `agora project use <name>`.
-   - If a project is already selected → continue.
+2. **Current project suitability** — check the currently selected project first.
+   - Inspect the selected project with `agora project show --json`.
+   - Treat it as directly usable only if the project resolves, App ID exists, App Certificate is exportable, and the required first-success features are present.
+   - If the current project is directly usable → keep it.
+   - If the current project is not directly usable → continue to project discovery.
 
-3. **App ID & App Certificate** — parse the `app_id` and `app_certificate` (or equivalent sign-key field) directly from the `project show --json` output.
-   - Both values are available in the CLI output. Extract them and hold for later use when writing `.env.local`.
-   - Do not ask the user to go to Agora Console to copy these values — the agent already has them.
+3. **Project discovery and selection**
+   - If the user explicitly named a project, inspect that exact project first and try to repair it with documented CLI commands.
+   - If the user did **not** name a project and the current selected project is not directly usable, inspect existing projects and look for a directly usable candidate.
+   - If a directly usable candidate is found, select it and explicitly tell the user which project was chosen before continuing.
+   - If no directly usable candidate exists, create a new dedicated first-success project with the required features already enabled, then select it.
 
-4. **Doctor** — `agora project doctor --json`
-   - If `healthy` or `warning` → readiness confirmed. All features including ConvoAI are good.
+4. **Credential export** — use `agora project env --with-secrets --json`
+   - Extract App ID and App Certificate from the CLI env output, not from Agora Console.
+   - Keep these values for later sample env population.
+   - If `--with-secrets` fails because the project is still not token-ready, treat that as a project-readiness failure and keep fixing or replace the project according to the selection rules above.
+
+5. **Doctor** — `agora project doctor --json`
+   - If `healthy` or `warning` → control-plane readiness is confirmed, not runtime/sample readiness.
    - If `not_ready` → read the reported issues and fix them directly:
      - ConvoAI not enabled → `agora project feature enable convoai`, then re-run doctor.
+     - RTM or related service just enabled → allow bounded wait/retry for up to about 5 minutes before concluding the project still needs intervention.
      - Other issues → run the matching recovery command (see [doctor.md](../cli/doctor.md)), then re-run doctor.
-   - Repeat until doctor passes.
+   - Repeat until doctor passes at the control-plane layer.
 
-5. **Auto-populate env** — once doctor passes, the agent has both `app_id` and `app_certificate` from step 3. When the sample repo is cloned and `.env.local` is created, the agent writes these values directly into the file. No manual copy-paste needed.
+6. **Auto-populate env** — once control-plane readiness passes, the agent has both App ID and App Certificate from step 4. When the sample repo is cloned and `.env.local` is created, the agent writes these values directly into the file. No manual copy-paste needed.
+
+7. **Sample-ready gate**
+   - Install dependencies and start the official sample using the documented commands.
+   - The quickstart is only fully ready when the app opens, the user can press `Try it now`, the agent joins, and the frontend stays up.
+   - If a failure is localized to the official sample itself rather than the environment or project readiness, a minimal upstream-shaped workaround is allowed. Do not replace the sample with a self-built implementation.
 
 For CLI command details, route to:
 

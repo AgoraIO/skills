@@ -42,7 +42,7 @@ import { AgoraVoiceAI } from 'agora-agent-client-toolkit';
 
 // Your existing RTC + RTM setup
 const rtcClient = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
-const rtmClient = new AgoraRTM.RTM('APP_ID', 'USER_ID');
+const rtmClient = new AgoraRTM.RTM('APP_ID', 'RTM_USER_ID'); // must match the RTM token subject; often String(rtcUid)
 await rtmClient.login({ token: 'RTM_TOKEN' });
 
 // Initialize the toolkit — pass your existing clients
@@ -191,6 +191,7 @@ await rtmClient.logout(); // you manage RTM lifecycle
 6. **Agent start config flags are required for some events** — `AGENT_STATE_CHANGED` requires `advanced_features.enable_rtm: true` AND `parameters.data_channel: "rtm"`. `AGENT_METRICS` requires `parameters.enable_metrics: true`. `AGENT_ERROR` requires `parameters.enable_error_message: true`.
 7. **Toolkit does not wrap join/publish** — call `rtcClient.join()` and `rtcClient.publish()` yourself before `subscribeMessage()`.
 8. **WORD mode requires PTS metadata enabled before RTC client creation** — if `renderMode` is `TranscriptHelperMode.WORD`, call `AgoraRTC.setParameter('ENABLE_AUDIO_PTS_METADATA', true)` before calling `AgoraRTC.createClient()`. Setting it after client creation produces no error — word-level timing data simply never arrives. This also applies when using `AUTO` mode if WORD is detected; prefer explicit `WORD` mode when karaoke display is required so the pre-configuration step is obvious.
+9. **RTM identity must match the RTM token subject** — if your RTM token was minted for `String(rtcUid)`, create or log in the RTM client with that same identity. Do not mint an RTM token for one user and log in RTM with another random ID; that can show up as generic conversation-start failures instead of a clear auth error.
 
 ## React Hooks
 

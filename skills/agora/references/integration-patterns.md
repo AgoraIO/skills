@@ -58,6 +58,8 @@ Recommended default: use `String(rtcUid)` as the RTM `userId` when your RTC UID 
 
 Alternative: use a stable app-level string identity for RTM and maintain an explicit mapping from RTC UID → RTM user ID in your app/backend.
 
+The RTM token subject and RTM login `userId` must match exactly. If your server minted the RTM token for `String(rtcUid)`, the client must log in RTM with that same string — not a different random or app-generated identity.
+
 UIDs greater than 2,147,483,647 wrap to negative on Android RTC — avoid them if Android clients are present.
 
 ### Channel Name Convention
@@ -112,6 +114,8 @@ If your client uses auto-assigned RTC UIDs, adapt the order slightly:
 4. Call `POST /join` from your app server
 
 The agent can publish transcripts/state through RTM only after the RTM client is logged in and subscribed.
+
+If RTM was just enabled on the project, allow bounded wait/retry before treating an RTM startup failure as a persistent project misconfiguration. Control-plane state can update before the RTM runtime path is actually usable.
 
 ### Required ConvoAI Flags for RTM Delivery
 

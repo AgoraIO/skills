@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - `skills/agora/references/cli/env.md` — dedicated Agora CLI `project env` reference covering export formats, `AGORA_` variable names, secret opt-in behavior, managed-block writes, and default `.env*` target selection
 - CLI eval coverage in `tests/eval-cases.md` for `project env` export-first semantics, `--with-secrets`, default write-target safety, and OAuth loopback redirect mismatch guidance
+- README prompt templates for explicitly telling agents to use the Agora skill, stay on the official sample-first path, and avoid undocumented CLI commands
 
 ### Changed
 
@@ -17,6 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `skills/agora/references/cli/automation.md`, `skills/agora/references/cli/projects.md`: shifted env guidance from `project show --json` toward `project env` / `project env write`, while keeping `project show --json` as metadata inspection
 - `skills/agora/references/cli/install-auth.md`: documented the verified OAuth loopback rule that authorize and token-exchange `redirect_uri` values must match exactly, with `localhost` vs `127.0.0.1` mismatch called out explicitly
 - `skills/agora/references/cli/README.md`, `skills/agora/references/cli/automation.md`, `skills/agora/references/cli/projects.md`, `skills/agora/references/cli/install-auth.md`, `skills/agora/references/cli/doctor.md`: raised the verified CLI baseline from `0.1.1` to `0.1.3`
+- `skills/agora/references/conversational-ai/README.md`, `skills/agora/references/conversational-ai/quickstarts.md`, `skills/agora/references/cli/doctor.md`: split ConvoAI onboarding into control-plane, runtime, and sample readiness so `doctor` no longer overclaims first-success readiness
+- `skills/agora/references/conversational-ai/quickstarts.md`: replaced the old “use current project or create one” shortcut with a deterministic first-success project-selection policy that prefers the current project only when it is directly usable, otherwise selects a usable candidate or creates a new token-ready project
+- `skills/agora/references/conversational-ai/auth-flow.md`, `skills/agora/references/integration-patterns.md`, `skills/agora/references/conversational-ai/agent-toolkit.md`, `skills/agora/references/conversational-ai/agent-client-toolkit-react.md`: added explicit RTM token-subject / login-identity alignment guidance and the RTM propagation-delay rule for first-success troubleshooting
+- `tests/eval-cases.md`: added coverage for first-success project selection, RTM propagation delay, minimal sample workarounds, explicit skill prompting, `doctor` boundary checks, and rejection of invented CLI shortcuts
 
 ## [1.4.0]
 

@@ -4,7 +4,7 @@ REST API-driven voice AI agents. Create agents that join RTC channels and conver
 
 > **HARD GATE:** If the user does not have a working ConvoAI baseline, route to [quickstarts.md](quickstarts.md) and stay there. Do not generate code, scaffold projects, propose custom architecture, or write files until the quickstart state machine reaches `complete`. This is not a suggestion — it is a blocking constraint.
 
-> **OFFICIAL DEMO FIRST:** When the user wants to try ConvoAI, build a demo, or prototype a voice AI agent, always clone and run the official sample repo first. Use the official repo and the official documented startup commands unchanged for the first-success gate. Do not implement from scratch. Do not use web search for Agora integration details — use only the skill reference files.
+> **OFFICIAL DEMO FIRST:** When the user wants to try ConvoAI, build a demo, or prototype a voice AI agent, always clone and run the official sample repo first. Use the official repo and the official documented startup commands for the first-success gate. Do not replace the flow with a self-built implementation. Do not use web search for Agora integration details — use only the skill reference files.
 
 ## Routing: Classify the Request
 
@@ -50,7 +50,7 @@ Use the CLI references as the source of truth for command details:
 Important:
 
 - a healthy CLI readiness check does **not** replace a working ConvoAI baseline
-- the CLI can help verify login, project context, feature readiness, and basic project config, but it does **not** by itself prove the App Certificate is available for the sample runtime path
+- the CLI can help verify login, project context, feature readiness, App Certificate presence, and basic project config, but it does **not** by itself prove RTM runtime availability or sample-ready status
 - for the full combined onboarding flow, use the matching path in [quickstarts.md](quickstarts.md) once the baseline path is clear
 
 ## SDK vs. Direct REST API
@@ -187,6 +187,8 @@ Things the official docs don't emphasize that cause frequent mistakes:
 - **20 PCU default limit** — max 20 concurrent agents per App ID. Exceeding returns error on `/join`. Contact Agora support to increase.
 - **Event notifications require two flags** — `advanced_features.enable_rtm: true` AND `parameters.data_channel: "rtm"` in the join config. Without both, `onAgentStateChanged`/`onAgentMetrics`/`onAgentError` won't fire. Additionally: `parameters.enable_metrics: true` for metrics, `parameters.enable_error_message: true` for errors.
 - **RTM channel name matches the RTC channel name** — the agent publishes transcripts and state events to the RTM channel with the same name as the RTC channel it joined. Subscribe the RTM client to the same channel name you passed to the agent's `properties.channel`.
+- **RTM login identity must match the RTM token subject** — if the RTM token was minted for `String(rtcUid)`, the RTM client must log in with that same identity. Do not mint a token for one user identity and then log in RTM with another random user ID; this can surface as generic startup failures such as "Failed to start conversation".
+- **RTM enablement can lag behind control-plane state** — after enabling RTM or related project capabilities, CLI/control-plane checks may report the feature as enabled before the RTM service is actually usable. For first-success flows, treat RTM availability as a bounded wait/retry condition for up to about 5 minutes before concluding the project still needs intervention.
 - **Custom LLM interruptable metadata** — the first SSE chunk can be `{"object": "chat.completion.custom_metadata", "metadata": {"interruptable": false}}` to prevent user speech from interrupting critical responses (e.g., compliance disclaimers). Subsequent chunks use standard `chat.completion.chunk` format.
 - **Error response format** — non-200 responses return `{ "detail": "...", "reason": "..." }`.
 - **MLLM `location` not `region`** — use `params.location: "us-central1"`, not `region`. The field name is `location` at every level (join payload and backend env vars).

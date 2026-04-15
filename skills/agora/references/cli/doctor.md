@@ -4,7 +4,7 @@ Verified against Agora CLI `0.1.3`.
 
 ## Purpose
 
-`agora project doctor` checks whether a project is ready for Conversational AI development from the CLI's point of view.
+`agora project doctor` checks whether a project is control-plane ready for Conversational AI development from the CLI's point of view.
 
 It verifies:
 
@@ -13,7 +13,7 @@ It verifies:
 - feature readiness
 - basic project configuration such as App ID presence
 
-It does not replace the full Conversational AI quickstart or end-to-end runtime validation.
+It does not replace the full Conversational AI quickstart, RTM runtime validation, or end-to-end sample validation.
 
 ## Commands
 
@@ -58,6 +58,8 @@ If doctor reports ConvoAI feature readiness issues:
 agora project feature enable convoai
 ```
 
+If RTM or a related capability was just enabled and the first run still fails, allow bounded wait/retry before concluding the project is still broken. Control-plane enablement may surface before the runtime service is actually usable.
+
 ## Deep Mode
 
 `--deep` is part of the verified CLI surface in `0.1.3`, but runtime preflight is not currently available there.
@@ -69,6 +71,14 @@ Verified `0.1.3` behavior:
 - the message is effectively "Deep runtime preflight is not available in CLI 0.1.3"
 
 Do not promise deeper runtime checks unless you have verified a newer CLI version.
+
+## First-Success Boundary
+
+Treat doctor results as **control-plane readiness only**:
+
+- `healthy` / `warning` can mean the project is configured correctly at the CLI layer
+- they do **not** prove RTM is already usable
+- they do **not** prove the official sample can start, open, survive `Try it now`, and complete a conversation
 
 ## Fix Mode
 
