@@ -1,6 +1,17 @@
 ---
 name: agora
-description: Write code and integration guidance using Agora products. Covers RTC (video/voice, live streaming, screen sharing), RTM/signaling, Conversational AI voice agents, Agora CLI project workflows, Cloud Recording, Server Gateway, and token generation. Use for Agora, RTC, RTM, ConvoAI, `agora` CLI, `agora login`, `agora project create`, `agora project env`, `agora project doctor`, video calling, voice calling, screen sharing, recording, tokens, signaling, or ConvoAI requests across Web, React, Next.js, iOS, Android, Go, and Python. RULES: Use only skill reference files for Agora integration — do not web search for Agora docs. For ConvoAI demos or prototypes, always clone the official sample first — do not implement from scratch.
+description: >-
+  Write code and integration guidance using Agora products. Covers RTC
+  (video/voice, live streaming, screen sharing), RTM/signaling, Conversational
+  AI voice agents, Agora CLI project workflows, Cloud Recording, Server
+  Gateway, and token generation. Use for Agora, RTC, RTM, ConvoAI, `agora`
+  CLI, `agora login`, `agora project create`, `agora project env`, `agora
+  project doctor`, video calling, voice calling, screen sharing, recording,
+  tokens, signaling, or ConvoAI requests across Web, React, Next.js, iOS,
+  Android, Go, and Python. RULES: Use only skill reference files for Agora
+  integration — do not web search for Agora docs. For ConvoAI demos or
+  prototypes, always clone the official sample first — do not implement from
+  scratch.
 metadata:
   author: agora
   version: '1.5.0'
