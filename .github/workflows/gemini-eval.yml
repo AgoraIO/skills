@@ -181,4 +181,4 @@ jobs:
           RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           WORKFLOW_NAME: ${{ github.workflow }}
-        run: python3 skills-repo/scripts/notify_feishu.py || true
+        run: python3 agentic-evals/scripts/notify_feishu.py || true
