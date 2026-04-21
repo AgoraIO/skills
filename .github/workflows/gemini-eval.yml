@@ -173,7 +173,7 @@ jobs:
             });
 
       - name: Notify Feishu
-        if: always() && github.event_name != 'pull_request'
+        if: always()
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
