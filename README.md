@@ -1,34 +1,41 @@
 # Agora Skills
 
-Add real-time voice, video, and AI voice agent capabilities to your app — with your AI coding assistant doing the heavy lifting. This skill gives your agent the knowledge to build video calls, live streaming, AI voice conversations, chat, recording, and more.
+**The fastest way to build real-time conversational AI applications and Voice Agents with your AI coding assistant.**
 
-## What Can You Build?
+Agora Skills is the official knowledge pack that teaches your AI coding assistant how to build on Agora — from picking the right product to wiring up credentials and running the first demo.
 
-- "I want to talk to an AI voice agent in my browser"
-- "Add video calling to my app"
-- "Build a live streaming feature"
-- "I need real-time chat and messaging"
-- "Record my voice/video sessions"
-- "Generate auth tokens for my backend"
+It's especially strong for conversational AI today — voice agents, AI companions, AI tutors, customer support bots, and physical AI — while still covering broader real-time use cases like chat, recording, and RTC-based experiences.
 
-Just describe what you want. The skill handles the rest — from account setup and credentials to running a working demo.
+## What This Skill Helps You Build
+
+Developers use Agora Skills to build:
+
+- **AI Voice Agents** — "I want to talk to an AI voice agent in my browser."
+- **AI Tutors** — "Build an AI tutor that can speak with users in real time."
+- **AI Companions** — "Create an AI companion with low-latency voice interaction and a custom personality."
+- **AI Customer Service** — "Build an AI customer service voice agent to replace our IVR."
+- **AI Voice Toys** — "Make a voice-enabled AI toy for kids with on-device wake word."
+- **Physical AI** — "Add real-time voice to a robot, wearable, or in-car assistant."
+- **Custom LLM Backends** — "Connect Agora Conversational AI to OpenAI, Anthropic, Gemini, DeepSeek, Qwen, or my own model."
+
+Agora Skills also covers real-time chat and messaging, session recording, production token generation, and traditional RTC scenarios (live streaming, voice chat rooms, live broadcast rooms) — see the capability table below for the full list.
 
 ## Quick Start
 
-Copy this into your AI agent:
+Copy this into your AI coding agent (Claude Code, Cursor, Windsurf, Copilot, Kiro, …):
 
-```text
-Install the Agora skill from https://github.com/AgoraIO/skills and use it.
-I want to build a voice AI agent demo. Walk me through the full setup.
-```
+> Install the Agora skill from https://github.com/AgoraIO/skills and use it.
+> I want to build a voice AI agent demo. Walk me through the full setup.
 
-The agent will:
-1. Log in to your Agora account via CLI (opens browser — sign up for free if you don't have one)
-2. Create a project and get credentials automatically
-3. Configure credentials automatically
-4. Start the demo
+With the Agora skill loaded, the agent can then:
 
-You don't need to visit the Agora Console or copy API keys — the agent uses the CLI to handle login, project creation, and credential extraction. You just complete the browser sign-in when prompted.
+1. **Log you into Agora** via the Agora CLI — opens a browser for free sign-up if you don't already have an account. No manual API key copy-pasting.
+2. **Create an Agora project** and extract the App ID, App Certificate, and any required tokens automatically.
+3. **Clone the official Conversational AI sample** that matches your target stack (Web, Next.js, iOS, Android, Python, Go…).
+4. **Run the demo locally** so you can actually talk to the voice agent within minutes.
+5. **Iterate from a working baseline** — swap the LLM (OpenAI / Anthropic / Gemini / DeepSeek / Qwen / your own), change the system prompt, add tools, or wire it into your existing app.
+
+You should not need to manually dig through the Agora Console just to get a first voice agent running.
 
 ## Installation
 
@@ -40,7 +47,7 @@ npx skills add github:AgoraIO/skills
 
 ### Claude Code Plugin
 
-```
+```bash
 /plugin marketplace add AgoraIO/skills
 /plugin install agora@agora-skills
 ```
@@ -51,29 +58,27 @@ npx skills add github:AgoraIO/skills
 git clone https://github.com/AgoraIO/skills.git
 ```
 
-Point your tool at `skills/agora/SKILL.md` as the entry point. Works with Cursor, Windsurf, GitHub Copilot, Kiro, or any tool that reads markdown.
+Then point your tool at:
 
-## How It Works
+```bash
+skills/agora/SKILL.md
+```
 
-1. You describe what you want to build
-2. The skill routes to the right product (voice AI, video, chat, etc.)
-3. For demos and prototypes, the agent clones an official sample and runs it as-is
-4. Credentials are handled via the [Agora CLI](https://www.npmjs.com/package/agoraio-cli) — the agent logs into your Agora account, creates a project, and extracts the credentials automatically
-5. Once the baseline works, you can customize
+This works with tools like **Cursor, Windsurf, GitHub Copilot, Kiro**, or any environment that can read markdown-based skill instructions.
 
-## What's Covered
 
-| Capability | Examples | Platforms |
-|-----------|----------|-----------|
-| AI Voice Agents | Talk to an AI in real time, custom LLM backends, voice bots | Web, React, Next.js, iOS, Android, Python, Go |
-| Video/Voice Calls | 1:1 calls, group calls, live streaming, screen sharing | Web, React, Next.js, iOS, Android, React Native, Flutter |
-| Chat & Signaling | Real-time messaging, presence, notifications | Web, iOS, Android |
-| Recording | Server-side recording of sessions | REST API |
-| Auth & Tokens | Token generation for production apps | Node.js, Python, Go |
-| Server Gateway | Server-side media streaming | Linux (C++) |
-| Multi-Product | RTC + RTM + AI agents combined | Cross-platform |
+## What’s Covered
 
-For architecture details and file structure, see [ARCHITECTURE.md](ARCHITECTURE.md).
+|Capability|Examples|Platforms|
+|---|---|---|
+|**Conversational AI / Voice Agents**|Real-time AI voice agents, AI companion, AI tutor, voice bots, customer support|Web, React, Next.js, iOS, Android, Python, Go|
+|**Video / Voice RTC**|1:1 calls, group calls, live streaming, screen sharing|Web, React, Next.js, iOS, Android, React Native, Flutter|
+|**Chat & Signaling**|Real-time messaging, presence, notifications|Web, iOS, Android|
+|**Recording**|Server-side recording of sessions|REST API|
+|**Auth & Tokens**|Token generation for production apps|Node.js, Python, Go|
+|**Server Gateway**|Server-side media streaming|Linux (C++)|
+|**Multi-Product Workflows**|RTC + RTM + AI agents combined|Cross-platform|
+
 
 ## IDE & Tool Setup
 
@@ -94,31 +99,31 @@ cp -r ~/agora-skills/skills/agora .claude/skills/agora
 
 ### Cursor
 
-Copy or symlink into `.cursor/rules/`. See [Cursor skills docs](https://cursor.com/docs/skills#skill-directories).
+Copy or symlink the skill into `.cursor/rules/`.
 
 ### Windsurf
 
-Add `skills/agora/` to your Cascade context. See [Windsurf skills docs](https://docs.windsurf.com/windsurf/cascade/skills).
+Add `skills/agora/` to your Cascade context.
 
 ### GitHub Copilot
 
-Reference via `@workspace` or add to `.github/copilot-instructions.md`. See [Copilot skills docs](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/create-skills).
+Reference it with `@workspace` or add the instructions into `.github/copilot-instructions.md`.
 
 ### Any other tool
 
-The skill files are plain markdown. Point your tool at `skills/agora/SKILL.md` as the entry point — it links to everything else.
+The skill files are plain markdown. Use `skills/agora/SKILL.md` as the entry point.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See[ `CONTRIBUTING.md`](https://github.com/AgoraIO/skills/blob/feat/readme-and-description-rewrite/CONTRIBUTING.md).
 
 ## About
 
-Powered by [Agora](https://www.agora.io) (agora.io) — the real-time engagement platform behind billions of voice, video, and interactive experiences worldwide.
+Powered by [Agora](agora.io)(agora.io) — the real-time engagement platform behind voice, video, messaging, and interactive AI experiences.
 
-- [Agora Documentation](https://docs.agora.io)
-- [Agora Console](https://console.agora.io)
-- [Agora GitHub](https://github.com/AgoraIO)
+- Agora Documentation: [https://docs.agora.io/](https://docs.agora.io/)
+- Agora Console: [https://console.agora.io/](https://console.agora.io/)
+- Agora GitHub: [https://github.com/AgoraIO](https://github.com/AgoraIO)
 
 ## License
 
