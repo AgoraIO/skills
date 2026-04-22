@@ -1,217 +1,130 @@
 # Agora Skills
 
-Structured reference knowledge for [Agora](https://www.agora.io) (agora.io) real-time AI and Communication SDKs, designed for AI coding assistants. Covers Conversational AI (voice AI agents), RTC (video/voice), RTM (signaling/messaging), and server-side token generation.
+**The fastest way to build real-time conversational AI applications and Voice Agents with your AI coding assistant.**
+
+Agora Skills is the official knowledge pack that teaches your AI coding assistant how to build on Agora — from picking the right product to wiring up credentials and running the first demo.
+
+It's especially strong for conversational AI today — voice agents, AI companions, AI tutors, customer support bots, and physical AI — while still covering broader real-time use cases like chat, recording, and RTC-based experiences.
+
+## What This Skill Helps You Build
+
+Developers use Agora Skills to build:
+
+- **AI Voice Agents** — "I want to talk to an AI voice agent in my browser."
+- **AI Tutors** — "Build an AI tutor that can speak with users in real time."
+- **AI Companions** — "Create an AI companion with low-latency voice interaction and a custom personality."
+- **AI Customer Service** — "Build an AI customer service voice agent to replace our IVR."
+- **AI Voice Toys** — "Make a voice-enabled AI toy for kids with on-device wake word."
+- **Physical AI** — "Add real-time voice to a robot, wearable, or in-car assistant."
+- **Custom LLM Backends** — "Connect Agora Conversational AI to OpenAI, Anthropic, Gemini, DeepSeek, Qwen, or my own model."
+
+Agora Skills also covers real-time chat and messaging, session recording, production token generation, and traditional RTC scenarios (live streaming, voice chat rooms, live broadcast rooms) — see the capability table below for the full list.
+
+## Quick Start
+
+Copy this into your AI coding agent (Claude Code, Cursor, Windsurf, Copilot, Kiro, …):
+
+> Install the Agora skill from https://github.com/AgoraIO/skills and use it.
+> I want to build a voice AI agent demo. Walk me through the full setup.
+
+With the Agora skill loaded, the agent can then:
+
+1. **Log you into Agora** via the Agora CLI — opens a browser for free sign-up if you don't already have an account. No manual API key copy-pasting.
+2. **Create an Agora project** and extract the App ID, App Certificate, and any required tokens automatically.
+3. **Clone the official Conversational AI sample** that matches your target stack (Web, Next.js, iOS, Android, Python, Go…).
+4. **Run the demo locally** so you can actually talk to the voice agent within minutes.
+5. **Iterate from a working baseline** — swap the LLM (OpenAI / Anthropic / Gemini / DeepSeek / Qwen / your own), change the system prompt, add tools, or wire it into your existing app.
+
+You should not need to manually dig through the Agora Console just to get a first voice agent running.
 
 ## Installation
 
-### Skills CLI (recommended)
+### Skills CLI
 
 ```bash
 npx skills add github:AgoraIO/skills
 ```
 
-Skills activate automatically when your agent detects relevant tasks (e.g., "build a voice agent", "integrate Agora RTC", "generate a token").
+### Claude Code Plugin
 
-### Claude Code Plugin (recommended if using Claude)
-
-Install Agora skills and the Agora Docs MCP server as a Claude Code plugin. Run these two slash commands inside Claude Code:
-
-```
+```bash
 /plugin marketplace add AgoraIO/skills
 /plugin install agora@agora-skills
 ```
 
-The Agora MCP server (`mcp.agora.io`) is bundled automatically — no separate MCP configuration needed.
-
-### Git clone
-
-Clone the repo once, then point your tool at `skills/agora/`:
+### Git Clone
 
 ```bash
-git clone https://github.com/AgoraIO/skills.git ~/agora-skills
+git clone https://github.com/AgoraIO/skills.git
 ```
 
-### Configure with your Agent or IDE (optional)
-
-**Claude Code — symlink (user-level):**
-
-When installing the skill using the Skills CLI, you can symlink the skill to your home directory. This will make the skill available to all your agents.
+Then point your tool at:
 
 ```bash
+skills/agora/SKILL.md
+```
+
+This works with tools like **Cursor, Windsurf, GitHub Copilot, Kiro**, or any environment that can read markdown-based skill instructions.
+
+
+## What’s Covered
+
+|Capability|Examples|Platforms|
+|---|---|---|
+|**Conversational AI / Voice Agents**|Real-time AI voice agents, AI companion, AI tutor, voice bots, customer support|Web, React, Next.js, iOS, Android, Python, Go|
+|**Video / Voice RTC**|1:1 calls, group calls, live streaming, screen sharing|Web, React, Next.js, iOS, Android, React Native, Flutter|
+|**Chat & Signaling**|Real-time messaging, presence, notifications|Web, iOS, Android|
+|**Recording**|Server-side recording of sessions|REST API|
+|**Auth & Tokens**|Token generation for production apps|Node.js, Python, Go|
+|**Server Gateway**|Server-side media streaming|Linux (C++)|
+|**Multi-Product Workflows**|RTC + RTM + AI agents combined|Cross-platform|
+
+
+## IDE & Tool Setup
+
+### Claude Code — symlink (user-level)
+
+```bash
+npx skills add github:AgoraIO/skills
+# or manually:
 ln -s ~/agora-skills/skills/agora ~/.claude/skills/agora
 ```
 
-**Claude Code — copy (project-level, shared with team):**
-
-When installing the skill using the Claude Code Plugin, you can copy the skill to your project directory. This will make the skill available to all your agents in the project.
+### Claude Code — copy (project-level, shared with team)
 
 ```bash
 mkdir -p .claude/skills
 cp -r ~/agora-skills/skills/agora .claude/skills/agora
 ```
 
-**Cursor:** Copy or symlink into `.cursor/rules/`. See [Cursor skills docs](https://cursor.com/docs/skills#skill-directories).
+### Cursor
 
-**Windsurf:** Add `skills/agora/` to your Cascade context. See [Windsurf skills docs](https://docs.windsurf.com/windsurf/cascade/skills).
+Copy or symlink the skill into `.cursor/rules/`.
 
-**GitHub Copilot:** Reference via `@workspace` or add to `.github/copilot-instructions.md`. See [Copilot CLI skills](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/create-skills) and [Copilot Agents skills](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-skills).
+### Windsurf
 
-**Any other tool:** The skill files are plain markdown. Point your tool at `skills/agora/` or load individual files directly. Use `SKILL.md` as the entry point — it links to everything else.
+Add `skills/agora/` to your Cascade context.
 
----
+### GitHub Copilot
 
-## Prompting Your Agent
+Reference it with `@workspace` or add the instructions into `.github/copilot-instructions.md`.
 
-If you want an agent to follow the Agora path instead of inventing its own flow, be explicit.
+### Any other tool
 
-Copy-paste templates:
+The skill files are plain markdown. Use `skills/agora/SKILL.md` as the entry point.
 
-```text
-Use the Agora skill for this task. If this is a ConvoAI first-success flow, follow the official sample path first. Do not invent undocumented CLI commands. Do not build a custom implementation before the official sample works once.
-```
+## Contributing
 
-If your tool supports explicit skill naming:
+See[ `CONTRIBUTING.md`](https://github.com/AgoraIO/skills/blob/feat/readme-and-description-rewrite/CONTRIBUTING.md).
 
-```text
-Please use $agora and follow the official ConvoAI sample-first path. Do not self-build a demo until the official sample works end to end.
-```
+## About
 
-If you want to control project selection:
+Powered by [Agora](agora.io)(agora.io) — the real-time engagement platform behind voice, video, messaging, and interactive AI experiences.
 
-```text
-If I do not specify a project, prefer a directly usable project for first success. If none exists, create a new dedicated token-ready project. If I specify a project, try to repair it first, then fall back to a new project only if needed.
-```
+- Agora Documentation: [https://docs.agora.io/](https://docs.agora.io/)
+- Agora Console: [https://console.agora.io/](https://console.agora.io/)
+- Agora GitHub: [https://github.com/AgoraIO](https://github.com/AgoraIO)
 
-If you want to avoid CLI hallucinations:
+## License
 
-```text
-Use only documented Agora CLI commands from the Agora skill. Do not invent commands like `agora convoai init` or other unofficial shortcuts.
-```
-
-## What This Is
-
-This repo contains markdown skill files that give AI coding assistants deep knowledge of Agora's platform. When a developer asks for help with Agora, the assistant loads the relevant reference material — from high-level product overviews down to platform-specific code examples and API details.
-
-**Products covered:**
-
-- **RTC (Video/Voice SDK)** — Web, React, Next.js, iOS (Swift), Android (Kotlin/Java), React Native, Flutter
-- **RTM (Signaling)** — Web (JS/TS), iOS (Swift), Android (Kotlin) — all v2; messaging, presence, metadata, stream channels
-- **Conversational AI** — REST API, agent config, Gemini Live + OpenAI Realtime MLLM, iOS/Android toolkits, 6 recipe repos (agent-samples, agent-toolkit, agent-client-toolkit-react, agent-ui-kit, server-custom-llm, server-mcp)
-- **Cloud Recording** — REST API acquire/start/query/stop lifecycle
-- **Server Gateway** — Linux SDK (C++) for server-side RTC
-- **Server-Side** — Token generation for Node.js, Python, Go
-- **Multi-Product Integration** — RTC + RTM + ConvoAI initialization order, UID strategy, codec selection, token matrix
-- **Testing Guidance** — Mocking patterns for all platforms (Web, React, iOS, Android, React Native, Flutter, RTM)
-
-## Design — 4-Layer Progressive Disclosure
-
-LLM context windows are finite. Load the minimum needed, go deeper only when required.
-
-| Layer                  | What                                                                | Size         | When Loaded          |
-| ---------------------- | ------------------------------------------------------------------- | ------------ | -------------------- |
-| **1 — Description**    | Trigger keywords in `SKILL.md` frontmatter                          | ~100 words   | Always (skill index) |
-| **2 — SKILL.md body**  | Core concepts, product index, framework notes                       | ~72 lines    | On activation        |
-| **3 — Product README** | Overview, critical rules, topic links                               | 20–100 lines | Per product          |
-| **4 — Topic files**    | Implementation detail, code examples, API reference, or TOC + links | 34–500 lines | Per topic            |
-
-Navigation: `SKILL.md` → product `README.md` → topic file (e.g., `web.md`, `agent-samples.md`).
-
-### Link-First vs Inline
-
-Not all content belongs inline. The skill uses two strategies depending on how fast upstream content moves and how well it's documented:
-
-| Product               | Strategy                                 | Why                                           |
-| --------------------- | ---------------------------------------- | --------------------------------------------- |
-| **Conversational AI** | TOC + links to repo READMEs and AGENT.md | Fast-moving, 5 upstream repos with good docs  |
-| **RTC / RTM**         | Inline code examples                     | Stable APIs, official docs lack good examples |
-| **Server / Tokens**   | TOC + links to official docs             | Well-documented at docs.agora.io              |
-
-ConvoAI files are aligned 1:1 with repos in [AgoraIO-Conversational-AI](https://github.com/orgs/AgoraIO-Conversational-AI/repositories). Each file maps to one repo and links to its README and AGENT.md as sources of truth. Gotchas and quirks that LLMs consistently get wrong stay inline in the ConvoAI README.
-
-## File Structure
-
-```
-skills/
-└── agora/                          Skill root
-    ├── SKILL.md                    Entry point, product index (v1.2.0)
-    ├── intake/
-    │   └── SKILL.md                Multi-product needs analysis router
-    └── references/
-        ├── doc-fetching.md         Two-tier lookup procedure (agent-facing)
-        ├── mcp-tools.md            MCP tool reference and graceful degradation
-        ├── integration-patterns.md RTC+RTM+ConvoAI: init order, UID strategy, codec, tokens
-        ├── rtc/                    RTC (Video/Voice SDK)
-        │   ├── README.md           Critical rules, encoder profiles, cross-platform notes
-        │   ├── web.md              agora-rtc-sdk-ng: client, tracks, events, screen share
-        │   ├── react.md            agora-rtc-react: hooks, codec interop, custom patterns
-        │   ├── nextjs.md           Next.js / SSR dynamic import patterns
-        │   ├── ios.md              AgoraRtcEngineKit (Swift): setup, delegation
-        │   ├── android.md          RtcEngine (Kotlin/Java): setup, callbacks
-        │   ├── react-native.md     react-native-agora: engine init, events, video views
-        │   ├── flutter.md          agora_rtc_engine (Dart): engine init, AgoraVideoView
-        │   └── cross-platform-coordination.md  UID strategy, codec interop, screen share
-        ├── rtm/                    RTM Signaling SDK v2
-        │   ├── README.md           Key concepts, gotchas, platform links
-        │   ├── web.md              agora-rtm v2: messaging, presence, stream channels
-        │   ├── ios.md              AgoraRtmClientKit (Swift): init, login, subscribe, publish
-        │   └── android.md          RtmClient (Kotlin): init, login, subscribe, publish
-        ├── conversational-ai/      Conversational AI (Voice AI Agents)
-        │   ├── README.md           Architecture, endpoints, auth, lifecycle, gotchas
-        │   ├── agent-samples.md    Backend, React clients, profiles, MLLM, deployment
-        │   ├── agent-toolkit.md    @agora/conversational-ai SDK: API, helpers, hooks
-        │   ├── agent-client-toolkit-react.md   React hooks: provider, transcript, state
-        │   ├── agent-ui-kit.md     @agora/agent-ui-kit React components
-        │   ├── agent-toolkit-ios.md    iOS ConversationalAIAPIImpl Swift toolkit
-        │   ├── agent-toolkit-android.md  Android ConversationalAIAPIImpl Kotlin toolkit
-        │   ├── server-custom-llm.md  Custom LLM proxy: RAG, tools, memory
-        │   ├── server-mcp.md       MCP memory server: persistent per-user memory
-        │   ├── auth-flow.md        Three-token flow for direct REST API implementors
-        │   ├── python-sdk.md       agora-agent Python SDK patterns
-        │   ├── go-sdk.md           agora-agent-server-sdk-go patterns
-        │   └── server-sdks.md      TypeScript/Node.js server SDK patterns
-        ├── cloud-recording/        Cloud Recording (REST API)
-        │   └── README.md           acquire/start/query/stop lifecycle, storage config
-        ├── server-gateway/         Server Gateway (Linux SDK)
-        │   ├── README.md           Overview, use cases, critical notes
-        │   └── linux-cpp.md        C++ SDK: setup, callbacks, media pipeline
-        ├── server/                 Server-Side (Tokens)
-        │   ├── README.md           Token types, when tokens are needed
-        │   └── tokens.md           Token generation TOC + links to official docs
-        └── testing-guidance/       Testing Patterns
-            └── SKILL.md            Mocking patterns: Web, React, iOS, Android, RN, Flutter, RTM
-```
-
-## Maintaining and Extending
-
-### Adding a New Product
-
-1. Create `references/{product}/README.md` (Layer 3)
-2. Add an entry to the **Products** section of `SKILL.md`
-3. Create topic files as needed (Layer 4)
-
-### Adding a New Platform
-
-1. Create `references/{product}/{platform}.md` (Layer 4)
-2. Add a link in the product's `README.md`
-
-### Updating Content
-
-- Edit the specific Layer 4 file.
-- **Inline files** (RTC, RTM, TEN): Keep code examples current, keep **Official Documentation** URLs at the bottom.
-- **Link-first files** (ConvoAI, server): Update TOC links when upstream repos restructure. Keep gotchas/quirks inline only for things LLMs get wrong that aren't obvious in upstream docs.
-- Don't duplicate content that lives in upstream repo READMEs or AGENT.md — link to it instead.
-
-### Verifying URLs
-
-```bash
-grep -roh 'https://[^ )]*' skills/ | sort -u | while read url; do
-  code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 10 "$url")
-  echo "$code $url"
-done
-```
-
-### Agora Release Notes
-
-- Conversational AI: https://docs.agora.io/en/conversational-ai/overview/release-notes
-- Video SDK: https://docs.agora.io/en/video-calling/overview/release-notes
-- Signaling (RTM): https://docs.agora.io/en/signaling/overview/release-notes
+MIT
