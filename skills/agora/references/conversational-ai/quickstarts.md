@@ -142,8 +142,8 @@ There is one default quickstart path. Do not offer alternatives before first suc
 3. Official sample baseline
    3.1 Clone `agent-quickstart-python`
    3.2 Run `bun install`
-   3.3 Copy `server-python/.env.example` to `server-python/.env.local`
-   3.4 Set `APP_ID` and `APP_CERTIFICATE` in `server-python/.env.local`
+   3.3 Copy `server/.env.example` to `server/.env.local`
+   3.4 Set `APP_ID` and `APP_CERTIFICATE` in `server/.env.local`
    3.5 Start with `bun run dev` (auto-creates venv, installs deps, starts both services)
 4. Success gate
    4.1 Frontend loads at http://localhost:3000
@@ -277,27 +277,33 @@ Let me check your project readiness — I'll use the Agora CLI to verify login, 
 
 Run these commands in order. Use `--json` where available so you can parse the output programmatically.
 
-1. **Auth check** — `agora auth status --json`
+1. **CLI version check** — `agora --version`
+   - Compare the installed version against the minimum supported version (`0.1.1`).
+   - If the CLI is not installed → run `npm install -g agoraio-cli`.
+   - If the installed version is older than `0.1.1` → run `npm install -g agoraio-cli@latest` to update before continuing.
+   - If the version is current → continue.
+
+2. **Auth check** — `agora auth status --json`
    - If not logged in → run `agora login` and wait for the user to complete the browser OAuth flow.
 
-2. **Current project suitability** — check the currently selected project first.
+3. **Current project suitability** — check the currently selected project first.
    - Inspect the selected project with `agora project show --json`.
    - Treat it as directly usable only if the project resolves, App ID exists, App Certificate is exportable, and the required first-success features are present.
    - If the current project is directly usable → keep it.
    - If the current project is not directly usable → continue to project discovery.
 
-3. **Project discovery and selection**
+4. **Project discovery and selection**
    - If the user explicitly named a project, inspect that exact project first and try to repair it with documented CLI commands.
    - If the user did **not** name a project and the current selected project is not directly usable, inspect existing projects and look for a directly usable candidate.
    - If a directly usable candidate is found, select it and explicitly tell the user which project was chosen before continuing.
    - If no directly usable candidate exists, create a new dedicated first-success project with the required features already enabled, then select it.
 
-4. **Credential export** — use `agora project env --with-secrets --json`
+5. **Credential export** — use `agora project env --with-secrets --json`
    - Extract App ID and App Certificate from the CLI env output, not from Agora Console.
    - Keep these values for later sample env population.
    - If `--with-secrets` fails because the project is still not token-ready, treat that as a project-readiness failure and keep fixing or replace the project according to the selection rules above.
 
-5. **Doctor** — `agora project doctor --json`
+6. **Doctor** — `agora project doctor --json`
    - If `healthy` or `warning` → control-plane readiness is confirmed, not runtime/sample readiness.
    - If `not_ready` → read the reported issues and fix them directly:
      - ConvoAI not enabled → `agora project feature enable convoai`, then re-run doctor.
@@ -305,9 +311,9 @@ Run these commands in order. Use `--json` where available so you can parse the o
      - Other issues → run the matching recovery command (see [doctor.md](../cli/doctor.md)), then re-run doctor.
    - Repeat until doctor passes at the control-plane layer.
 
-6. **Auto-populate env** — once control-plane readiness passes, the agent has both App ID and App Certificate from step 4. When the sample repo is cloned and `.env.local` is created, the agent writes these values directly into the file. No manual copy-paste needed.
+7. **Auto-populate env** — once control-plane readiness passes, the agent has both App ID and App Certificate from step 5. When the sample repo is cloned and `.env.local` is created, the agent writes these values directly into the file. No manual copy-paste needed.
 
-7. **Sample-ready gate**
+8. **Sample-ready gate**
    - Install dependencies and start the official sample using the documented commands.
    - The quickstart is only fully ready when the app opens, the user can press `Try it now`, the agent joins, and the frontend stays up.
    - If a failure is localized to the official sample itself rather than the environment or project readiness, a minimal upstream-shaped workaround is allowed. Do not replace the sample with a self-built implementation.
