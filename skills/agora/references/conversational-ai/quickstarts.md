@@ -32,17 +32,17 @@ If the user already has a working baseline, exit this file and route back throug
 Follow this exact user-visible order:
 
 1. Product intro in plain language
-2. Baseline-path confirmation
-3. Project-readiness checkpoint — use the CLI directly to verify
-4. Vendor-path confirmation — **skip if the user has not mentioned BYOK, providers, or Studio Agent ID; defaults apply automatically**
-5. Vendor selection, only if the user asks for the current provider list or chooses a non-default path
-6. Studio Agent ID confirmation, only if the user wants to reuse an agent configured in Agora Studio
-7. Backend-path confirmation, only if a separate backend or existing-repo integration still needs it
-8. Structured quickstart spec
+2. Project-readiness checkpoint — use the CLI directly to verify and fix
+3. Vendor-path confirmation — **skip if the user has not mentioned BYOK, providers, or Studio Agent ID; defaults apply automatically**
+4. Vendor selection, only if the user asks for the current provider list or chooses a non-default path
+5. Studio Agent ID confirmation, only if the user wants to reuse an agent configured in Agora Studio
+6. Structured quickstart spec
+
+There is no baseline-path or backend-path selection. The default path is always the Python server + React frontend quickstart (`agent-quickstart-python`). Do not offer alternatives before first success.
 
 ## Interaction Rules
 
-- One decision group per turn. Do not ask baseline, credentials, and backend path in the same reply.
+- One decision group per turn. Do not ask credentials and vendor path in the same reply.
 - Skip anything the user already answered.
 - **Auto-skip `vendor_defaults`**: if the user has not mentioned BYOK, vendor API keys, a specific provider, or a Studio Agent ID, skip the vendor gate entirely and use the defaults. Do not ask about providers when the user just wants the fastest path.
 - Infer obvious context from the user's stack or repository description.
@@ -50,12 +50,10 @@ Follow this exact user-visible order:
 - While quickstart is unresolved, do **not** generate `/join` payloads, SDK code, custom file structures, clone commands, or repo adaptation plans.
 - While quickstart is unresolved, read only this file and [README.md](README.md).
 - If the user asks to use the CLI to speed up onboarding, keep the request inside this quickstart flow. The CLI is already the default readiness path, so continue normally.
-- If the user explicitly asks for the full fastest onboarding flow, full checklist, or a complete CLI + sample sequence, you may give one matching full-flow combination only when the baseline path is already obvious from the request or has already been resolved. Otherwise ask the baseline-path prompt first.
-- Existing-app requests stay in quickstart until the ConvoAI path is proven once.
 - Unless the user explicitly asks for BYOK (bring your own key) or a different provider stack, anchor on the defaults first — no vendor API keys needed.
-- If `baseline_path=full-stack-nextjs`, keep the official sample's env var names. Do **not** rename them to generic provider-reference placeholders during quickstart.
 - For non-default provider selection, fetch the official current provider docs before confirming support or generating config details.
 - If the user already has an **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, treat that as a separate quickstart branch. Do not re-ask STT/LLM/TTS provider choices unless the user explicitly wants to replace the Studio-managed config.
+- Do not offer baseline-path choices. The default is always `agent-quickstart-python` (Python server + React frontend). Other demos are referenced only after first success.
 
 ## Command Integrity Under Environment Restrictions
 
@@ -124,19 +122,15 @@ For command details, route to the CLI references:
 
 After the CLI readiness step is resolved, return to this quickstart and continue from the same readiness checkpoint.
 
-## Fast Onboarding Combinations
+## Default Quickstart Path
 
-Use this section only in explicit full-flow response mode: the user asks for the whole fastest onboarding flow, full checklist, or complete CLI + sample sequence, and the baseline path is already obvious or already resolved.
+There is one default quickstart path. Do not offer alternatives before first success.
 
-If the baseline path is still unclear, do **not** dump all combinations. Ask the baseline-path prompt first.
-
-### 1. Recommended: CLI preflight + full-stack Next.js quickstart
-
-Use this for most new demos and proofs of concept.
+**Repo:** <https://github.com/AgoraIO-Conversational-AI/agent-quickstart-python> *(Python server + React frontend)*
 
 1. Runtime prerequisites
-   1.1 Use Node.js 22.x+
-   1.2 Use pnpm 8.x+
+   1.1 Bun (package manager & script runner)
+   1.2 Python 3.8+
 2. CLI preflight
    2.1 Log in: `agora login`
    2.2 Prefer the current selected project only if it is directly usable for first-success
@@ -146,76 +140,18 @@ Use this for most new demos and proofs of concept.
    2.6 Check `agora project doctor`
    2.7 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
 3. Official sample baseline
-   3.1 Clone `agent-quickstart-nextjs`
-   3.2 Run `pnpm install`
-   3.3 Copy `env.local.example` to `.env.local`
-   3.4 Set `NEXT_PUBLIC_AGORA_APP_ID`
-   3.5 Set `NEXT_AGORA_APP_CERTIFICATE`
-   3.6 Start the app with `pnpm dev`
+   3.1 Clone `agent-quickstart-python`
+   3.2 Run `bun install`
+   3.3 Copy `server-python/.env.example` to `server-python/.env.local`
+   3.4 Set `APP_ID` and `APP_CERTIFICATE` in `server-python/.env.local`
+   3.5 Start with `bun run dev` (auto-creates venv, installs deps, starts both services)
 4. Success gate
-   4.1 The app starts locally
-   4.2 The browser can open the sample
-   4.3 The user can click `Try it now`
+   4.1 Frontend loads at http://localhost:3000
+   4.2 Backend runs at http://localhost:8000
+   4.3 The user can start a conversation
    4.4 The agent joins the RTC channel
-   4.5 The frontend does not crash
-   4.6 The user can speak to the agent and hear TTS back
-   4.7 Only after this counts as a working baseline
-
-### 2. CLI preflight + separate backend/frontend baseline
-
-Use this when the user explicitly wants a decomposed server + client shape.
-
-1. CLI preflight
-   1.1 `agora login`
-   1.2 Prefer a directly usable project; otherwise create a new dedicated token-ready project
-   1.3 Ensure `rtc`, `rtm`, and `convoai` are enabled
-   1.4 Export App ID + App Certificate with `agora project env --with-secrets --json`
-   1.5 `agora project doctor`
-   1.6 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
-2. Baseline repo path
-   2.1 If the private Python baseline is available, use that
-   2.2 Otherwise fall back to `agent-samples`
-3. Public fallback steps for `agent-samples`
-   3.1 Clone `agent-samples`
-   3.2 Run `nvm install`
-   3.3 In `simple-backend`, create the venv, install requirements, and copy `.env.example` to `.env`
-   3.4 Configure the backend env with Agora credentials and the chosen sample profile
-   3.5 Start `simple-backend`
-   3.6 Start `react-voice-client` for the first success path
-4. Success gate
-   4.1 Backend can start the agent
-   4.2 Frontend joins the same channel
-   4.3 The conversation succeeds once before customization
-
-### 3. CLI preflight + existing app integration
-
-Use this when the user already has an app or repo but ConvoAI has not worked yet.
-
-1. CLI preflight
-   1.1 `agora login`
-   1.2 Inspect the specified or current target project first
-   1.3 If it is not first-success ready, repair it with documented CLI commands
-   1.4 If it still cannot satisfy first-success requirements, create a new dedicated token-ready project
-   1.5 Export App ID + App Certificate with `agora project env --with-secrets --json`
-   1.6 `agora project doctor`
-   1.7 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
-2. Existing app alignment
-   2.1 Keep the app sample-aligned for the first success path
-   2.2 Do not jump straight into custom `/join` payloads or bespoke architecture
-   2.3 Reuse the official full-stack sample or `agent-samples` flow until the agent works once
-   2.4 Confirm App ID and App Certificate are wired through the same sample-aligned token path
-3. Success gate
-   3.1 The existing app reaches the same end-to-end baseline as the official sample
-   3.2 Only then move to custom structure or advanced SDK usage
-
-### Combination Selection Rule
-
-- If the user wants the fastest default path, use Combination 1.
-- If they explicitly want a separate backend and frontend, use Combination 2.
-- If they already have an app or repo, use Combination 3.
-- In all three combinations, the CLI is the preflight layer and the sample-aligned baseline is the proof layer.
-- In all three combinations, `doctor` only proves control-plane readiness; runtime/sample readiness still needs explicit confirmation.
-- If the user asks for command detail beyond these combinations, route to the CLI references.
+   4.5 The user can speak to the agent and hear TTS back
+   4.6 Only after this counts as a working baseline
 
 ## First-Success Vendor Defaults
 
@@ -248,32 +184,16 @@ Use this rule during quickstart:
 
 ## Env Name Policy
 
-Use different rules depending on whether the user is staying sample-aligned or generating custom code.
-
-### Sample-aligned path (`full-stack-nextjs`)
+### Default sample path (`agent-quickstart-python`)
 
 Keep the official sample's env names as the source of truth.
 
 Default (no vendor keys needed):
 
 ```bash
-NEXT_PUBLIC_AGORA_APP_ID=
-NEXT_AGORA_APP_CERTIFICATE=
-# Optional:
-# NEXT_PUBLIC_AGENT_UID=123456
-# NEXT_AGENT_GREETING=
-```
-
-BYOK mode (only if the user explicitly opts in):
-
-```bash
-NEXT_PUBLIC_AGORA_APP_ID=
-NEXT_AGORA_APP_CERTIFICATE=
-NEXT_DEEPGRAM_API_KEY=
-NEXT_OPENAI_API_KEY=
-NEXT_OPENAI_URL=
-NEXT_ELEVENLABS_API_KEY=
-NEXT_ELEVENLABS_VOICE_ID=
+APP_ID=
+APP_CERTIFICATE=
+PORT=8000
 ```
 
 Do **not** prompt for vendor API keys unless the user explicitly asks for BYOK.
@@ -283,13 +203,16 @@ Do **not** rename these env vars to a different custom scheme during quickstart.
 
 If the user is no longer sample-aligned and needs provider-specific config layout, fetch the current official ConvoAI provider docs and use those as the source of truth.
 
-## Baseline Paths
+## Baseline Path
 
-| Path | Use when | After quickstart completes |
-|---|---|---|
-| `full-stack-nextjs` | Best default for a new project or prototype | Continue with Path A in this file, then use [agent-toolkit.md](agent-toolkit.md) or [server-sdks.md](server-sdks.md) for customization |
-| `separate-backend-frontend` | The user explicitly wants a separate server and client | Use Path B if Python fits, or combine [agent-samples.md](agent-samples.md) with the backend file chosen later |
-| `existing-app-integration` | The user already has an app or repo, but ConvoAI is not working yet | Keep the implementation sample-aligned; use [agent-samples.md](agent-samples.md) plus the backend file chosen later |
+The default and only quickstart baseline is `agent-quickstart-python` (Python server + React frontend).
+
+After first success, the user can explore other demos:
+
+| Demo | Description | Reference |
+|------|-------------|-----------|
+| `agent-quickstart-nextjs` | Full-stack Next.js (single app with API routes) | [See below](#other-demo-references) |
+| `agent-samples` | Decomposed backend + multiple client apps | [agent-samples.md](agent-samples.md) |
 
 ## State Machine
 
@@ -298,13 +221,11 @@ The quickstart is a blocking state machine. While a state is unresolved, the onl
 | State | Allowed | Forbidden | Next prompt | Advance when |
 |---|---|---|---|---|
 | `intro` | Give a short plain-language intro to what ConvoAI is | Code, repo plans, framework recommendations | Product intro text | Intro delivered |
-| `baseline_path` | Ask which baseline path to use | Code, clone steps, provider discussions | Baseline-path prompt | User picks A/B/C or gives equivalent clear context |
-| `project_readiness` | Execute CLI commands directly to verify auth, direct-use project suitability, App ID, App Certificate, feature activation, and fix missing prerequisites on the spot. Extract credentials from CLI env output for later env auto-population. Do not ask the user to visit Console or choose a verification method | Code, repo inspection, backend implementation | Readiness prompt | Control-plane readiness is confirmed and App ID + App Certificate are captured from CLI env output |
-| `vendor_defaults` | Ask whether to use the defaults (no vendor keys), BYOK, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID. **Skip this gate entirely if the user has not mentioned BYOK, providers, or Studio Agent ID — defaults apply automatically.** | Code, implementation | Vendor-defaults prompt | User picks A/B/C/D/E, directly names a provider path / Studio Agent ID path, or gate is auto-skipped |
+| `project_readiness` | Execute CLI commands directly to verify auth, project, App ID, App Certificate, feature activation, and fix missing prerequisites. Extract credentials from CLI env output. | Code, repo inspection, implementation | Readiness prompt | Control-plane readiness confirmed and credentials captured |
+| `vendor_defaults` | Ask whether to use the defaults (no vendor keys), BYOK, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID. **Skip this gate entirely if the user has not mentioned BYOK, providers, or Studio Agent ID — defaults apply automatically.** | Code, implementation | Vendor-defaults prompt | User picks or gate is auto-skipped |
 | `vendor_selection` | Collect only provider-mode and provider choices after checking the official current provider docs | Code, implementation, secret collection | Custom-provider prompt | Provider mode and provider names are resolved |
 | `studio_agent_id` | Collect the Agora Studio Agent ID and confirm the user wants Studio to remain the source of truth for agent config | Code, re-asking provider setup from scratch | Studio-Agent-ID prompt | The Studio Agent ID path is resolved |
-| `backend_path` | Ask for backend path only if still needed | Code, detailed implementation | Backend-path prompt | Backend path is clear or no longer needed |
-| `complete` | Emit structured spec and continue to the mapped reference file | Re-open resolved gates | None | Spec emitted |
+| `complete` | Emit structured spec and continue to execution | Re-open resolved gates | None | Spec emitted |
 
 ### Pre-Action Self-Check
 
@@ -320,12 +241,10 @@ Before every tool call or user-visible reply:
 - If the user asks for code before quickstart resolves, answer with the next gate instead of generating code.
 - If a reply only partially resolves the current gate, ask a narrow follow-up for the missing field only.
 - If the user asks for the fastest onboarding path or mentions setup during the readiness gate, proceed directly with the CLI verification sequence and then return to the quickstart once readiness is confirmed.
-- If the user asks for the full fastest onboarding flow before the baseline path is clear, ask the baseline-path prompt first instead of dumping all full-flow combinations.
+- If the user asks for the full fastest onboarding flow, proceed with the default quickstart path directly.
 - If the user names a provider that is not in the current official provider docs, say this clearly: it is **not currently documented as supported in the official Agora ConvoAI provider docs**, so do not proceed as if it is supported. Offer the documented default combo or a live-doc verification path.
 - If the user asks to see the provider list, fetch the current official provider docs and stay in the vendor gate until they accept the default combo or choose a documented alternative.
 - If the user says they already have an Agora Studio Agent ID, switch to the `studio_agent_id` state and stop re-asking provider-vendor questions unless they explicitly say they want to replace the Studio-managed config.
-- If the user changes the baseline-path assumption later (for example, picks Path A first and later insists on a separate Python backend), return to `baseline_path` and re-confirm instead of silently drifting paths.
-- If the user chooses Path B but does not have access to the private repo, keep the quickstart state intact and continue with the public `agent-samples` fallback only after stating that the private baseline is unavailable.
 
 ## Prompt Templates
 
@@ -342,15 +261,6 @@ Suggested transition line:
 
 ```text
 Before we jump into custom code, let's first use the official sample to get the whole flow working once. Once the agent can join the channel and finish one real conversation, we can turn that working version into your demo.
-```
-
-### Baseline Path
-
-```text
-Before we customize anything, let's first use an official sample to get the full ConvoAI flow working once:
-A. Use the official full-stack Next.js quickstart
-B. Use a separate backend + frontend baseline (private Python repo if you have access; otherwise we will fall back to the public decomposed sample)
-C. Adapt an existing app/repo, but keep it sample-aligned until ConvoAI works end to end
 ```
 
 ### Project Readiness
@@ -407,18 +317,6 @@ For CLI command details, route to:
 - [../cli/README.md](../cli/README.md)
 - [../cli/projects.md](../cli/projects.md)
 - [../cli/doctor.md](../cli/doctor.md)
-
-### Backend Path
-
-Use only if the baseline path still leaves the backend unclear.
-
-```text
-Which backend path should we optimize for after the baseline is chosen?
-A. TypeScript / Node.js
-B. Python
-C. Go
-D. Another backend language / direct REST
-```
 
 ### Vendor Defaults
 
@@ -495,11 +393,8 @@ After all gates are resolved, normalize the result into a short spec and continu
 
 ```yaml
 use_case: [text]
-mode: [quickstart | integration]
+mode: quickstart
 proven_working_baseline: no
-baseline_path: [full-stack-nextjs | separate-backend-frontend | existing-app-integration]
-frontend: [nextjs-react | standalone-react | existing-app | unknown]
-backend: [typescript-node | python | go | direct-rest | unknown]
 project_readiness:
   app_id: [ready | missing | unknown]
   app_certificate: [ready | missing | unknown]
@@ -514,7 +409,6 @@ providers:
 studio_agent:
   use_existing_agent_id: [yes | no | unknown]
   agent_id: [text | missing | unknown]
-config_style: [sample-aligned | custom-path | unknown]
 ```
 
 Notes:
@@ -522,108 +416,32 @@ Notes:
 - `stt` is the SDK-facing name in this quickstart spec. Platform docs may call the same stage `ASR`.
 - `studio_agent.agent_id` means the **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, not the runtime `agent_id` returned by `/join`.
 - When this Studio path is used, that Studio Agent ID maps to the request field `pipeline_id`.
-- `AGORA_STUDIO_AGENT_ID` is the preferred config placeholder name for this path; the request field remains `pipeline_id`.
-- `config_style` is derived from the chosen baseline path unless the user explicitly overrides it later:
-  `full-stack-nextjs` and `existing-app-integration` usually imply `sample-aligned`;
-  fully custom provider configuration usually implies `custom-path`.
 
 ## After Collection
 
-Route according to the completed spec:
+Execute the default quickstart path (clone `agent-quickstart-python`, configure, run, verify first success).
 
-- `full-stack-nextjs` → stay in Path A below. Use [server-sdks.md](server-sdks.md) only if the user later customizes the server-side API routes.
-- `separate-backend-frontend` + `python` → use Path B below, then [python-sdk.md](python-sdk.md) for backend details.
-- `separate-backend-frontend` + `typescript-node` → use [agent-samples.md](agent-samples.md) for the decomposed app shape, then [server-sdks.md](server-sdks.md).
-- `separate-backend-frontend` + `go` → use [agent-samples.md](agent-samples.md) for client structure, then [go-sdk.md](go-sdk.md).
-- existing Agora Studio Agent ID → use [conversational-ai-studio.md](conversational-ai-studio.md).
-- provider selection or parameter confirmation → fetch the current official ConvoAI provider docs.
-- `direct-rest` → use [auth-flow.md](auth-flow.md).
-- `existing-app-integration` → keep changes sample-aligned with [agent-samples.md](agent-samples.md) until the first successful end-to-end ConvoAI session.
+After first success, route by user's next request:
 
-## Path A — Full-Stack Next.js (Default)
+- existing Agora Studio Agent ID → use [conversational-ai-studio.md](conversational-ai-studio.md)
+- provider selection or parameter confirmation → fetch the current official ConvoAI provider docs
+- custom LLM backend → [server-custom-llm.md](server-custom-llm.md)
+- direct REST API (non-SDK languages) → [auth-flow.md](auth-flow.md)
+- other demos → see "After the Baseline Works" section below
+
+## Other Demo References
+
+These are available after the first success baseline is proven. Do not use these as the default quickstart path.
+
+### Full-Stack Next.js (`agent-quickstart-nextjs`)
 
 **Repo:** <https://github.com/AgoraIO-Conversational-AI/agent-quickstart-nextjs>
 
-Single Next.js application covering token generation, agent lifecycle API routes, and the React UI. This is the best starting point for most new projects.
+Single Next.js app with built-in API routes for token generation and agent lifecycle. Includes React UI with live transcription. Requires Node.js 22+ and pnpm 8+. See the repo README for setup.
 
-> **Note:** Agora SDKs are browser-only. If you add custom RTC components, follow the SSR patterns in [../rtc/nextjs.md](../rtc/nextjs.md).
+### Decomposed Samples (`agent-samples`)
 
-> **agent-quickstart-nextjs vs. agent-samples**: `agent-quickstart-nextjs` is a single self-contained Next.js app with API routes. `agent-samples` is a decomposed baseline with a separate backend and client apps. Use [agent-samples.md](agent-samples.md) only when the quickstart spec requires that structure.
-
-### What's Included
-
-- Next.js API routes for token generation (`/api/generate-agora-token`), agent start (`/api/invite-agent`), and agent stop (`/api/stop-conversation`)
-- React UI with live transcription, audio visualization, device selection, and mobile-responsive chat
-- `agora-agent-uikit`, `agora-agent-client-toolkit`, and `agora-agent-server-sdk` pre-wired
-- Dual RTC + RTM token auth
-- One-click Vercel deployment
-
-### Stack
-
-- **Framework:** Next.js (TypeScript)
-- **UI:** Tailwind CSS + shadcn/ui
-- **Real-time:** Agora RTC + RTM
-- **Default pipeline:** Deepgram nova-3 (STT), OpenAI gpt-4o-mini (LLM), MiniMax speech_2_6_turbo (TTS)
-- **BYOK option:** Deepgram (STT), OpenAI (LLM), ElevenLabs (TTS) — uncomment in `invite-agent/route.ts`
-
-### Setup
-
-```bash
-git clone https://github.com/AgoraIO-Conversational-AI/agent-quickstart-nextjs.git
-cd agent-quickstart-nextjs
-pnpm install
-cp env.local.example .env.local
-# Edit .env.local — only NEXT_PUBLIC_AGORA_APP_ID and NEXT_AGORA_APP_CERTIFICATE are required
-pnpm dev
-```
-
-Open `http://localhost:3000`.
-
-**Requirements:** Node.js 22.x+, pnpm 8.x+
-
-### Environment Variables
-
-Default (only Agora credentials needed):
-
-```bash
-# Required
-NEXT_PUBLIC_AGORA_APP_ID=
-NEXT_AGORA_APP_CERTIFICATE=
-
-# Optional
-NEXT_PUBLIC_AGENT_UID=123456
-NEXT_AGENT_GREETING=
-```
-
-BYOK mode (uncomment the BYOK blocks in `app/api/invite-agent/route.ts` first):
-
-```bash
-# Required (same as above)
-NEXT_PUBLIC_AGORA_APP_ID=
-NEXT_AGORA_APP_CERTIFICATE=
-
-# Vendor keys (required for BYOK)
-NEXT_DEEPGRAM_API_KEY=
-NEXT_OPENAI_API_KEY=
-NEXT_OPENAI_URL=https://api.openai.com/v1/chat/completions
-NEXT_ELEVENLABS_API_KEY=
-NEXT_ELEVENLABS_VOICE_ID=
-```
-
-> The App Certificate is required for token generation. Get both from [Agora Console](https://console.agora.io).
-> When staying on this sample-aligned path, do not rename these env vars to a different custom provider env scheme during quickstart.
-
-## Path B — Python Backend + React Frontend (Private Repo)
-
-**Repo:** <https://github.com/AgoraIO-Community/conversational-ai-quickstart> *(private — contact your Agora developer relations or solutions engineer contact to request access)*
-
-Use this when you specifically need a separate Python backend and a standalone React frontend deployed independently.
-
-- Python backend handles token generation and agent lifecycle via the ConvoAI REST API
-- React frontend connects via RTC + RTM
-- Refer to the repo README for setup once you have access
-
-If access to the private repo is unavailable, keep the quickstart spec and fall back to [agent-samples.md](agent-samples.md) for the public decomposed baseline, then use [python-sdk.md](python-sdk.md) for backend behavior.
+Multiple backend + client combinations. See [agent-samples.md](agent-samples.md).
 
 ## After the Baseline Works
 
