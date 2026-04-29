@@ -1,0 +1,72 @@
+name: Sync Anthropic Fork
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "skills/agora/**"
+      - "scripts/export-anthropic-skill.sh"
+      - ".github/workflows/sync-anthropics-fork.yml"
+      - ".github/anthropics-pr-body.md"
+  push:
+    branches: [main]
+    paths:
+      - "skills/agora/**"
+      - "scripts/export-anthropic-skill.sh"
+      - ".github/workflows/sync-anthropics-fork.yml"
+      - ".github/anthropics-pr-body.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      TARGET_REPO: chenyuguo-agora/skills
+      TARGET_BRANCH: sync/voice-ai-integration
+      TARGET_PATH: skills/voice-ai-integration
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Export voice-ai-integration bundle
+        run: bash scripts/export-anthropic-skill.sh "$RUNNER_TEMP/export"
+
+      - name: Clone fork repo
+        env:
+          SYNC_TOKEN: ${{ secrets.ANTHROPICS_SKILLS_SYNC_TOKEN }}
+        run: |
+          test -n "$SYNC_TOKEN" || {
+            echo "::error::Missing secret ANTHROPICS_SKILLS_SYNC_TOKEN"
+            exit 1
+          }
+          git clone --depth 1 "https://x-access-token:${SYNC_TOKEN}@github.com/${TARGET_REPO}.git" "$RUNNER_TEMP/target-repo"
+
+      - name: Sync exported skill into fork branch
+        env:
+          SYNC_TOKEN: ${{ secrets.ANTHROPICS_SKILLS_SYNC_TOKEN }}
+        run: |
+          cd "$RUNNER_TEMP/target-repo"
+          git checkout -B "$TARGET_BRANCH"
+          mkdir -p "$(dirname "$TARGET_PATH")"
+          rsync -a --delete "$RUNNER_TEMP/export/skills/voice-ai-integration/" "$TARGET_PATH/"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A "$TARGET_PATH"
+
+          if git diff --cached --quiet -- "$TARGET_PATH"; then
+            echo "No sync changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Sync voice-ai-integration from AgoraIO/skills"
+          git push --force-with-lease origin "$TARGET_BRANCH"
+
+      - name: Print upstream PR URL
+        run: |
+          echo "Open this URL to create or update the upstream PR manually:"
+          echo "https://github.com/anthropics/skills/compare/main...chenyuguo-agora:${TARGET_BRANCH}?expand=1"
