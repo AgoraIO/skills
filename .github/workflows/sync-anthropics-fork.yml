@@ -27,8 +27,6 @@ jobs:
       TARGET_REPO: chenyuguo-agora/skills
       TARGET_BRANCH: sync/voice-ai-integration
       TARGET_PATH: skills/voice-ai-integration
-      UPSTREAM_REPO: anthropics/skills
-      PR_TITLE: "Add voice-ai-integration skill for Agora-powered voice AI workflows"
 
     steps:
       - name: Checkout source repo
@@ -67,34 +65,7 @@ jobs:
           git commit -m "Sync voice-ai-integration from AgoraIO/skills"
           git push --force-with-lease origin "$TARGET_BRANCH"
 
-      - name: Create or update upstream PR
-        env:
-          GH_TOKEN: ${{ secrets.ANTHROPICS_SKILLS_SYNC_TOKEN }}
+      - name: Print upstream PR URL
         run: |
-          test -n "$GH_TOKEN" || {
-            echo "::error::Missing secret ANTHROPICS_SKILLS_SYNC_TOKEN"
-            exit 1
-          }
-
-          PR_NUMBER="$(gh pr list \
-            --repo "$UPSTREAM_REPO" \
-            --head "chenyuguo-agora:${TARGET_BRANCH}" \
-            --base main \
-            --state open \
-            --json number \
-            --jq '.[0].number')"
-
-          if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
-            gh pr edit "$PR_NUMBER" \
-              --repo "$UPSTREAM_REPO" \
-              --title "$PR_TITLE" \
-              --body-file ".github/anthropics-pr-body.md"
-            exit 0
-          fi
-
-          gh pr create \
-            --repo "$UPSTREAM_REPO" \
-            --base main \
-            --head "chenyuguo-agora:${TARGET_BRANCH}" \
-            --title "$PR_TITLE" \
-            --body-file ".github/anthropics-pr-body.md"
+          echo "Open this URL to create or update the upstream PR manually:"
+          echo "https://github.com/anthropics/skills/compare/main...chenyuguo-agora:${TARGET_BRANCH}?expand=1"
