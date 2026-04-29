@@ -1,0 +1,17 @@
+{
+  "name": "agora-cursor-plugins",
+  "owner": {
+    "name": "Agora",
+    "email": "devrel@agora.io"
+  },
+  "metadata": {
+    "description": "Official Agora Cursor plugin packaging for voice AI, RTC, RTM, token generation, and CLI workflows"
+  },
+  "plugins": [
+    {
+      "name": "agora",
+      "source": "agora",
+      "description": "Official Agora plugin with skills for Conversational AI, RTC, RTM, Cloud Recording, tokens, and Agora CLI setup."
+    }
+  ]
+}

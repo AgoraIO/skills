@@ -1,0 +1,30 @@
+{
+  "name": "agora",
+  "displayName": "Agora",
+  "version": "1.5.1",
+  "description": "Official Agora workflows for voice AI, RTC, RTM, token generation, recording, and CLI onboarding.",
+  "author": {
+    "name": "Agora",
+    "email": "devrel@agora.io"
+  },
+  "homepage": "https://github.com/AgoraIO/skills",
+  "repository": "https://github.com/AgoraIO/skills",
+  "license": "MIT",
+  "logo": "assets/logo.svg",
+  "keywords": [
+    "agora",
+    "voice-ai",
+    "rtc",
+    "rtm",
+    "conversational-ai",
+    "token-generation"
+  ],
+  "category": "developer-tools",
+  "tags": [
+    "voice-agents",
+    "real-time-communication",
+    "mcp",
+    "skills"
+  ],
+  "skills": "../skills/"
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Agora">
+  <rect width="128" height="128" rx="24" fill="#0b1f33"/>
+  <circle cx="64" cy="64" r="34" fill="none" stroke="#ffffff" stroke-width="10"/>
+  <circle cx="64" cy="64" r="10" fill="#ff5a36"/>
+</svg>
