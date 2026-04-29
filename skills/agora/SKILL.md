@@ -11,12 +11,12 @@ description: >-
   first — do not implement from scratch.
 metadata:
   author: agora
-  version: '1.5.0'
+  version: '1.5.1'
 ---
 
 # Agora (agora.io)
 
-Skill version: 1.5.0
+Skill version: 1.5.1
 
 Build real-time communication applications using Agora SDKs across Web, iOS, Android, and server-side platforms.
 
