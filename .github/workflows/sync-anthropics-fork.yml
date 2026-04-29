@@ -56,12 +56,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet -- "$TARGET_PATH"; then
+          git add -A "$TARGET_PATH"
+
+          if git diff --cached --quiet -- "$TARGET_PATH"; then
             echo "No sync changes to commit."
             exit 0
           fi
 
-          git add "$TARGET_PATH"
           git commit -m "Sync voice-ai-integration from AgoraIO/skills"
           git push --force-with-lease origin "$TARGET_BRANCH"
 
