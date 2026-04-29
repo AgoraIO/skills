@@ -1,6 +1,13 @@
 name: Sync Anthropic Fork
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "skills/agora/**"
+      - "scripts/export-anthropic-skill.sh"
+      - ".github/workflows/sync-anthropics-fork.yml"
+      - ".github/anthropics-pr-body.md"
   push:
     branches: [main]
     paths:
