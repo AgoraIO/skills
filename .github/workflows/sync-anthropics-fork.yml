@@ -7,7 +7,7 @@ on:
       - "skills/agora/**"
       - "scripts/export-anthropic-skill.sh"
       - ".github/workflows/sync-anthropics-fork.yml"
-      - "distribution/platforms/anthropics-pr-body.md"
+      - ".github/anthropics-pr-body.md"
   workflow_dispatch:
 
 permissions:
@@ -81,7 +81,7 @@ jobs:
             gh pr edit "$PR_NUMBER" \
               --repo "$UPSTREAM_REPO" \
               --title "$PR_TITLE" \
-              --body-file "distribution/platforms/anthropics-pr-body.md"
+              --body-file ".github/anthropics-pr-body.md"
             exit 0
           fi
 
@@ -90,4 +90,4 @@ jobs:
             --base main \
             --head "chenyuguo-agora:${TARGET_BRANCH}" \
             --title "$PR_TITLE" \
-            --body-file "distribution/platforms/anthropics-pr-body.md"
+            --body-file ".github/anthropics-pr-body.md"
