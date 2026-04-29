@@ -1,0 +1,93 @@
+name: Sync Anthropic Fork
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/agora/**"
+      - "scripts/export-anthropic-skill.sh"
+      - ".github/workflows/sync-anthropics-fork.yml"
+      - "distribution/platforms/anthropics-pr-body.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      TARGET_REPO: chenyuguo-agora/skills
+      TARGET_BRANCH: sync/voice-ai-integration
+      TARGET_PATH: skills/voice-ai-integration
+      UPSTREAM_REPO: anthropics/skills
+      PR_TITLE: "Add voice-ai-integration skill for Agora-powered voice AI workflows"
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Export voice-ai-integration bundle
+        run: bash scripts/export-anthropic-skill.sh "$RUNNER_TEMP/export"
+
+      - name: Clone fork repo
+        env:
+          SYNC_TOKEN: ${{ secrets.ANTHROPICS_SKILLS_SYNC_TOKEN }}
+        run: |
+          test -n "$SYNC_TOKEN" || {
+            echo "::error::Missing secret ANTHROPICS_SKILLS_SYNC_TOKEN"
+            exit 1
+          }
+          git clone --depth 1 "https://x-access-token:${SYNC_TOKEN}@github.com/${TARGET_REPO}.git" "$RUNNER_TEMP/target-repo"
+
+      - name: Sync exported skill into fork branch
+        env:
+          SYNC_TOKEN: ${{ secrets.ANTHROPICS_SKILLS_SYNC_TOKEN }}
+        run: |
+          cd "$RUNNER_TEMP/target-repo"
+          git checkout -B "$TARGET_BRANCH"
+          mkdir -p "$(dirname "$TARGET_PATH")"
+          rsync -a --delete "$RUNNER_TEMP/export/skills/voice-ai-integration/" "$TARGET_PATH/"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- "$TARGET_PATH"; then
+            echo "No sync changes to commit."
+            exit 0
+          fi
+
+          git add "$TARGET_PATH"
+          git commit -m "Sync voice-ai-integration from AgoraIO/skills"
+          git push --force-with-lease origin "$TARGET_BRANCH"
+
+      - name: Create or update upstream PR
+        env:
+          GH_TOKEN: ${{ secrets.ANTHROPICS_SKILLS_SYNC_TOKEN }}
+        run: |
+          test -n "$GH_TOKEN" || {
+            echo "::error::Missing secret ANTHROPICS_SKILLS_SYNC_TOKEN"
+            exit 1
+          }
+
+          PR_NUMBER="$(gh pr list \
+            --repo "$UPSTREAM_REPO" \
+            --head "chenyuguo-agora:${TARGET_BRANCH}" \
+            --base main \
+            --state open \
+            --json number \
+            --jq '.[0].number')"
+
+          if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
+            gh pr edit "$PR_NUMBER" \
+              --repo "$UPSTREAM_REPO" \
+              --title "$PR_TITLE" \
+              --body-file "distribution/platforms/anthropics-pr-body.md"
+            exit 0
+          fi
+
+          gh pr create \
+            --repo "$UPSTREAM_REPO" \
+            --base main \
+            --head "chenyuguo-agora:${TARGET_BRANCH}" \
+            --title "$PR_TITLE" \
+            --body-file "distribution/platforms/anthropics-pr-body.md"
