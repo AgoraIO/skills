@@ -32,11 +32,12 @@ If the user already has a working baseline, exit this file and route back throug
 Follow this exact user-visible order:
 
 1. Product intro in plain language
-2. Project-readiness checkpoint — use the CLI directly to verify and fix
-3. Vendor-path confirmation — **skip if the user has not mentioned BYOK, providers, or Studio Agent ID; defaults apply automatically**
-4. Vendor selection, only if the user asks for the current provider list or chooses a non-default path
-5. Studio Agent ID confirmation, only if the user wants to reuse an agent configured in Agora Studio
-6. Structured quickstart spec
+2. Environment check — verify runtime dependencies are installed
+3. Project-readiness checkpoint — use the CLI directly to verify and fix
+4. Vendor-path confirmation — **skip if the user has not mentioned BYOK, providers, or Studio Agent ID; defaults apply automatically**
+5. Vendor selection, only if the user asks for the current provider list or chooses a non-default path
+6. Studio Agent ID confirmation, only if the user wants to reuse an agent configured in Agora Studio
+7. Structured quickstart spec
 
 There is no baseline-path or backend-path selection. The default path is always the Python server + React frontend quickstart (`agent-quickstart-python`). Do not offer alternatives before first success.
 
@@ -221,6 +222,7 @@ The quickstart is a blocking state machine. While a state is unresolved, the onl
 | State | Allowed | Forbidden | Next prompt | Advance when |
 |---|---|---|---|---|
 | `intro` | Give a short plain-language intro to what ConvoAI is | Code, repo plans, framework recommendations | Product intro text | Intro delivered |
+| `environment_check` | Check Node.js, Bun, Python, Agora CLI versions. Install or update missing tools. | Code, repo inspection, implementation | Environment check commands | All four dependencies are installed and meet minimum versions |
 | `project_readiness` | Execute CLI commands directly to verify auth, project, App ID, App Certificate, feature activation, and fix missing prerequisites. Extract credentials from CLI env output. | Code, repo inspection, implementation | Readiness prompt | Control-plane readiness confirmed and credentials captured |
 | `vendor_defaults` | Ask whether to use the defaults (no vendor keys), BYOK, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID. **Skip this gate entirely if the user has not mentioned BYOK, providers, or Studio Agent ID — defaults apply automatically.** | Code, implementation | Vendor-defaults prompt | User picks or gate is auto-skipped |
 | `vendor_selection` | Collect only provider-mode and provider choices after checking the official current provider docs | Code, implementation, secret collection | Custom-provider prompt | Provider mode and provider names are resolved |
@@ -263,6 +265,24 @@ Suggested transition line:
 Before we jump into custom code, let's first use the official sample to get the whole flow working once. Once the agent can join the channel and finish one real conversation, we can turn that working version into your demo.
 ```
 
+### Environment Check
+
+Before starting the CLI readiness flow, verify that all runtime dependencies are installed. Run these checks and fix any missing tools automatically. Do not ask the user to install them manually.
+
+| Dependency | Check command | Minimum version | Install if missing |
+|-----------|--------------|----------------|-------------------|
+| Node.js | `node --version` | 18+ | Direct the user to https://nodejs.org or use `nvm install 22` |
+| Bun | `bun --version` | 1.0+ | `npm install -g bun` |
+| Python | `python3 --version` | 3.8+ | Direct the user to https://python.org |
+| Agora CLI | `npm list -g agoraio-cli` | 0.1.3+ | `npm install -g agoraio-cli@latest` |
+
+Execution rules:
+- Check all four in order. If any is missing or below minimum version, install/update it before continuing.
+- For Node.js and Python, if they are not installed, tell the user what to install and wait — do not attempt to install system-level runtimes.
+- For Bun and Agora CLI, install them directly via npm.
+- If Agora CLI is installed but outdated, run `npm install -g agoraio-cli@latest` to update.
+- Only proceed to project readiness after all four checks pass.
+
 ### Project Readiness
 
 Do not ask the user to self-report readiness or choose between manual and CLI paths. The agent must directly execute CLI commands to check each prerequisite and, when something is missing, fix it on the spot.
@@ -277,33 +297,27 @@ Let me check your project readiness — I'll use the Agora CLI to verify login, 
 
 Run these commands in order. Use `--json` where available so you can parse the output programmatically.
 
-1. **CLI version check** — `agora --version`
-   - Compare the installed version against the minimum supported version (`0.1.1`).
-   - If the CLI is not installed → run `npm install -g agoraio-cli`.
-   - If the installed version is older than `0.1.1` → run `npm install -g agoraio-cli@latest` to update before continuing.
-   - If the version is current → continue.
-
-2. **Auth check** — `agora auth status --json`
+1. **Auth check** — `agora auth status --json`
    - If not logged in → run `agora login` and wait for the user to complete the browser OAuth flow.
 
-3. **Current project suitability** — check the currently selected project first.
+2. **Current project suitability** — check the currently selected project first.
    - Inspect the selected project with `agora project show --json`.
    - Treat it as directly usable only if the project resolves, App ID exists, App Certificate is exportable, and the required first-success features are present.
    - If the current project is directly usable → keep it.
    - If the current project is not directly usable → continue to project discovery.
 
-4. **Project discovery and selection**
+3. **Project discovery and selection**
    - If the user explicitly named a project, inspect that exact project first and try to repair it with documented CLI commands.
    - If the user did **not** name a project and the current selected project is not directly usable, inspect existing projects and look for a directly usable candidate.
    - If a directly usable candidate is found, select it and explicitly tell the user which project was chosen before continuing.
    - If no directly usable candidate exists, create a new dedicated first-success project with the required features already enabled, then select it.
 
-5. **Credential export** — use `agora project env --with-secrets --json`
+4. **Credential export** — use `agora project env --with-secrets --json`
    - Extract App ID and App Certificate from the CLI env output, not from Agora Console.
    - Keep these values for later sample env population.
    - If `--with-secrets` fails because the project is still not token-ready, treat that as a project-readiness failure and keep fixing or replace the project according to the selection rules above.
 
-6. **Doctor** — `agora project doctor --json`
+5. **Doctor** — `agora project doctor --json`
    - If `healthy` or `warning` → control-plane readiness is confirmed, not runtime/sample readiness.
    - If `not_ready` → read the reported issues and fix them directly:
      - ConvoAI not enabled → `agora project feature enable convoai`, then re-run doctor.
@@ -311,9 +325,9 @@ Run these commands in order. Use `--json` where available so you can parse the o
      - Other issues → run the matching recovery command (see [doctor.md](../cli/doctor.md)), then re-run doctor.
    - Repeat until doctor passes at the control-plane layer.
 
-7. **Auto-populate env** — once control-plane readiness passes, the agent has both App ID and App Certificate from step 5. When the sample repo is cloned and `.env.local` is created, the agent writes these values directly into the file. No manual copy-paste needed.
+6. **Auto-populate env** — once control-plane readiness passes, the agent has both App ID and App Certificate from step 4. When the sample repo is cloned and `.env.local` is created, the agent writes these values directly into the file. No manual copy-paste needed.
 
-8. **Sample-ready gate**
+7. **Sample-ready gate**
    - Install dependencies and start the official sample using the documented commands.
    - The quickstart is only fully ready when the app opens, the user can press `Try it now`, the agent joins, and the frontend stays up.
    - If a failure is localized to the official sample itself rather than the environment or project readiness, a minimal upstream-shaped workaround is allowed. Do not replace the sample with a self-built implementation.
