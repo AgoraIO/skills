@@ -34,6 +34,7 @@ the full product landscape, identifies what the user needs, and routes to the ri
 | Cloud Recording | Record RTC sessions server-side | "recording", "archive sessions", "record calls" |
 | Server/Tokens | Auth token generation | "token server", "authentication", "App Certificate" |
 | Server Gateway SDK | Server-side media streaming (Linux) | "server SDK", "Linux SDK", "send audio from server", "server gateway" |
+| Agora CLI | Local auth, project, quickstart, env, and readiness workflows | "install CLI", "agora init", "project doctor", "export env" |
 
 ### Product Relationships
 
@@ -142,6 +143,7 @@ For each identified product, route to its skill file:
 | Cloud Recording | [references/cloud-recording/README.md](../references/cloud-recording/README.md) |
 | Token generation | [references/server/README.md](../references/server/README.md) |
 | Server Gateway SDK | [references/server-gateway/README.md](../references/server-gateway/README.md) |
+| Agora CLI | [references/cli/README.md](../references/cli/README.md) |
 
 When multiple products are needed, run the primary product's skill first,
 then address supporting products in order.
@@ -161,4 +163,5 @@ For common patterns, skip the full intake flow:
 | "recording" / "record sessions" / "record calls" | → `references/cloud-recording/README.md` directly |
 | "generate token" / "token server" / "App Certificate" | → `references/server/README.md` directly |
 | "Server Gateway" / "Linux SDK" / "server sends audio" | → `references/server-gateway/README.md` directly |
+| "Agora CLI" / "`agora init`" / "`agora quickstart`" / "`project doctor`" / "export env" | → `references/cli/README.md` directly |
 

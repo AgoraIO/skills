@@ -5,18 +5,19 @@ description: >-
   chat, live streaming, recording, or token generation to their app. Supports
   Web, React, Next.js, iOS (Swift), Android (Kotlin), React Native, Flutter,
   Go, and Python. Also activate for Agora CLI commands (`agora login`, `agora
-  project create`, `agora project doctor`).
+  init`, `agora quickstart`, `agora project env`, `agora project doctor`,
+  `agora introspect --json`, `agora --help --all`).
   RULES: Use only skill reference files for integration — do not web search
   for Agora docs. For demos or prototypes, always clone the official sample
   first — do not implement from scratch.
 metadata:
   author: agora
-  version: '1.5.1'
+  version: '1.6.0'
 ---
 
 # Agora (agora.io)
 
-Skill version: 1.5.1
+Skill version: 1.6.0
 
 Build real-time communication applications using Agora SDKs across Web, iOS, Android, and server-side platforms.
 
@@ -60,9 +61,9 @@ REST API-driven voice AI agents. Create agents that join RTC channels and conver
 
 ### Agora CLI
 
-Agora project and auth workflow through the installed `agora` command-line tool. Use when the request is about installing the CLI, logging in, creating or selecting projects, exporting project env vars with `project env`, enabling `convoai`, or checking readiness with `project doctor`.
+Agora project and auth workflow through the installed `agora` command-line tool. Use when the request is about installing the CLI, logging in, creating or selecting projects, running `init` or `quickstart`, exporting project env vars with `project env`, writing quickstart env files, enabling `convoai`, checking readiness with `project doctor`, telemetry, upgrades, or command introspection.
 
-**[references/cli/README.md](references/cli/README.md)** — Start here for `agoraio-cli`, `agora login`, `agora project create`, `agora project env`, `agora project env write`, `agora project feature enable`, `agora project doctor`, config defaults, and script-safe `--json` usage
+**[references/cli/README.md](references/cli/README.md)** — Start here for the Go-based `agora` CLI, curl/npm install, `agora init`, `agora quickstart`, `agora project env`, `agora quickstart env write`, `agora project doctor`, `agora introspect --json`, telemetry, config defaults, and script-safe `--json` usage
 
 ### Cloud Recording
 
@@ -110,9 +111,12 @@ Examples of clear requests:
 - "What providers does ConvoAI support?" → `references/conversational-ai/README.md`
 - "I want MLLM with Gemini" → `references/conversational-ai/README.md`
 - "I already have an Agent ID from Agora Studio" → `references/conversational-ai/README.md`
-- "How do I install agoraio-cli?" → `references/cli/README.md`
+- "How do I install the Agora CLI?" → `references/cli/README.md`
+- "How do I use `agora init`?" → `references/cli/README.md`
+- "How do I bind a quickstart with `agora quickstart env write`?" → `references/cli/README.md`
 - "How do I export `.env` values with the Agora CLI?" → `references/cli/README.md`
 - "Help me use agora project doctor" → `references/cli/README.md`
+- "Show the CLI command tree with `agora introspect --json`" → `references/cli/README.md`
 - "Generate RTC token in Go" → `references/server/tokens.md`
 
 > **Routing constraint:** When a request matches ConvoAI and the user does not have a proven working baseline, go to `references/conversational-ai/README.md` which will route to `quickstarts.md`. Do NOT go through `intake/SKILL.md` for clear ConvoAI requests. Do NOT skip the quickstart gates by jumping directly into code generation or project scaffolding.
@@ -143,7 +147,9 @@ current provider docs must be fetched.
 
 **If MCP is unavailable or Level 2 fetch fails**: use the fallback URLs in `doc-fetching.md` to reach the official markdown docs directly. Never fabricate API parameters — always tell the user to verify against official docs if live fetch is unavailable.
 
-If a user explicitly asks about the Agora MCP server, see [references/mcp-tools.md](references/mcp-tools.md).
+If a user explicitly asks about the Agora Docs MCP server (`agora-docs-mcp`),
+see [references/mcp-tools.md](references/mcp-tools.md). It is for traversing
+Agora docs, not for using Agora backends.
 
 ## Web Framework Notes
 

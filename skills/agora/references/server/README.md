@@ -19,3 +19,4 @@ Server-side token generation for Agora authentication.
 
 - **[tokens.md](tokens.md)** — Token generation for Node.js, Python, and Go. Express server example, security best practices.
 - **Full token auth guide** — <https://docs-md.agora.io/en/video-calling/token-authentication/deploy-token-server.md>
+- **Local credential export** — for development setup, use [../cli/env.md](../cli/env.md) to export or write App ID/App Certificate values with the Agora CLI. Never expose the App Certificate to client code.
