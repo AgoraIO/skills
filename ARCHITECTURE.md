@@ -70,9 +70,11 @@ skills/
         ├── cli/                    Agora CLI
         │   ├── README.md           Command surface, routing
         │   ├── install-auth.md     Install, login, config
+        │   ├── quickstarts.md      Init, quickstart clone/bind/env
         │   ├── projects.md         Project CRUD, feature enablement
         │   ├── doctor.md           Readiness checks
-        │   └── automation.md       Scripted usage, --json
+        │   ├── automation.md       Scripted usage, --json
+        │   └── env.md              Project and quickstart env export/write
         ├── cloud-recording/        Cloud Recording (REST API)
         │   └── README.md           acquire/start/query/stop lifecycle
         ├── server-gateway/         Server Gateway (Linux SDK)

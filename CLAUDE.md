@@ -13,7 +13,7 @@ skills/
     ├── intake/SKILL.md        ← intake router; do not restructure this file
     └── references/
         ├── doc-fetching.md    ← two-tier lookup procedure (agent-facing)
-        ├── mcp-tools.md       ← Agora MCP server install guide (user-facing)
+        ├── mcp-tools.md       ← Agora Docs MCP install guide (docs traversal only)
         ├── integration-patterns.md  ← multi-product coordination (RTC+RTM+ConvoAI)
         ├── rtc/               ← Web, React, Next.js, iOS, Android, React Native, Flutter
         ├── rtm/               ← Web, iOS, Android (all v2)
