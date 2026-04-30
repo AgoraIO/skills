@@ -1,10 +1,10 @@
 # Agora CLI Projects
 
-Verified against Agora CLI `0.1.3`.
+Verified against Agora CLI `0.1.7`.
 
 ## Core Workflow
 
-Use this sequence for most CLI project tasks:
+Use `agora init` for the fastest end-to-end demo setup. Use low-level project commands when the workflow must be decomposed:
 
 ```bash
 agora login
@@ -19,7 +19,9 @@ agora project feature list
 ### Create
 
 ```bash
-agora project create <name> [--region global|cn] [--type general|voice-agent|chat|rtc] [--template voice-agent] [--feature rtc|rtm|convoai]
+agora project create <name> [--region global|cn] [--template voice-agent] [--feature rtc|rtm|convoai]
+agora project create <name> --dry-run
+agora project create <name> --idempotency-key <key>
 ```
 
 For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow.
@@ -63,7 +65,7 @@ agora project env write
 
 ## Feature Commands
 
-Valid verified feature names in `0.1.3`:
+Valid verified feature names in `0.1.7`:
 
 - `rtc`
 - `rtm`
@@ -87,6 +89,8 @@ agora project feature enable convoai
 
 If the user omits `[project]`, the CLI uses the locally selected project context.
 
+In a bound quickstart repo, project resolution prefers repo-local `.agora/project.json` before global `agora project use` context. See [quickstarts.md](quickstarts.md) for the full precedence.
+
 If no project is selected, the verified recovery is:
 
 ```bash
@@ -100,3 +104,4 @@ or rerun the command with a project argument.
 - Do not invent `agora project delete`.
 - Do not invent `agora project feature disable`.
 - Do not invent ConvoAI-specific nested groups under `agora project`.
+- Do not invent `agora project doctor all`; use `agora project doctor --feature convoai`, `--feature rtc`, or `--feature rtm`.

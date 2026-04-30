@@ -1,6 +1,6 @@
 # Agora CLI Doctor
 
-Verified against Agora CLI `0.1.3`.
+Verified against Agora CLI `0.1.7`.
 
 ## Purpose
 
@@ -12,6 +12,7 @@ It verifies:
 - project resolution or current-project context
 - feature readiness
 - basic project configuration such as App ID presence
+- in `--deep` mode, repo-local `.agora` metadata and quickstart env consistency checks where applicable
 
 It does not replace the full Conversational AI quickstart, RTM runtime validation, or end-to-end sample validation.
 
@@ -20,19 +21,22 @@ It does not replace the full Conversational AI quickstart, RTM runtime validatio
 ```bash
 agora project doctor [project]
 agora project doctor --json
+agora project doctor --feature convoai
+agora project doctor --feature rtc
+agora project doctor --feature rtm
 agora project doctor --deep
 ```
 
 ## Interpreting Results
 
-Verified result states in `0.1.3`:
+Verified result states in `0.1.7`:
 
 - `healthy`: project is ready from the CLI's current checks
 - `warning`: partially ready, but not fully clean
 - `not_ready`: blocking issues were found
 - `auth_error`: not logged in or project context cannot be resolved
 
-Exit behavior verified in `0.1.3`:
+Exit behavior verified in `0.1.7`:
 
 - healthy doctor run exits `0`
 - blocking readiness issues exit nonzero
@@ -62,15 +66,9 @@ If RTM or a related capability was just enabled and the first run still fails, a
 
 ## Deep Mode
 
-`--deep` is part of the verified CLI surface in `0.1.3`, but runtime preflight is not currently available there.
+`--deep` is part of the verified CLI surface in `0.1.7`. It runs deeper repo-local checks for `.agora` metadata and quickstart env consistency where applicable.
 
-Verified `0.1.3` behavior:
-
-- doctor still runs
-- the runtime-preflight item is reported as skipped
-- the message is effectively "Deep runtime preflight is not available in CLI 0.1.3"
-
-Do not promise deeper runtime checks unless you have verified a newer CLI version.
+Do not claim `--deep` proves RTC or RTM runtime connectivity. It remains a CLI readiness check.
 
 ## First-Success Boundary
 
@@ -82,6 +80,6 @@ Treat doctor results as **control-plane readiness only**:
 
 ## Fix Mode
 
-`--fix` exists in the command help for `0.1.3`, but do not claim broad automatic remediation behavior unless you have verified it for the user's version.
+`--fix` is not in the verified `0.1.7` command surface. Do not claim broad automatic remediation behavior unless a future CLI version documents it.
 
 For safe guidance, prefer explicit remediation commands over "the CLI will fix this automatically."
