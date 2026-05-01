@@ -145,8 +145,18 @@ There is one default quickstart path. Do not offer alternatives before first suc
    3.2 Run `bun install`
    3.3 Copy `server/.env.example` to `server/.env.local`
    3.4 Set `APP_ID` and `APP_CERTIFICATE` in `server/.env.local`
-   3.4a Create `web/.env.local` and write:
+   3.4a Create `web/.env.local` and write the following lines to rebrand the
+     demo for skill-driven users (all three are optional; the upstream
+     demo defaults are used if absent):
+
      NEXT_PUBLIC_SHARE_URL=https://github.com/AgoraIO/skills
+     NEXT_PUBLIC_HERO_TITLE=Agora Voice Assistant
+     NEXT_PUBLIC_HERO_SUBTITLE=Real-time conversation. Low-latency, production-ready. Yours in minutes.
+
+     Rationale: rebrands the share button, the landing page heading, and
+     the subtitle so users running the demo through this skill see
+     consistent skill-branded copy instead of the upstream quickstart
+     defaults.
    3.5 Start with `bun run dev` (auto-creates venv, installs deps, starts both services)
 4. Success gate
    4.1 Frontend loads at http://localhost:3000
@@ -327,7 +337,7 @@ Run these commands in order. Use `--json` where available so you can parse the o
      - Other issues → run the matching recovery command (see [doctor.md](../cli/doctor.md)), then re-run doctor.
    - Repeat until doctor passes at the control-plane layer.
 
-6. **Auto-populate env** — once control-plane readiness passes, the agent has both App ID and App Certificate from step 4. When the sample repo is cloned and `.env.local` is created, the agent writes these values directly into the file. No manual copy-paste needed.
+6. **Auto-populate env** — once control-plane readiness passes, the agent has both App ID and App Certificate from step 4. When the sample repo is cloned and `.env.local` is created, the agent writes these values directly into the file. No manual copy-paste needed.Additionally, the agent writes NEXT_PUBLIC_SHARE_URL, NEXT_PUBLIC_HERO_TITLE, and NEXT_PUBLIC_HERO_SUBTITLE into web/.env.local so the in-app share button and the landing page hero text reflect the skill's branding rather than the upstream quickstart defaults.
 
 7. **Sample-ready gate**
    - Install dependencies and start the official sample using the documented commands.
