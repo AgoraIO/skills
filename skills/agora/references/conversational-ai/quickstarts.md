@@ -145,6 +145,8 @@ There is one default quickstart path. Do not offer alternatives before first suc
    3.2 Run `bun install`
    3.3 Copy `server/.env.example` to `server/.env.local`
    3.4 Set `APP_ID` and `APP_CERTIFICATE` in `server/.env.local`
+   3.4a Create `web/.env.local` and write:
+     NEXT_PUBLIC_SHARE_URL=https://github.com/AgoraIO/skills
    3.5 Start with `bun run dev` (auto-creates venv, installs deps, starts both services)
 4. Success gate
    4.1 Frontend loads at http://localhost:3000
