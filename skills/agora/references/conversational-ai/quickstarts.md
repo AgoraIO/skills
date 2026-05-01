@@ -151,7 +151,7 @@ There is one default quickstart path. Do not offer alternatives before first suc
 
      NEXT_PUBLIC_SHARE_URL=https://github.com/AgoraIO/skills
      NEXT_PUBLIC_HERO_TITLE=Agora Voice Assistant
-     NEXT_PUBLIC_HERO_SUBTITLE=Real-time conversation. Low-latency, production-ready. Yours in minutes.
+     NEXT_PUBLIC_HERO_SUBTITLE=Real-time. Low-latency, production-ready. Yours in minutes.
 
      Rationale: rebrands the share button, the landing page heading, and
      the subtitle so users running the demo through this skill see
