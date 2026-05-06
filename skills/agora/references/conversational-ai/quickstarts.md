@@ -107,17 +107,21 @@ The CLI covers:
 - login / auth status
 - current project selection
 - project env export
+- official quickstart cloning and repo-local binding
+- template-aware quickstart env writing
 - feature enablement
 - App ID presence, App Certificate presence, and other basic project checks
 - `agora project doctor` readiness checks
 
-Use `agora project env --with-secrets --json` as the primary source of truth for App ID and App Certificate during quickstart. Use `project show --json` only when project metadata inspection is needed.
+Use `agora init` for a new official quickstart when the CLI can perform the clone + project binding + env writing safely. Use `agora quickstart env write` for an existing official quickstart repo. Use `agora project env --with-secrets --json` as the primary source of truth when the flow is decomposed and the agent needs App ID/App Certificate values directly. Use `project show --json` only when project metadata inspection is needed.
 
 Do **not** treat a healthy doctor result as a proven ConvoAI baseline.
 
 For command details, route to the CLI references:
 
 - [../cli/README.md](../cli/README.md)
+- [../cli/quickstarts.md](../cli/quickstarts.md)
+- [../cli/env.md](../cli/env.md)
 - [../cli/projects.md](../cli/projects.md)
 - [../cli/doctor.md](../cli/doctor.md)
 
@@ -134,17 +138,20 @@ There is one default quickstart path. Do not offer alternatives before first suc
    1.2 Python 3.8+
 2. CLI preflight
    2.1 Log in: `agora login`
-   2.2 Prefer the current selected project only if it is directly usable for first-success
-   2.3 Otherwise select another directly usable project or create a new dedicated token-ready project
-   2.4 Ensure `rtc`, `rtm`, and `convoai` are enabled for the first-success path
-   2.5 Export App ID + App Certificate with `agora project env --with-secrets --json`
-   2.6 Check `agora project doctor`
-   2.7 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
+   2.2 Verify CLI version with `agora version` (minimum `0.1.7`)
+   2.3 Prefer `agora init <name> --template python` for a new official sample checkout
+   2.4 For an existing official quickstart, use `agora quickstart env write <repo> --project <project>`
+   2.5 If decomposing the flow, prefer the current selected project only if it is directly usable for first-success
+   2.6 Otherwise select another directly usable project or create a new dedicated token-ready project
+   2.7 Ensure `rtc`, `rtm`, and `convoai` are enabled for the first-success path
+   2.8 Export App ID + App Certificate with `agora project env --with-secrets --json` only when direct credential values are needed outside `init` / `quickstart env write`
+   2.9 Check `agora project doctor`
+   2.10 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
 3. Official sample baseline
-   3.1 Clone `agent-quickstart-python`
+   3.1 Clone `agent-quickstart-python` directly or through `agora init`
    3.2 Run `bun install`
-   3.3 Copy `server/.env.example` to `server/.env.local`
-   3.4 Set `APP_ID` and `APP_CERTIFICATE` in `server/.env.local`
+   3.3 Ensure `server/.env` exists and contains `APP_ID` and `APP_CERTIFICATE` (`agora quickstart env write` can seed this for the official quickstart)
+   3.4 Do not rename the sample's env variables during first success
    3.5 Start with `bun run dev` (auto-creates venv, installs deps, starts both services)
 4. Success gate
    4.1 Frontend loads at http://localhost:3000
@@ -274,13 +281,14 @@ Before starting the CLI readiness flow, verify that all runtime dependencies are
 | Node.js | `node --version` | 18+ | Direct the user to https://nodejs.org or use `nvm install 22` |
 | Bun | `bun --version` | 1.0+ | `npm install -g bun` |
 | Python | `python3 --version` | 3.8+ | Direct the user to https://python.org |
-| Agora CLI | `npm list -g agoraio-cli` | 0.1.3+ | `npm install -g agoraio-cli@latest` |
+| Agora CLI | `agora version` | 0.1.7+ | `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh \| sh -s -- --add-to-path` |
 
 Execution rules:
 - Check all four in order. If any is missing or below minimum version, install/update it before continuing.
 - For Node.js and Python, if they are not installed, tell the user what to install and wait — do not attempt to install system-level runtimes.
-- For Bun and Agora CLI, install them directly via npm.
-- If Agora CLI is installed but outdated, run `npm install -g agoraio-cli@latest` to update.
+- For Bun, install directly via npm.
+- For Agora CLI, prefer the official curl installer. `npm install -g agoraio-cli` is acceptable when Node 18+ is available and the package is acting as the Go binary install wrapper.
+- If Agora CLI is installed but outdated, use `agora upgrade --check` for package-manager-specific guidance or reinstall from the official installer.
 - Only proceed to project readiness after all four checks pass.
 
 ### Project Readiness
@@ -290,7 +298,7 @@ Do not ask the user to self-report readiness or choose between manual and CLI pa
 Tell the user what you are about to check, then execute the commands yourself:
 
 ```text
-Let me check your project readiness — I'll use the Agora CLI to verify login, project, App ID, App Certificate, and ConvoAI activation. If anything is missing I'll fix it directly. Once the control-plane checks out I'll grab the credentials and fill in .env.local for you automatically.
+Let me check your project readiness — I'll use the Agora CLI to verify login, project, App ID, App Certificate, and ConvoAI activation. If anything is missing I'll fix it directly. Once the control-plane checks out I'll seed the official quickstart env file automatically.
 ```
 
 #### Agent execution sequence
@@ -312,7 +320,7 @@ Run these commands in order. Use `--json` where available so you can parse the o
    - If a directly usable candidate is found, select it and explicitly tell the user which project was chosen before continuing.
    - If no directly usable candidate exists, create a new dedicated first-success project with the required features already enabled, then select it.
 
-4. **Credential export** — use `agora project env --with-secrets --json`
+4. **Credential export / env write** — use `agora quickstart env write` for an official quickstart, or `agora project env --with-secrets --json` when direct credential values are needed.
    - Extract App ID and App Certificate from the CLI env output, not from Agora Console.
    - Keep these values for later sample env population.
    - If `--with-secrets` fails because the project is still not token-ready, treat that as a project-readiness failure and keep fixing or replace the project according to the selection rules above.
@@ -325,7 +333,7 @@ Run these commands in order. Use `--json` where available so you can parse the o
      - Other issues → run the matching recovery command (see [doctor.md](../cli/doctor.md)), then re-run doctor.
    - Repeat until doctor passes at the control-plane layer.
 
-6. **Auto-populate env** — once control-plane readiness passes, the agent has both App ID and App Certificate from step 4. When the sample repo is cloned and `.env.local` is created, the agent writes these values directly into the file. No manual copy-paste needed.
+6. **Auto-populate env** — once control-plane readiness passes, seed the official quickstart env with `agora quickstart env write` when possible. For the Python quickstart, the target is `server/.env` with `APP_ID` and `APP_CERTIFICATE`. No manual copy-paste needed.
 
 7. **Sample-ready gate**
    - Install dependencies and start the official sample using the documented commands.
@@ -335,6 +343,8 @@ Run these commands in order. Use `--json` where available so you can parse the o
 For CLI command details, route to:
 
 - [../cli/README.md](../cli/README.md)
+- [../cli/quickstarts.md](../cli/quickstarts.md)
+- [../cli/env.md](../cli/env.md)
 - [../cli/projects.md](../cli/projects.md)
 - [../cli/doctor.md](../cli/doctor.md)
 

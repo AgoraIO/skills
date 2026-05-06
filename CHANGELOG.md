@@ -8,12 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- `skills/agora/references/cli/quickstarts.md` — Agora CLI `init`, `quickstart create`, `quickstart env write`, and repo-local `.agora/project.json` binding guidance verified against CLI `0.1.7`
+- CLI eval coverage for `agora introspect --json`, telemetry controls, auth JSON unauthenticated handling, quickstart env vs project env, installed `agora` notation, and non-ConvoAI CLI routing
 - `skills/agora/references/cli/env.md` — dedicated Agora CLI `project env` reference covering export formats, `AGORA_` variable names, secret opt-in behavior, managed-block writes, and default `.env*` target selection
 - CLI eval coverage in `tests/eval-cases.md` for `project env` export-first semantics, `--with-secrets`, default write-target safety, and OAuth loopback redirect mismatch guidance
 - README prompt templates for explicitly telling agents to use the Agora skill, stay on the official sample-first path, and avoid undocumented CLI commands
 
 ### Changed
 
+- `skills/agora/references/cli/README.md`, `skills/agora/references/cli/install-auth.md`, `skills/agora/references/cli/env.md`, `skills/agora/references/cli/projects.md`, `skills/agora/references/cli/doctor.md`, `skills/agora/references/cli/automation.md`: raised the verified CLI baseline to Go CLI `0.1.7`, `https://github.com/AgoraIO/cli`, curl/PowerShell/npm-wrapper install paths, `agora init`, `quickstart`, `introspect`, telemetry, upgrade, and v0.1.7 JSON automation behavior
+- `skills/agora/references/conversational-ai/README.md`, `skills/agora/references/conversational-ai/quickstarts.md`: aligned ConvoAI first-success setup with `agora init`, `agora quickstart env write`, v0.1.7 CLI checks, and current quickstart env targets
+- `skills/agora/SKILL.md`, `skills/agora/intake/SKILL.md`, `skills/agora/references/doc-fetching.md`, `skills/agora/references/mcp-tools.md`: expanded CLI routing, local-first CLI doc lookup, and clarified that `agora-docs-mcp` is docs traversal only while the CLI handles backend/account/project workflows
+- `README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`: documented Agora CLI as a first-class skill area and added the v0.1.7 maintenance workflow
 - `skills/agora/references/cli/README.md`, `skills/agora/SKILL.md`: updated CLI routing and examples to include `agora project env` and `agora project env write` as first-class workflows
 - `skills/agora/references/cli/automation.md`, `skills/agora/references/cli/projects.md`: shifted env guidance from `project show --json` toward `project env` / `project env write`, while keeping `project show --json` as metadata inspection
 - `skills/agora/references/cli/install-auth.md`: documented the verified OAuth loopback rule that authorize and token-exchange `redirect_uri` values must match exactly, with `localhost` vs `127.0.0.1` mismatch called out explicitly
@@ -85,7 +91,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Intake router (`skills/agora/intake/SKILL.md`) — multi-product needs analysis for ambiguous requests
 - Agora token-based auth for ConvoAI REST API — inline gotcha + implementation in `conversational-ai/README.md`
 - OpenAI Realtime MLLM configuration in `agent-samples.md`
-- Agora MCP server config bundled in `.claude-plugin/mcp-config.json`
+- Agora Docs MCP server config bundled in `.claude-plugin/mcp-config.json`
 
 ### Changed
 

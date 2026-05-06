@@ -1,8 +1,15 @@
-# Agora Doc MCP Server
+# Agora Docs MCP Server
 
-The Agora Doc MCP server gives AI assistants direct tool-call access to Agora
-documentation. It is an optional enhancement — the skill works without it using
-the two-tier fetch approach in [doc-fetching.md](doc-fetching.md).
+<!-- applies-from: v0.2.0 -->
+
+The Agora Docs MCP server (`agora-docs-mcp`, configured here as `agora-docs`)
+gives AI assistants direct tool-call access to Agora documentation. It is an
+optional enhancement — the skill works without it using the two-tier fetch
+approach in [doc-fetching.md](doc-fetching.md).
+
+Agora Docs MCP is for traversing docs only. It does not operate Agora backends,
+log in to accounts, create projects, write env files, or check project readiness;
+the local `agora` CLI handles those workflows.
 
 **Only use MCP when the user explicitly asks for it.** The default documentation
 lookup is the two-tier fetch approach in [doc-fetching.md](doc-fetching.md) — use

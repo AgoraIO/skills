@@ -78,6 +78,30 @@ They represent debugging knowledge that LLMs consistently get wrong. Before upda
 4. If a gotcha no longer applies to any supported SDK version, move it to a
    `## Historical Notes` section at the bottom of the file rather than deleting it.
 
+## Updating Agora CLI References
+
+The bundled CLI skill files live under `skills/agora/references/cli/` and should track the canonical CLI repository: <https://github.com/AgoraIO/cli>.
+
+When updating CLI guidance:
+
+1. Install or update the CLI from the canonical installer, or use the npm wrapper once it maps to the same Go binary:
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh -s -- --add-to-path
+   agora version
+   ```
+2. Pin the verified release in the CLI reference files, for example `Verified against Agora CLI 0.1.7`.
+3. Diff the command surface against upstream sources:
+   - `agora --help --all`
+   - `agora introspect --json`
+   - `docs/commands.md`
+   - `docs/automation.md`
+   - `docs/error-codes.md`
+   - `docs/telemetry.md`
+   - `CHANGELOG.md` and GitHub Releases
+4. Keep install guidance aligned across `cli/install-auth.md`, `skills/agora/SKILL.md`, `README.md`, and eval cases.
+5. Update `tests/eval-cases.md` for new stable commands, changed flags, JSON contracts, or commands that are now valid and should no longer be rejected.
+6. Preserve the no-hallucination rule: if a command is not in the verified CLI surface or upstream docs, route to the closest real command instead of inventing one.
+
 ## Required Frontmatter
 
 Every `SKILL.md` must include:
@@ -176,8 +200,10 @@ To update a registration after a version bump:
 2. Once merged, users get the update automatically when Claude Code refreshes (`/plugin marketplace update`)
 3. For agentskills.io manual updates, follow the [agentskills.io submission guide](https://agentskills.io)
 
-The Agora MCP server config is bundled in `.claude-plugin/mcp-config.json` and
-referenced from `plugin.json` via `"mcpServers": "./mcp-config.json"`.
+The Agora Docs MCP (`agora-docs-mcp`) config is bundled in
+`.claude-plugin/mcp-config.json` and referenced from `plugin.json` via
+`"mcpServers": "./mcp-config.json"`. It is for documentation traversal only,
+not for Agora backend/account/project operations.
 
 ## Verifying URLs
 
