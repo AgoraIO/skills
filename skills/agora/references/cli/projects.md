@@ -1,6 +1,10 @@
 # Agora CLI Projects
 
-Verified against Agora CLI `0.1.7`.
+<!-- applies-from: v0.2.0 -->
+
+Use this file when the user needs to create, select, inspect, or feature-enable Agora projects from the CLI.
+
+Verified against Agora CLI `0.2.0`.
 
 ## Core Workflow
 
@@ -12,6 +16,7 @@ agora project create my-agent-demo --feature rtc --feature rtm --feature convoai
 agora project use my-agent-demo
 agora project env
 agora project feature list
+agora project list --refresh-cache
 ```
 
 ## Project Commands
@@ -22,17 +27,21 @@ agora project feature list
 agora project create <name> [--region global|cn] [--template voice-agent] [--feature rtc|rtm|convoai]
 agora project create <name> --dry-run
 agora project create <name> --idempotency-key <key>
+agora project create <name> --rtm-data-center EU
 ```
 
-For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow.
+For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow. In `0.2.0`, omitted `--feature` defaults to `rtc`, `rtm`, and `convoai`, and `convoai` implies `rtm`.
 
 ### List
 
 ```bash
 agora project list [--page N] [--page-size N] [--keyword <text>]
+agora project list --refresh-cache
 ```
 
 Use this when the user needs to discover a project ID or exact project name.
+
+`--refresh-cache` updates the unfiltered first-page cache the CLI uses for shell completion. That matters when the user's completion results lag behind recent project changes.
 
 ### Select Current Project
 
@@ -65,7 +74,7 @@ agora project env write
 
 ## Feature Commands
 
-Valid verified feature names in `0.1.7`:
+Valid verified feature names in `0.2.0`:
 
 - `rtc`
 - `rtm`

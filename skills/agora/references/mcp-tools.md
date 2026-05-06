@@ -1,5 +1,7 @@
 # Agora Docs MCP Server
 
+<!-- applies-from: v0.2.0 -->
+
 The Agora Docs MCP server (`agora-docs-mcp`, configured here as `agora-docs`)
 gives AI assistants direct tool-call access to Agora documentation. It is an
 optional enhancement — the skill works without it using the two-tier fetch

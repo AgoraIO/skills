@@ -1,10 +1,48 @@
 # Agora CLI Doctor
 
-Verified against Agora CLI `0.1.7`.
+<!-- applies-from: v0.2.0 -->
+
+Use this file when the user needs either local CLI install diagnostics (`agora doctor`) or project readiness diagnostics (`agora project doctor`).
+
+Verified against Agora CLI `0.2.0`.
 
 ## Purpose
 
-`agora project doctor` checks whether a project is control-plane ready for Conversational AI development from the CLI's point of view.
+`agora doctor` checks the local CLI install.
+
+`agora project doctor` checks whether a project is control-plane ready for feature development from the CLI's point of view.
+
+Use `agora doctor` first when the failure looks local to the workstation or shell. Use `agora project doctor` when auth works and the problem is project configuration or feature readiness.
+
+## Install Doctor
+
+```bash
+agora doctor
+agora doctor --json
+agora doctor --quiet
+```
+
+Verified `0.2.0` install-doctor checks include:
+
+- binary path and PATH resolution
+- installed version
+- `AGORA_HOME` writability
+- API and OAuth DNS/network reachability
+- auth/session state
+- known MCP host detection
+
+Verified `0.2.0` install-doctor exit codes:
+
+- `0`: healthy
+- `1`: blocking install issues
+- `2`: warnings
+- `3`: auth or session issues
+
+Common recovery paths:
+
+- PATH issue: run the shell-specific command printed by `agora doctor`
+- network or DNS issue: fix connectivity or proxy settings before retrying auth
+- auth issue: run `agora login`
 
 It verifies:
 
@@ -29,18 +67,19 @@ agora project doctor --deep
 
 ## Interpreting Results
 
-Verified result states in `0.1.7`:
+Verified result states in `0.2.0`:
 
 - `healthy`: project is ready from the CLI's current checks
 - `warning`: partially ready, but not fully clean
 - `not_ready`: blocking issues were found
 - `auth_error`: not logged in or project context cannot be resolved
 
-Exit behavior verified in `0.1.7`:
+Exit behavior verified in `0.2.0`:
 
 - healthy doctor run exits `0`
-- blocking readiness issues exit nonzero
-- unauthenticated deep-mode doctor exits `3`
+- blocking readiness issues exit `1`
+- warning-only readiness issues exit `2`
+- auth or session issues exit `3`
 
 ## Common Recovery Commands
 
@@ -66,7 +105,7 @@ If RTM or a related capability was just enabled and the first run still fails, a
 
 ## Deep Mode
 
-`--deep` is part of the verified CLI surface in `0.1.7`. It runs deeper repo-local checks for `.agora` metadata and quickstart env consistency where applicable.
+`--deep` is part of the verified CLI surface in `0.2.0`. It runs deeper repo-local checks for `.agora` metadata and quickstart env consistency where applicable.
 
 Do not claim `--deep` proves RTC or RTM runtime connectivity. It remains a CLI readiness check.
 
@@ -80,6 +119,6 @@ Treat doctor results as **control-plane readiness only**:
 
 ## Fix Mode
 
-`--fix` is not in the verified `0.1.7` command surface. Do not claim broad automatic remediation behavior unless a future CLI version documents it.
+`--fix` is not in the verified `0.2.0` command surface. Do not claim broad automatic remediation behavior unless a future CLI version documents it.
 
 For safe guidance, prefer explicit remediation commands over "the CLI will fix this automatically."

@@ -15,6 +15,8 @@ metadata:
   version: '1.6.0'
 ---
 
+<!-- applies-from: v0.2.0 -->
+
 # Agora (agora.io)
 
 Skill version: 1.6.0
@@ -61,9 +63,9 @@ REST API-driven voice AI agents. Create agents that join RTC channels and conver
 
 ### Agora CLI
 
-Agora project and auth workflow through the installed `agora` command-line tool. Use when the request is about installing the CLI, logging in, creating or selecting projects, running `init` or `quickstart`, exporting project env vars with `project env`, writing quickstart env files, enabling `convoai`, checking readiness with `project doctor`, telemetry, upgrades, or command introspection.
+Agora project and auth workflow through the installed `agora` command-line tool. Use when the request is about installing the CLI, logging in, creating or selecting projects, running `init` or `quickstart`, exporting project env vars with `project env`, writing quickstart env files, enabling `convoai`, checking readiness with `doctor` or `project doctor`, inspecting environment overrides with `env-help`, browsing built-in recipes with `skills`, serving MCP tools with `mcp serve`, telemetry, upgrades, or command introspection.
 
-**[references/cli/README.md](references/cli/README.md)** — Start here for the Go-based `agora` CLI, curl/npm install, `agora init`, `agora quickstart`, `agora project env`, `agora quickstart env write`, `agora project doctor`, `agora introspect --json`, telemetry, config defaults, and script-safe `--json` usage
+**[references/cli/README.md](references/cli/README.md)** — Start here for the Go-based `agora` CLI, curl/npm install, `agora init`, `agora quickstart`, `agora project env`, `agora quickstart env write`, `agora doctor`, `agora project doctor`, `agora env-help`, `agora skills`, `agora mcp serve`, `agora introspect --json`, telemetry, config defaults, and script-safe `--json` usage
 
 ### Cloud Recording
 
@@ -116,6 +118,9 @@ Examples of clear requests:
 - "How do I bind a quickstart with `agora quickstart env write`?" → `references/cli/README.md`
 - "How do I export `.env` values with the Agora CLI?" → `references/cli/README.md`
 - "Help me use agora project doctor" → `references/cli/README.md`
+- "How do I diagnose my CLI install with `agora doctor`?" → `references/cli/README.md`
+- "What `AGORA_*` vars does the CLI honor?" → `references/cli/README.md`
+- "How do I browse built-in CLI skills?" → `references/cli/README.md`
 - "Show the CLI command tree with `agora introspect --json`" → `references/cli/README.md`
 - "Generate RTC token in Go" → `references/server/tokens.md`
 
