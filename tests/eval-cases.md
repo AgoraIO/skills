@@ -89,14 +89,14 @@ For each case:
 
 - User Input: "I want MLLM with Gemini"
 - Expected Behavior: Routes directly to `references/conversational-ai/README.md`
-- Pass Criteria: Does not go through `intake/SKILL.md` first when the request is already clearly ConvoAI-specific
+- Pass Criteria: Does not add an extra routing hop before going to the ConvoAI module when the request is already clearly ConvoAI-specific
 - Result: ___
 
 ### R-12: Studio Agent ID request routes to ConvoAI before intake
 
 - User Input: "I already have an Agent ID from Agora Studio Agents"
 - Expected Behavior: Routes directly to `references/conversational-ai/README.md`, then into the ConvoAI quickstart Studio Agent ID branch
-- Pass Criteria: Does not go through `intake/SKILL.md` first when the request is already clearly ConvoAI-specific
+- Pass Criteria: Does not add an extra routing hop before going to the ConvoAI module when the request is already clearly ConvoAI-specific
 - Result: ___
 
 ### R-13: Mixed CLI + ConvoAI onboarding request stays ConvoAI-first
@@ -210,8 +210,8 @@ For each case:
 ### F-01: Vague request — no product specified
 
 - User Input: "Build me an AI assistant for my app"
-- Expected Behavior: Does not generate code immediately; routes through `skills/agora/intake/SKILL.md` for needs analysis
-- Pass Criteria: Does not fabricate an Agora product choice; acknowledges ambiguity
+- Expected Behavior: Does not generate code immediately; infers ConvoAI as the primary route or asks one focused clarification if the target is still genuinely unclear
+- Pass Criteria: Does not force a separate intake flow or a rigid needs-analysis template; keeps the ambiguity handling natural and minimal
 - Result: ___
 
 ### F-02: MCP server unreachable
@@ -525,7 +525,7 @@ For each case:
 
 - User Input: "Help me use `agora project doctor`"
 - Expected Behavior: Routes directly to the CLI module
-- Pass Criteria: Does not go through `agora-intake`; treats the request as a CLI usage question first
+- Pass Criteria: Does not add an unnecessary routing detour; treats the request as a CLI usage question first
 - Result: ___
 
 ### CLI-12: ConvoAI onboarding prep points to CLI doctor without pretending onboarding is complete

@@ -10,7 +10,6 @@ The skill content lives under a nested path: `skills/agora/`. When adding or edi
 skills/
 └── agora/                     ← skill root (all edits go here)
     ├── SKILL.md               ← entry point; do not restructure this file
-    ├── intake/SKILL.md        ← intake router; do not restructure this file
     └── references/
         ├── doc-fetching.md    ← two-tier lookup procedure (agent-facing)
         ├── mcp-tools.md       ← Agora MCP server install guide (user-facing)
