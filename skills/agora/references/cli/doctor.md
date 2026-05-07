@@ -1,10 +1,48 @@
 # Agora CLI Doctor
 
-Verified against Agora CLI `0.1.3`.
+<!-- applies-from: v0.2.0 -->
+
+Use this file when the user needs either local CLI install diagnostics (`agora doctor`) or project readiness diagnostics (`agora project doctor`).
+
+Verified against Agora CLI `0.2.0`.
 
 ## Purpose
 
-`agora project doctor` checks whether a project is control-plane ready for Conversational AI development from the CLI's point of view.
+`agora doctor` checks the local CLI install.
+
+`agora project doctor` checks whether a project is control-plane ready for feature development from the CLI's point of view.
+
+Use `agora doctor` first when the failure looks local to the workstation or shell. Use `agora project doctor` when auth works and the problem is project configuration or feature readiness.
+
+## Install Doctor
+
+```bash
+agora doctor
+agora doctor --json
+agora doctor --quiet
+```
+
+Verified `0.2.0` install-doctor checks include:
+
+- binary path and PATH resolution
+- installed version
+- `AGORA_HOME` writability
+- API and OAuth DNS/network reachability
+- auth/session state
+- known MCP host detection
+
+Verified `0.2.0` install-doctor exit codes:
+
+- `0`: healthy
+- `1`: blocking install issues
+- `2`: warnings
+- `3`: auth or session issues
+
+Common recovery paths:
+
+- PATH issue: run the shell-specific command printed by `agora doctor`
+- network or DNS issue: fix connectivity or proxy settings before retrying auth
+- auth issue: run `agora login`
 
 It verifies:
 
@@ -12,6 +50,7 @@ It verifies:
 - project resolution or current-project context
 - feature readiness
 - basic project configuration such as App ID presence
+- in `--deep` mode, repo-local `.agora` metadata and quickstart env consistency checks where applicable
 
 It does not replace the full Conversational AI quickstart, RTM runtime validation, or end-to-end sample validation.
 
@@ -20,23 +59,27 @@ It does not replace the full Conversational AI quickstart, RTM runtime validatio
 ```bash
 agora project doctor [project]
 agora project doctor --json
+agora project doctor --feature convoai
+agora project doctor --feature rtc
+agora project doctor --feature rtm
 agora project doctor --deep
 ```
 
 ## Interpreting Results
 
-Verified result states in `0.1.3`:
+Verified result states in `0.2.0`:
 
 - `healthy`: project is ready from the CLI's current checks
 - `warning`: partially ready, but not fully clean
 - `not_ready`: blocking issues were found
 - `auth_error`: not logged in or project context cannot be resolved
 
-Exit behavior verified in `0.1.3`:
+Exit behavior verified in `0.2.0`:
 
 - healthy doctor run exits `0`
-- blocking readiness issues exit nonzero
-- unauthenticated deep-mode doctor exits `3`
+- blocking readiness issues exit `1`
+- warning-only readiness issues exit `2`
+- auth or session issues exit `3`
 
 ## Common Recovery Commands
 
@@ -62,15 +105,9 @@ If RTM or a related capability was just enabled and the first run still fails, a
 
 ## Deep Mode
 
-`--deep` is part of the verified CLI surface in `0.1.3`, but runtime preflight is not currently available there.
+`--deep` is part of the verified CLI surface in `0.2.0`. It runs deeper repo-local checks for `.agora` metadata and quickstart env consistency where applicable.
 
-Verified `0.1.3` behavior:
-
-- doctor still runs
-- the runtime-preflight item is reported as skipped
-- the message is effectively "Deep runtime preflight is not available in CLI 0.1.3"
-
-Do not promise deeper runtime checks unless you have verified a newer CLI version.
+Do not claim `--deep` proves RTC or RTM runtime connectivity. It remains a CLI readiness check.
 
 ## First-Success Boundary
 
@@ -82,6 +119,6 @@ Treat doctor results as **control-plane readiness only**:
 
 ## Fix Mode
 
-`--fix` exists in the command help for `0.1.3`, but do not claim broad automatic remediation behavior unless you have verified it for the user's version.
+`--fix` is not in the verified `0.2.0` command surface. Do not claim broad automatic remediation behavior unless a future CLI version documents it.
 
 For safe guidance, prefer explicit remediation commands over "the CLI will fix this automatically."

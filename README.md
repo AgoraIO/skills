@@ -37,6 +37,14 @@ With the Agora skill loaded, the agent can then:
 
 You should not need to manually dig through the Agora Console just to get a first voice agent running.
 
+For local CLI-powered onboarding, install the Agora CLI with:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh -s -- --add-to-path
+```
+
+The npm path, `npm install -g agoraio-cli`, is also supported as an install wrapper for the same Go-based `agora` command when Node.js 18+ is available.
+
 ## Installation
 
 ### Skills CLI
@@ -76,6 +84,7 @@ This works with tools like **Cursor, Windsurf, GitHub Copilot, Kiro**, or any en
 |**Chat & Signaling**|Real-time messaging, presence, notifications|Web, iOS, Android|
 |**Recording**|Server-side recording of sessions|REST API|
 |**Auth & Tokens**|Token generation for production apps|Node.js, Python, Go|
+|**Agora CLI**|Login, project creation/binding, `init`, quickstart env writing, readiness checks, automation|macOS, Linux, Windows|
 |**Server Gateway**|Server-side media streaming|Linux (C++)|
 |**Multi-Product Workflows**|RTC + RTM + AI agents combined|Cross-platform|
 

@@ -453,30 +453,30 @@ For each case:
 
 ### CLI-01: Root routing for install and login
 
-- User Input: "How do I install agoraio-cli and log in?"
+- User Input: "How do I install the Agora CLI and log in?"
 - Expected Behavior: Routes to the top-level CLI module rather than RTC / ConvoAI / intake
-- Pass Criteria: Uses the CLI references, installs `agoraio-cli`, names the `agora` command, and includes `agora login`
+- Pass Criteria: Uses the CLI references, recommends the `https://github.com/AgoraIO/cli` curl installer, names the installed `agora` command, mentions npm `agoraio-cli` only as a thin install wrapper path, and includes `agora login`
 - Result: ___
 
 ### CLI-02: Deprecated preview package migration
 
 - User Input: "I still have agora-cli-preview installed. What should I do?"
 - Expected Behavior: Explains the stable package migration path
-- Pass Criteria: Tells the user to uninstall `agora-cli-preview` and install `agoraio-cli`; does not present the preview package as current
+- Pass Criteria: Tells the user not to use `agora-cli-preview`; routes to the current `agora` install path via the AgoraIO/cli installer or npm `agoraio-cli` wrapper; does not present the preview package as current
 - Result: ___
 
 ### CLI-03: Version-aware minimum support
 
 - User Input: "What CLI version should I use for this skill?"
 - Expected Behavior: Anchors guidance on the verified minimum version
-- Pass Criteria: States that the skill is verified against CLI `0.1.3` and written for `>=0.1.3`; does not hand-wave with "latest"
+- Pass Criteria: States that the skill is verified against CLI `0.1.7` and written for `>=0.1.7`; does not hand-wave with "latest"
 - Result: ___
 
 ### CLI-04: Project creation guidance stays within real command surface
 
 - User Input: "Create an Agora project for RTC and ConvoAI with the CLI"
 - Expected Behavior: Uses the documented project workflow
-- Pass Criteria: References `agora project create <name> --feature rtc --feature convoai`; does not invent unsupported flags or subcommands
+- Pass Criteria: References `agora project create <name> --feature rtc --feature convoai` for low-level project creation, or `agora init <name> --template <template>` for full demo onboarding; does not invent unsupported flags or subcommands
 - Result: ___
 
 ### CLI-05: Feature enable guidance uses real feature values
@@ -497,14 +497,14 @@ For each case:
 
 - User Input: "What does `agora project doctor --deep` do?"
 - Expected Behavior: Describes the currently verified behavior instead of promising future runtime checks
-- Pass Criteria: States that deep mode exists, but in CLI `0.1.3` runtime preflight is not available and is reported as skipped
+- Pass Criteria: States that in CLI `0.1.7`, deep mode runs repo-local checks such as `.agora` metadata and quickstart env consistency where applicable; does not claim it proves RTC/RTM runtime connectivity or sample-ready status
 - Result: ___
 
 ### CLI-08: Agent automation prefers JSON output
 
 - User Input: "I want an agent to call the CLI safely from scripts"
 - Expected Behavior: Recommends machine-readable output and stable parsing boundaries
-- Pass Criteria: Recommends `--json` or persisted JSON output mode; does not tell agents to parse pretty output by default
+- Pass Criteria: Recommends `--json`, `agora introspect --json` for command discovery, `AGORA_HOME` isolation for CI/multi-agent runs, and does not tell agents to parse pretty output by default
 - Result: ___
 
 ### CLI-09: Config defaults and override locations are accurate
@@ -518,7 +518,7 @@ For each case:
 
 - User Input: "Can I run `agora convoai init`?"
 - Expected Behavior: Rejects the invented command and routes to the real command set
-- Pass Criteria: Explicitly says this is not part of the verified CLI surface; redirects to actual `auth`, `config`, `project`, `project feature`, or `project doctor` commands
+- Pass Criteria: Explicitly says this is not part of the verified CLI surface; redirects to actual `agora init`, `agora quickstart`, `auth`, `config`, `project`, `project feature`, or `project doctor` commands
 - Result: ___
 
 ### CLI-11: Root routing bypasses intake for clear CLI requests
@@ -551,9 +551,9 @@ For each case:
 
 ### CLI-15: Env write chooses safe default targets
 
-- User Input: "If I run `agora project env write` without a path, where does it write?"
-- Expected Behavior: Describes the verified default target selection order
-- Pass Criteria: Prefers existing managed blocks, then `.env.local`, then `.env`, then other runtime `.env.*`, and explicitly excludes `.env.example`, `.env.sample`, and `.env.template`
+- User Input: "What's the difference between `agora project env write` and `agora quickstart env write`?"
+- Expected Behavior: Distinguishes generic project dotenv writing from official quickstart template-aware env writing
+- Pass Criteria: Says `project env write` writes generic `AGORA_APP_ID` / `AGORA_APP_CERTIFICATE`, while `quickstart env write` writes runtime-specific files and variable names such as Next.js `NEXT_PUBLIC_AGORA_APP_ID` / `NEXT_AGORA_APP_CERTIFICATE` or Python `server/.env` with `APP_ID` / `APP_CERTIFICATE`
 - Result: ___
 
 ### CLI-16: OAuth loopback redirect mismatch guidance is host-aware
@@ -574,7 +574,7 @@ For each case:
 
 - User Input: "Can I use `agora convoai quickstart init` or `agora project doctor all`?"
 - Expected Behavior: Rejects invented CLI shortcuts
-- Pass Criteria: Explicitly says these are not part of the verified CLI surface and routes the user back to real `auth`, `project`, `project env`, `project feature`, and `project doctor` commands
+- Pass Criteria: Explicitly says these are not part of the verified CLI surface and routes the user back to real `agora init`, `agora quickstart`, `auth`, `project`, `project env`, `project feature`, and `project doctor --feature <feature>` commands
 - Result: ___
 
 ### CLI-19: Repo README teaches explicit skill prompting
@@ -582,6 +582,41 @@ For each case:
 - User Input: "How do I tell my agent to use the Agora skill and not self-build?"
 - Expected Behavior: Points to explicit prompt templates or gives equivalent wording
 - Pass Criteria: Tells the user to explicitly instruct the agent to use the Agora skill, follow the official sample-first path, and avoid undocumented CLI commands or self-built first-success flows
+- Result: ___
+
+### CLI-20: Command tree discovery uses introspect
+
+- User Input: "How can an agent discover the full Agora CLI command tree?"
+- Expected Behavior: Uses the v0.1.7 machine-readable discovery path
+- Pass Criteria: Recommends `agora introspect --json` for agents and `agora --help --all` / `agora --help --all --json` for help output; does not suggest scraping pretty help as the default
+- Result: ___
+
+### CLI-21: Telemetry controls are documented
+
+- User Input: "How do I turn off Agora CLI telemetry in automation?"
+- Expected Behavior: Routes to CLI automation guidance
+- Pass Criteria: Mentions `agora telemetry disable`, `agora telemetry status`, and `DO_NOT_TRACK=1`; does not invent unrelated env vars
+- Result: ___
+
+### CLI-22: Auth JSON unauthenticated state is recoverable
+
+- User Input: "`agora auth status --json` exits 3 with AUTH_UNAUTHENTICATED. Is that fatal?"
+- Expected Behavior: Interprets the documented auth state correctly
+- Pass Criteria: Says this is a recoverable unauthenticated state and the next step is `agora login` or `agora login --no-browser`, not a generic CLI crash
+- Result: ___
+
+### CLI-23: Installed CLI examples do not use local binary notation
+
+- User Input: "Show me commands for the installed Agora CLI"
+- Expected Behavior: Uses installed-command examples
+- Pass Criteria: Uses `agora ...` in examples, and reserves `./agora` only for a locally built binary from the CLI repository
+- Result: ___
+
+### CLI-24: CLI-only token-server setup stays out of ConvoAI routing
+
+- User Input: "Use the Agora CLI to export env vars for my RTC token server."
+- Expected Behavior: Routes to the CLI env workflow and server token reference, not the ConvoAI quickstart
+- Pass Criteria: Uses `references/cli/env.md` for env export/write and `references/server/tokens.md` for token generation; does not route into ConvoAI onboarding
 - Result: ___
 
 ### C-15: RTM token subject and RTM login identity stay aligned

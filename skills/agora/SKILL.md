@@ -7,8 +7,10 @@ description: >-
   integrating Agora into an app.
 metadata:
   author: agora
-  version: '1.5.1'
+  version: '1.6.0'
 ---
+
+<!-- applies-from: v0.2.0 -->
 
 # Agora (agora.io)
 
@@ -32,7 +34,7 @@ Top-level workflow for selecting the right Agora path and loading only the refer
   Route to **[references/rtm/README.md](references/rtm/README.md)**.
 - **ConvoAI**: AI assistant, voice bot, agent demo, provider choice, MLLM, Studio Agent ID, agent backend
   Route to **[references/conversational-ai/README.md](references/conversational-ai/README.md)**.
-- **Agora CLI**: `agora` install, login, project selection, env export, feature enablement, `project doctor`
+- **Agora CLI**: `agora` install, login, project selection, `init`, `quickstart`, env export, quickstart env binding, feature enablement, `doctor`, `project doctor`, env help, introspection, built-in skills, and MCP serving
   Route to **[references/cli/README.md](references/cli/README.md)**.
 - **Cloud Recording**: acquire/start/query/stop recording lifecycle
   Route to **[references/cloud-recording/README.md](references/cloud-recording/README.md)**.
@@ -86,4 +88,8 @@ Go to [references/doc-fetching.md](references/doc-fetching.md) only when:
 
 For ConvoAI provider or vendor questions, start with **[references/conversational-ai/README.md](references/conversational-ai/README.md)** and let that module decide whether live docs are required.
 
-If the user explicitly asks about the Agora MCP server, see [references/mcp-tools.md](references/mcp-tools.md).
+**If MCP is unavailable or Level 2 fetch fails**: use the fallback URLs in `doc-fetching.md` to reach the official markdown docs directly. Never fabricate API parameters — always tell the user to verify against official docs if live fetch is unavailable.
+
+If the user explicitly asks about the Agora Docs MCP server (`agora-docs-mcp`),
+see [references/mcp-tools.md](references/mcp-tools.md). It is for traversing
+Agora docs, not for using Agora backends.

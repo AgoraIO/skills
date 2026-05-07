@@ -1,10 +1,14 @@
 # Agora CLI Projects
 
-Verified against Agora CLI `0.1.3`.
+<!-- applies-from: v0.2.0 -->
+
+Use this file when the user needs to create, select, inspect, or feature-enable Agora projects from the CLI.
+
+Verified against Agora CLI `0.2.0`.
 
 ## Core Workflow
 
-Use this sequence for most CLI project tasks:
+Use `agora init` for the fastest end-to-end demo setup. Use low-level project commands when the workflow must be decomposed:
 
 ```bash
 agora login
@@ -12,6 +16,7 @@ agora project create my-agent-demo --feature rtc --feature rtm --feature convoai
 agora project use my-agent-demo
 agora project env
 agora project feature list
+agora project list --refresh-cache
 ```
 
 ## Project Commands
@@ -19,18 +24,24 @@ agora project feature list
 ### Create
 
 ```bash
-agora project create <name> [--region global|cn] [--type general|voice-agent|chat|rtc] [--template voice-agent] [--feature rtc|rtm|convoai]
+agora project create <name> [--region global|cn] [--template voice-agent] [--feature rtc|rtm|convoai]
+agora project create <name> --dry-run
+agora project create <name> --idempotency-key <key>
+agora project create <name> --rtm-data-center EU
 ```
 
-For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow.
+For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow. In `0.2.0`, omitted `--feature` defaults to `rtc`, `rtm`, and `convoai`, and `convoai` implies `rtm`.
 
 ### List
 
 ```bash
 agora project list [--page N] [--page-size N] [--keyword <text>]
+agora project list --refresh-cache
 ```
 
 Use this when the user needs to discover a project ID or exact project name.
+
+`--refresh-cache` updates the unfiltered first-page cache the CLI uses for shell completion. That matters when the user's completion results lag behind recent project changes.
 
 ### Select Current Project
 
@@ -63,7 +74,7 @@ agora project env write
 
 ## Feature Commands
 
-Valid verified feature names in `0.1.3`:
+Valid verified feature names in `0.2.0`:
 
 - `rtc`
 - `rtm`
@@ -87,6 +98,8 @@ agora project feature enable convoai
 
 If the user omits `[project]`, the CLI uses the locally selected project context.
 
+In a bound quickstart repo, project resolution prefers repo-local `.agora/project.json` before global `agora project use` context. See [quickstarts.md](quickstarts.md) for the full precedence.
+
 If no project is selected, the verified recovery is:
 
 ```bash
@@ -100,3 +113,4 @@ or rerun the command with a project argument.
 - Do not invent `agora project delete`.
 - Do not invent `agora project feature disable`.
 - Do not invent ConvoAI-specific nested groups under `agora project`.
+- Do not invent `agora project doctor all`; use `agora project doctor --feature convoai`, `--feature rtc`, or `--feature rtm`.
