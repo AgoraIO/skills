@@ -3,7 +3,8 @@ name: agora
 description: >-
   Activate when the user wants to build voice AI agents, video or voice calls,
   live streaming, screen sharing, in-app messaging and presence, recording,
-  token or auth flows, or `agora` CLI tasks such as login, especially when
+  token or auth flows, or use the `agora` CLI for login, quickstarts, env
+  setup, diagnostics, introspection, skills, or MCP serving, especially when
   integrating Agora into an app.
 metadata:
   author: agora
@@ -19,7 +20,7 @@ Top-level workflow for selecting the right Agora path and loading only the refer
 ## Workflow
 
 1. Identify the user's primary goal from the problem they are solving.
-2. Choose exactly one primary route first: RTC, RTM, ConvoAI, CLI, Cloud Recording, Server, or Server Gateway.
+2. Choose exactly one primary route first: RTC, RTM, ConvoAI, CLI, Cloud Recording, Server, Server Gateway, or Cross-product coordination.
 3. Load only the primary product README first.
 4. If the task clearly spans multiple products, add the minimum supporting references after the primary route is chosen.
 5. If the request matches ConvoAI and there is no proven working baseline yet, stop and follow the quickstart path before generating custom code or scaffolding.
