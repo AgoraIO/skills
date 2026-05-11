@@ -16,13 +16,6 @@ perl -0pi -e \
    s/^# Agora \(agora\.io\)$/# Voice AI Integration (Agora)/m' \
   "$TARGET_SKILL_DIR/SKILL.md"
 
-# Keep nested skill names unique in the destination repo as well.
-perl -0pi -e \
-  's/^name:\s*agora-intake$/name: voice-ai-integration-intake/m;
-   s/^# Agora Intake — Product Routing & Needs Analysis$/# Voice AI Integration Intake — Product Routing & Needs Analysis/m;
-   s/skills\/agora\/SKILL\.md/skills\/voice-ai-integration\/SKILL.md/g' \
-  "$TARGET_SKILL_DIR/intake/SKILL.md"
-
 cat > "$TARGET_SKILL_DIR/README.md" <<'EOF'
 # voice-ai-integration
 

@@ -10,7 +10,6 @@ scripts/
 skills/
 └── agora/                          # Skill root
     ├── SKILL.md                    # Entry point, product index
-    ├── intake/SKILL.md             # Intake router for vague requests
     └── references/
         ├── doc-fetching.md         # Two-tier lookup procedure
         ├── mcp-tools.md            # MCP tool reference + graceful degradation
@@ -30,7 +29,7 @@ skills/
 | Layer | What | Size | When Loaded |
 |-------|------|------|-------------|
 | **1 — Description** | Trigger keywords in `SKILL.md` frontmatter | ~100 words | Always (skill index) |
-| **2 — SKILL.md body** | Core concepts, product index, framework notes | ~72 lines | On activation |
+| **2 — SKILL.md body** | Product routing, guardrails, ambiguity rules | ~90 lines | On activation |
 | **3 — Product README** | Overview, critical rules, topic links | 20–100 lines | Per product |
 | **4 — Topic files** | Implementation detail, code examples, API reference | 34–500 lines | Per topic |
 

@@ -20,12 +20,11 @@ Server Gateway (`references/server-gateway/`), Testing Guidance (`references/tes
    (Layer 4 — 34–500 lines)
 4. Apply the freeze-forever test to all inline content (see below)
 5. Add at least one eval case to `tests/eval-cases.md` for the new product
-6. Update `skills/agora/intake/SKILL.md`:
-   - Add the product to the Product Landscape table
-   - Update the Product Relationships diagram
-   - Add relevant rows to Common Product Combinations
-   - Add a routing entry to the Step 4 table
-   - Add a Decision Shortcuts row if the product has a clear keyword trigger
+6. Update `skills/agora/SKILL.md`:
+   - Add the product to the **Products** section
+   - Update the **Product Relationships** diagram if the new product changes dependencies
+   - Add relevant rows to **Common Product Combinations**
+   - Update **Routing** and **Ambiguity Rules** if the new product introduces new cues or disambiguation logic
 7. Bump the version in all three version files (see [Version Bumping](#version-bumping))
 
 ## Adding a New Platform
