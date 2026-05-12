@@ -20,7 +20,7 @@ Not all content belongs inline. The skill uses two strategies depending on how f
 | Product | Strategy | Why |
 |---------|----------|-----|
 | **Conversational AI** | TOC + links to repo READMEs and AGENT.md | Fast-moving, 5 upstream repos with good docs |
-| **RTC / RTM** | Inline code examples | Stable APIs, official docs lack good examples |
+| **RTC / RTM / RTSA** | Inline code examples | Stable APIs, official docs lack good examples |
 | **Server / Tokens** | TOC + links to official docs | Well-documented at docs.agora.io |
 
 ConvoAI files are aligned 1:1 with repos in [AgoraIO-Conversational-AI](https://github.com/orgs/AgoraIO-Conversational-AI/repositories). Each file maps to one repo and links to its README and AGENT.md as sources of truth. Gotchas and quirks that LLMs consistently get wrong stay inline in the ConvoAI README.
@@ -47,6 +47,8 @@ skills/
         │   ├── react-native.md     react-native-agora
         │   ├── flutter.md          agora_rtc_engine (Dart)
         │   └── cross-platform-coordination.md
+        ├── rtsa/                   RTSA (Linux/RTOS SDK)
+        │   └── README.md           Critical rules, memory optimization, API reference
         ├── rtm/                    RTM Signaling SDK v2
         │   ├── README.md           Key concepts, gotchas, platform links
         │   ├── web.md              agora-rtm v2
@@ -103,7 +105,7 @@ skills/
 ### Updating Content
 
 - Edit the specific Layer 4 file
-- **Inline files** (RTC, RTM): Keep code examples current, keep official doc URLs at the bottom
+- **Inline files** (RTC, RTM, RTSA): Keep code examples current, keep official doc URLs at the bottom
 - **Link-first files** (ConvoAI, server): Update TOC links when upstream repos restructure. Keep gotchas inline only for things LLMs get wrong
 - Don't duplicate content that lives in upstream repo READMEs — link to it instead
 
