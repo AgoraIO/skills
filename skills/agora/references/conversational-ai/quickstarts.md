@@ -2,7 +2,7 @@
 name: conversational-ai-quickstarts
 description: |
   Locked quickstart flow for Agora Conversational AI. Use when no working baseline exists.
-  BLOCKING: Do not write code, create files, scaffold projects, or propose custom architecture until the quickstart state machine reaches `complete`. Use the Agora CLI directly to verify and fix project readiness — do not ask the user to self-report. One decision group per turn. Before every reply, check: baseline_resolved? cli_readiness_done? vendor_gate_done? If any is false, stay in the current gate.
+  BLOCKING: Do not write code, create files, scaffold projects, or propose custom architecture until the quickstart state machine reaches `complete`. Use the Agora CLI directly to verify and fix project readiness — do not ask the user to self-report. For mutating commands (install/upgrade tools, change project features, write env files), ask for user confirmation first. One decision group per turn. Before every reply, check: baseline_resolved? cli_readiness_done? vendor_gate_done? If any is false, stay in the current gate.
   SAMPLE INTEGRITY: After cloning the official sample, the default allowed actions are: install dependencies, populate env with CLI-extracted credentials, and start the app using the commands documented in the sample's README. Do NOT substitute your own startup commands or replace the sample with a self-built implementation. If a documented command is blocked by sandbox or permissions, re-run that exact command with escalation if available; otherwise stop and report an environment constraint. If the failure is localized to the official sample itself, a minimal upstream-shaped workaround is allowed, but not a custom architecture or repo rewrite.
 license: MIT
 metadata:
@@ -32,14 +32,13 @@ If the user already has a working baseline, exit this file and route back throug
 Follow this exact user-visible order:
 
 1. Product intro in plain language
-2. Environment check — verify runtime dependencies are installed
-3. Project-readiness checkpoint — use the CLI directly to verify and fix
-4. Vendor-path confirmation — **skip if the user has not mentioned BYOK, providers, or Studio Agent ID; defaults apply automatically**
-5. Vendor selection, only if the user asks for the current provider list or chooses a non-default path
-6. Studio Agent ID confirmation, only if the user wants to reuse an agent configured in Agora Studio
-7. Structured quickstart spec
-
-There is no baseline-path or backend-path selection. The default path is always the Python server + React frontend quickstart (`agent-quickstart-python`). Do not offer alternatives before first success.
+2. Intake — confirm preferred stack (`python` or `node/ts`) and confirm whether the agent is allowed to install/upgrade missing tools
+3. Environment check — verify runtime dependencies are installed
+4. Project-readiness checkpoint — use the CLI directly to verify and fix
+5. Vendor-path confirmation — **skip if the user has not mentioned BYOK, providers, or Studio Agent ID; defaults apply automatically**
+6. Vendor selection, only if the user asks for the current provider list or chooses a non-default path
+7. Studio Agent ID confirmation, only if the user wants to reuse an agent configured in Agora Studio
+8. Structured quickstart spec
 
 ## Interaction Rules
 
@@ -54,7 +53,24 @@ There is no baseline-path or backend-path selection. The default path is always 
 - Unless the user explicitly asks for BYOK (bring your own key) or a different provider stack, anchor on the defaults first — no vendor API keys needed.
 - For non-default provider selection, fetch the official current provider docs before confirming support or generating config details.
 - If the user already has an **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, treat that as a separate quickstart branch. Do not re-ask STT/LLM/TTS provider choices unless the user explicitly wants to replace the Studio-managed config.
-- Do not offer baseline-path choices. The default is always `agent-quickstart-python` (Python server + React frontend). Other demos are referenced only after first success.
+- If stack preference is unknown, ask one short intake question before selecting the baseline sample.
+- If stack preference is still unspecified after intake, default to `agent-quickstart-python`.
+
+## Industry-Standard Execution Policy
+
+Apply this policy for quickstart setup actions:
+
+1. Detect first: run read-only checks and report what is installed.
+2. Recommend second: propose the best baseline path from user preference + detected tools.
+3. Confirm before mutate: ask before any install/upgrade, project feature change, or file write.
+4. Execute exactly: once confirmed, run the documented command without substituting variants.
+5. Report clearly: summarize what changed and what remains blocked.
+
+Guardrails:
+
+- Never silently install or upgrade system tools.
+- Never assume language/runtime preference when the user has already stated one.
+- Prefer least-surprise behavior: explicit approval for machine changes, deterministic commands, and transparent outcomes.
 
 ## Command Integrity Under Environment Restrictions
 
@@ -100,7 +116,7 @@ Use three readiness layers during quickstart:
 
 ## CLI-Driven Readiness Check
 
-The project readiness step requires the agent to directly execute Agora CLI commands to verify and fix prerequisites. Do not ask the user to run CLI commands themselves, do not offer manual alternatives, and do not present choices. The agent checks, the agent fixes.
+The project readiness step requires the agent to directly execute Agora CLI commands to verify and fix prerequisites. Do not ask the user to run CLI commands themselves and do not offer manual alternatives. The agent checks directly; for mutating actions (for example enabling features or writing env files), ask for confirmation first.
 
 The CLI covers:
 
@@ -127,11 +143,17 @@ For command details, route to the CLI references:
 
 After the CLI readiness step is resolved, return to this quickstart and continue from the same readiness checkpoint.
 
-## Default Quickstart Path
+## First-Success Baseline Selection
 
-There is one default quickstart path. Do not offer alternatives before first success.
+Select the baseline sample from user preference first, then installed tools:
 
-**Repo:** <https://github.com/AgoraIO-Conversational-AI/agent-quickstart-python> *(Python server + React frontend)*
+- If user explicitly wants Python (or has no preference): use `agent-quickstart-python`.
+- If user explicitly wants Node/TypeScript and has Node 22+ + pnpm 8+: use `agent-quickstart-nextjs`.
+- If user asks for Go as the final backend, still complete one official quickstart baseline first, then route to [go-sdk.md](go-sdk.md) for backend implementation.
+
+If no stack preference is provided, default to:
+
+- **Repo:** <https://github.com/AgoraIO-Conversational-AI/agent-quickstart-python> *(Python server + React frontend)*
 
 1. Runtime prerequisites
    1.1 Bun (package manager & script runner)
@@ -148,7 +170,7 @@ There is one default quickstart path. Do not offer alternatives before first suc
    2.9 Check `agora project doctor`
    2.10 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
 3. Official sample baseline
-   3.1 Clone `agent-quickstart-python` directly or through `agora init`
+   3.1 Clone the selected official quickstart (`agent-quickstart-python` or `agent-quickstart-nextjs`) directly or through `agora init`
    3.2 Run `bun install`
    3.3 Ensure `server/.env` exists and contains `APP_ID` and `APP_CERTIFICATE` (`agora quickstart env write` can seed this for the official quickstart)
    3.4 Do not rename the sample's env variables during first success
@@ -213,7 +235,7 @@ If the user is no longer sample-aligned and needs provider-specific config layou
 
 ## Baseline Path
 
-The default and only quickstart baseline is `agent-quickstart-python` (Python server + React frontend).
+Default baseline is `agent-quickstart-python` unless the user explicitly chooses Node/TypeScript and the required Node/pnpm runtime is available.
 
 After first success, the user can explore other demos:
 
@@ -229,8 +251,9 @@ The quickstart is a blocking state machine. While a state is unresolved, the onl
 | State | Allowed | Forbidden | Next prompt | Advance when |
 |---|---|---|---|---|
 | `intro` | Give a short plain-language intro to what ConvoAI is | Code, repo plans, framework recommendations | Product intro text | Intro delivered |
-| `environment_check` | Check Node.js, Bun, Python, Agora CLI versions. Install or update missing tools. | Code, repo inspection, implementation | Environment check commands | All four dependencies are installed and meet minimum versions |
-| `project_readiness` | Execute CLI commands directly to verify auth, project, App ID, App Certificate, feature activation, and fix missing prerequisites. Extract credentials from CLI env output. | Code, repo inspection, implementation | Readiness prompt | Control-plane readiness confirmed and credentials captured |
+| `intake` | Confirm preferred stack (`python` or `node/ts`) and get confirmation policy for mutating commands | Code, repo inspection, implementation | Intake prompt | Stack preference + install/update consent are resolved |
+| `environment_check` | Check Node.js, Bun, Python, Agora CLI versions. Recommend and run installs/upgrades only after user confirmation. | Code, repo inspection, implementation | Environment check commands | Required dependencies for selected baseline are installed and meet minimum versions |
+| `project_readiness` | Execute CLI commands directly to verify auth, project, App ID, App Certificate, feature activation, and fix missing prerequisites; ask before mutating project state. Extract credentials from CLI env output. | Code, repo inspection, implementation | Readiness prompt | Control-plane readiness confirmed and credentials captured |
 | `vendor_defaults` | Ask whether to use the defaults (no vendor keys), BYOK, show the current official provider list, choose a non-default cascading / MLLM path, or reuse a Studio Agent ID. **Skip this gate entirely if the user has not mentioned BYOK, providers, or Studio Agent ID — defaults apply automatically.** | Code, implementation | Vendor-defaults prompt | User picks or gate is auto-skipped |
 | `vendor_selection` | Collect only provider-mode and provider choices after checking the official current provider docs | Code, implementation, secret collection | Custom-provider prompt | Provider mode and provider names are resolved |
 | `studio_agent_id` | Collect the Agora Studio Agent ID and confirm the user wants Studio to remain the source of truth for agent config | Code, re-asking provider setup from scratch | Studio-Agent-ID prompt | The Studio Agent ID path is resolved |
@@ -250,7 +273,7 @@ Before every tool call or user-visible reply:
 - If the user asks for code before quickstart resolves, answer with the next gate instead of generating code.
 - If a reply only partially resolves the current gate, ask a narrow follow-up for the missing field only.
 - If the user asks for the fastest onboarding path or mentions setup during the readiness gate, proceed directly with the CLI verification sequence and then return to the quickstart once readiness is confirmed.
-- If the user asks for the full fastest onboarding flow, proceed with the default quickstart path directly.
+- If the user asks for the full fastest onboarding flow and has not stated a stack preference, use `agent-quickstart-python`.
 - If the user names a provider that is not in the current official provider docs, say this clearly: it is **not currently documented as supported in the official Agora ConvoAI provider docs**, so do not proceed as if it is supported. Offer the documented default combo or a live-doc verification path.
 - If the user asks to see the provider list, fetch the current official provider docs and stay in the vendor gate until they accept the default combo or choose a documented alternative.
 - If the user says they already have an Agora Studio Agent ID, switch to the `studio_agent_id` state and stop re-asking provider-vendor questions unless they explicitly say they want to replace the Studio-managed config.
@@ -272,9 +295,18 @@ Suggested transition line:
 Before we jump into custom code, let's first use the official sample to get the whole flow working once. Once the agent can join the channel and finish one real conversation, we can turn that working version into your demo.
 ```
 
+### Intake
+
+Ask this right after intro when stack preference or install policy is still unknown:
+
+```text
+Before we run setup, which baseline do you want first: Python or Node/TypeScript?
+I can run environment checks automatically. If anything is missing, do you want me to install/upgrade tools for you when possible, or should I stop and ask first?
+```
+
 ### Environment Check
 
-Before starting the CLI readiness flow, verify that all runtime dependencies are installed. Auto-install missing tools where safe (`bun`, `agora` CLI), and route the user for system runtime installs (`node`, `python`) when needed.
+Before starting the CLI readiness flow, verify that all runtime dependencies are installed. Run read-only checks first, then ask before install/upgrade actions.
 
 | Dependency | Check command | Minimum version | Install if missing |
 |-----------|--------------|----------------|-------------------|
@@ -284,21 +316,21 @@ Before starting the CLI readiness flow, verify that all runtime dependencies are
 | Agora CLI | `agora version` | 0.2.0+ | `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh \| sh` |
 
 Execution rules:
-- Check all four in order. If any is missing or below minimum version, install/update it before continuing.
+- Check all four in order. If any is missing or below minimum version, request approval for install/update or stop with explicit next steps.
 - For Node.js and Python, if they are not installed, tell the user what to install and wait — do not attempt to install system-level runtimes.
-- For Bun, install directly via npm.
-- For Agora CLI, prefer the official curl installer. `npm install -g agoraio-cli` is acceptable when Node 18+ is available and the package is acting as the Go binary install wrapper.
+- For Bun, ask first, then install via npm if the user approves.
+- For Agora CLI, ask first, then install with the official curl installer if the user approves. `npm install -g agoraio-cli` is acceptable when Node 18+ is available and the package is acting as the Go binary install wrapper.
 - If Agora CLI is installed but outdated, use `agora upgrade --check` for package-manager-specific guidance or reinstall from the official installer.
 - Only proceed to project readiness after all four checks pass.
 
 ### Project Readiness
 
-Do not ask the user to self-report readiness or choose between manual and CLI paths. The agent must directly execute CLI commands to check each prerequisite and, when something is missing, fix it on the spot.
+Do not ask the user to self-report readiness or choose between manual and CLI paths. The agent must directly execute CLI commands to check each prerequisite. For any mutating remediation command, ask for confirmation before executing it.
 
 Tell the user what you are about to check, then execute the commands yourself:
 
 ```text
-Let me check your project readiness — I'll use the Agora CLI to verify login, project, App ID, App Certificate, and ConvoAI activation. If anything is missing I'll fix it directly. Once the control-plane checks out I'll seed the official quickstart env file automatically.
+Let me check your project readiness — I'll use the Agora CLI to verify login, project, App ID, App Certificate, and ConvoAI activation. I'll run read-only checks first, then ask before any command that changes project state or writes files. Once the control-plane checks out, I'll seed the official quickstart env file.
 ```
 
 #### Agent execution sequence
@@ -449,7 +481,7 @@ Notes:
 
 ## After Collection
 
-Execute the default quickstart path (clone `agent-quickstart-python`, configure, run, verify first success).
+Execute the selected quickstart baseline (clone the chosen official sample, configure, run, verify first success).
 
 After first success, route by user's next request:
 
