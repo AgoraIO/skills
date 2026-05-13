@@ -8,6 +8,8 @@ Verified against Agora CLI `0.2.0`.
 
 ## Install
 
+Run read-only checks first (`agora version`, `which agora`, or equivalent). Ask for user approval before running installers, global package installs, shell-profile updates, or package removal commands.
+
 Preferred macOS / Linux / POSIX shell installer:
 
 ```bash
