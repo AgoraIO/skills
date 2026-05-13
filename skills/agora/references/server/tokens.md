@@ -11,6 +11,15 @@ Tokens authenticate users before joining channels. Generated server-side from Ap
 - Max token validity: 24 hours
 - Use `RtcRole.SUBSCRIBER` for audience-only users (prevents stream bombing)
 
+## UID / Account-Name Constraints (Token Gotcha)
+
+- Numeric UID (`buildTokenWithUid` + RTC join with numeric uid): must be `0` to `2^32 - 1`.
+- String UID/account name (`buildTokenWithUserAccount` or `buildTokenWithRtm` account): ASCII only, max `255` characters.
+- Here, `account` means the user's RTC identity string (account name), not your Agora customer account.
+- Identity and type must match end-to-end:
+  - If the token is minted for numeric UID `123`, join RTC with numeric `123`.
+  - If the token is minted for account `"user-123"`, join with the same account string, not a numeric UID.
+
 ## Token Generation Guides
 
 - **[Deploy a Token Server](https://docs.agora.io/en/video-calling/token-authentication/deploy-token-server)** — Express/Flask/Go server examples
@@ -54,7 +63,7 @@ const token = RtcTokenBuilder.buildTokenWithRtm(
   appId,           // string — your Agora App ID
   appCertificate,  // string — your App Certificate
   channelName,     // string — channel the user will join
-  account,         // string — user account (string identity, not numeric UID)
+  account,         // string — user account name / identity (not numeric UID)
   RtcRole.PUBLISHER,
   tokenExpire,     // number — seconds until token expires (e.g. 3600)
   privilegeExpire  // number — seconds until privileges expire (0 = same as tokenExpire)
