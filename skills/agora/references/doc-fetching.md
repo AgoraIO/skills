@@ -52,7 +52,7 @@ using the Agora Docs MCP server, see [mcp-tools.md](mcp-tools.md).
 
 ## Agora CLI
 
-For local `agora` command-line usage, check [cli/README.md](cli/README.md) first. The bundled CLI references are verified against the installed Agora CLI `0.1.7` command surface.
+For local `agora` command-line usage, check [cli/README.md](cli/README.md) first. Treat that file as the source of truth for the currently verified CLI baseline and command surface.
 
 If the bundled CLI references do not cover a CLI-only detail, use the canonical CLI repository instead of general Agora product docs:
 

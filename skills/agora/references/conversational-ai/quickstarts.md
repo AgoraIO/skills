@@ -138,7 +138,7 @@ There is one default quickstart path. Do not offer alternatives before first suc
    1.2 Python 3.8+
 2. CLI preflight
    2.1 Log in: `agora login`
-   2.2 Verify CLI version with `agora version` (minimum `0.1.7`)
+   2.2 Verify CLI version with `agora version` (minimum `0.2.0`)
    2.3 Prefer `agora init <name> --template python` for a new official sample checkout
    2.4 For an existing official quickstart, use `agora quickstart env write <repo> --project <project>`
    2.5 If decomposing the flow, prefer the current selected project only if it is directly usable for first-success
@@ -274,14 +274,14 @@ Before we jump into custom code, let's first use the official sample to get the 
 
 ### Environment Check
 
-Before starting the CLI readiness flow, verify that all runtime dependencies are installed. Run these checks and fix any missing tools automatically. Do not ask the user to install them manually.
+Before starting the CLI readiness flow, verify that all runtime dependencies are installed. Auto-install missing tools where safe (`bun`, `agora` CLI), and route the user for system runtime installs (`node`, `python`) when needed.
 
 | Dependency | Check command | Minimum version | Install if missing |
 |-----------|--------------|----------------|-------------------|
 | Node.js | `node --version` | 18+ | Direct the user to https://nodejs.org or use `nvm install 22` |
 | Bun | `bun --version` | 1.0+ | `npm install -g bun` |
 | Python | `python3 --version` | 3.8+ | Direct the user to https://python.org |
-| Agora CLI | `agora version` | 0.1.7+ | `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh \| sh -s -- --add-to-path` |
+| Agora CLI | `agora version` | 0.2.0+ | `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh \| sh` |
 
 Execution rules:
 - Check all four in order. If any is missing or below minimum version, install/update it before continuing.

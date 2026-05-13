@@ -37,14 +37,6 @@ With the Agora skill loaded, the agent can then:
 
 You should not need to manually dig through the Agora Console just to get a first voice agent running.
 
-For local CLI-powered onboarding, install the Agora CLI with:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh -s -- --add-to-path
-```
-
-The npm path, `npm install -g agoraio-cli`, is also supported as an install wrapper for the same Go-based `agora` command when Node.js 18+ is available.
-
 ## Installation
 
 ### Skills CLI
@@ -52,6 +44,14 @@ The npm path, `npm install -g agoraio-cli`, is also supported as an install wrap
 ```bash
 npx skills add github:AgoraIO/skills
 ```
+
+### Agora CLI (for local onboarding)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh
+```
+
+The npm path, `npm install -g agoraio-cli`, is also supported as an install wrapper for the same Go-based `agora` command when Node.js 18+ is available.
 
 ### Claude Code Plugin
 

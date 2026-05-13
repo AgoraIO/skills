@@ -5,8 +5,9 @@ Uses the `agora-rtc-react` package, which wraps `agora-rtc-sdk-ng` with React ho
 ## Installation
 
 ```bash
-npm install agora-rtc-react agora-rtc-sdk-ng
-# agora-rtc-sdk-ng is a required peer dependency — install both.
+npm install agora-rtc-react
+# Since agora-rtc-react 2.x, you do not need to add agora-rtc-sdk-ng
+# to your app's package.json manually.
 # agora-rtc-react re-exports all agora-rtc-sdk-ng types and classes,
 # so you can import AgoraRTC and its types from either package.
 ```
