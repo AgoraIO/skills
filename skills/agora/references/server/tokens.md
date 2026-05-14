@@ -15,10 +15,11 @@ Tokens authenticate users before joining channels. Generated server-side from Ap
 
 - Numeric UID (`buildTokenWithUid` + RTC join with numeric uid): must be `0` to `2^32 - 1`.
 - String UID/account name (`buildTokenWithUserAccount` or `buildTokenWithRtm` account): ASCII only, max `255` characters.
+- **RTM / `buildTokenWithRtm` `account`**: the API expects a string. Prefer an integer user id encoded as a string of digits (for example `"12345"`), not an arbitrary alphanumeric handle, to avoid identity clashes with other services.
 - Here, `account` means the user's RTC identity string (account name), not your Agora customer account.
 - Identity and type must match end-to-end:
   - If the token is minted for numeric UID `123`, join RTC with numeric `123`.
-  - If the token is minted for account `"user-123"`, join with the same account string, not a numeric UID.
+  - If the token is minted for account `"12345"` (string carrying a numeric id — preferred), join with that exact same string identity on the client; do not substitute a different handle or assume it interchangeably maps to a numeric uid unless your SDK documents that.
 
 ## Token Generation Guides
 
@@ -29,20 +30,20 @@ Tokens authenticate users before joining channels. Generated server-side from Ap
 
 All implementations are in [AgoraIO/Tools — DynamicKey/AgoraDynamicKey](https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey):
 
-| Language | Notes |
-|----------|-------|
-| Node.js | Also available as [`agora-token`](https://www.npmjs.com/package/agora-token) on npm |
-| Python 3 | Use `python3/` directory |
-| Go | |
-| Java | |
-| C# | |
-| Dart | |
-| Deno | Native implementation — do NOT use the `agora-token` npm package in Deno |
-| Rust | |
-| PHP | |
-| Ruby | |
-| Lua | |
-| Perl | |
+| Language | Notes                                                                               |
+| -------- | ----------------------------------------------------------------------------------- |
+| Node.js  | Also available as [`agora-token`](https://www.npmjs.com/package/agora-token) on npm |
+| Python 3 | Use `python3/` directory                                                            |
+| Go       |                                                                                     |
+| Java     |                                                                                     |
+| C#       |                                                                                     |
+| Dart     |                                                                                     |
+| Deno     | Native implementation — do NOT use the `agora-token` npm package in Deno            |
+| Rust     |                                                                                     |
+| PHP      |                                                                                     |
+| Ruby     |                                                                                     |
+| Lua      |                                                                                     |
+| Perl     |                                                                                     |
 
 ## Token Types
 
@@ -60,14 +61,14 @@ Generates a combined RTC + RTM token using `AccessToken2`. Use this when you nee
 import { RtcTokenBuilder, RtcRole } from 'agora-token';
 
 const token = RtcTokenBuilder.buildTokenWithRtm(
-  appId,           // string — your Agora App ID
-  appCertificate,  // string — your App Certificate
-  channelName,     // string — channel the user will join
-  account,         // string — user account name / identity (not numeric UID)
+  appId, // string — your Agora App ID
+  appCertificate, // string — your App Certificate
+  channelName, // string — channel the user will join
+  account, // string — prefer integer user id as a string of digits (e.g. "12345")
   RtcRole.PUBLISHER,
-  tokenExpire,     // number — seconds until token expires (e.g. 3600)
-  privilegeExpire  // number — seconds until privileges expire (0 = same as tokenExpire)
+  tokenExpire, // number — seconds until token expires (e.g. 3600)
+  privilegeExpire, // number — seconds until privileges expire (0 = same as tokenExpire)
 );
 ```
 
-> **`account` vs `uid`**: `buildTokenWithRtm` takes a string `account`, not a numeric UID. When using this token for RTC, the client must join with the same account string (not a number). If your client uses numeric UIDs, use `buildTokenWithUid` instead.
+> **`account` vs `uid`**: `buildTokenWithRtm` takes a string `account`, not an integer type. Prefer passing the user's numeric id as a numeric string, and have the client join with that exact same string identity. If the RTC client joins with a numeric uid type instead, use `buildTokenWithUid` for RTC-only tokens.
