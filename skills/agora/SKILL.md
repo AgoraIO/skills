@@ -8,7 +8,7 @@ description: >-
   integrating Agora into an app.
 metadata:
   author: agora
-  version: '1.6.0'
+  version: '1.6.1'
 ---
 
 <!-- applies-from: v0.2.0 -->

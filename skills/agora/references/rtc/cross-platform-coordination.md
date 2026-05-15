@@ -8,6 +8,7 @@ Agora assigns UIDs per channel. For multi-platform apps:
 
 - **Auto-assign on all clients**: Pass `null`/`0` to `join()` — each platform auto-receives a unique numeric UID. Clients subscribe to all remote users regardless of platform.
 - **Fixed UIDs**: Assign specific UIDs per user role (e.g., `1001` for host, `1002` for co-host) when you need deterministic lookup. Must be unique per channel — duplicates cause undefined behavior.
+- **UID limits**: Numeric UIDs must be `0` to `2^32 - 1`. String UIDs must be ASCII and at most `255` characters.
 - **RTC + RTM coordination**: After RTC join, use `String(rtcUid)` as the RTM user ID to correlate users across both systems (see [../rtm/README.md](../rtm/README.md)).
 
 ## Codec Interoperability

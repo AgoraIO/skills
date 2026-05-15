@@ -56,6 +56,12 @@ await client.setClientRole("audience") // Can only subscribe
 - `TOKEN`: Pass `null` for testing without tokens enabled. In production, always use a server-generated token.
 - `uid`: Pass `null` for auto-assignment, or a specific number. String UIDs also supported.
 
+### UID Constraints (Easy to Miss)
+
+- Numeric UID: `0` to `2^32 - 1` (32-bit unsigned integer).
+- String UID: ASCII only, maximum `255` characters.
+- Keep UID type consistent per channel: all users should use either numeric or string UIDs, not a mix.
+
 ## Creating Tracks
 
 ### Microphone Audio

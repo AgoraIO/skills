@@ -112,6 +112,8 @@ Write rules:
 - `--template nextjs|standard`: override the workspace detector when the credential key layout must be forced
 - do not combine `--append` and `--overwrite`
 
+Ask for explicit approval before running `--overwrite`, and state the target path before writing. Prefer append/update behavior for existing env files.
+
 Do not use template files such as `.env.example`, `.env.sample`, or `.env.template` as write targets for real values or secrets.
 
 In `0.2.0`, `project env write` updates or creates repo-local `.agora/project.json` metadata and records detected `projectType` / `envPath` when missing.

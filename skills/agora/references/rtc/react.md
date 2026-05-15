@@ -5,8 +5,9 @@ Uses the `agora-rtc-react` package, which wraps `agora-rtc-sdk-ng` with React ho
 ## Installation
 
 ```bash
-npm install agora-rtc-react agora-rtc-sdk-ng
-# agora-rtc-sdk-ng is a required peer dependency — install both.
+npm install agora-rtc-react
+# Since agora-rtc-react 2.x, you do not need to add agora-rtc-sdk-ng
+# to your app's package.json manually.
 # agora-rtc-react re-exports all agora-rtc-sdk-ng types and classes,
 # so you can import AgoraRTC and its types from either package.
 ```
@@ -33,6 +34,8 @@ function App() {
 > For live streaming (host/audience), use `mode: "live"` instead.
 
 > **Codec interop**: `'vp8'` and `'vp9'` scale better in multi-user calls. `'h264'` does not scale well beyond small groups. If codecs differ between Web and native clients, Agora's server transcodes transparently (works but adds latency). See [cross-platform-coordination.md](cross-platform-coordination.md) for full interop notes.
+
+> **UID constraints**: If you pass `uid` into `useJoin`, numeric UIDs must be `0` to `2^32 - 1`; string UIDs must be ASCII and at most `255` characters. Keep UID type consistent per channel.
 
 ## Video Call Component
 
