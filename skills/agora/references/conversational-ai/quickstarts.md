@@ -265,16 +265,17 @@ If no stack preference is provided, default to:
    1.1 Python baseline: Bun (package manager & script runner) + Python 3.8+
    1.2 Node/TS baseline: Node.js 22+ + pnpm 8+ preferred; fallback to npm when pnpm is unavailable and the sample supports npm
 2. CLI preflight
-   2.1 Log in: `agora login`
-   2.2 Verify CLI version with `agora version` (minimum `0.2.0`)
-   2.3 Prefer `agora init <name> --template <template>` where `<template>` matches the selected baseline (`python` or `nextjs`)
-   2.4 For an existing official quickstart, use `agora quickstart env write <repo> --project <project>`
-   2.5 If decomposing the flow, prefer the current selected project only if it is directly usable for first-success
-   2.6 Otherwise select another directly usable project, or ask before creating a new dedicated token-ready project
-   2.7 Ensure `rtc`, `rtm`, and `convoai` are enabled for the first-success path
-   2.8 Use `agora project env --with-secrets --json` only when direct raw credential values are explicitly needed outside `init` / `quickstart env write`
-   2.9 Check `agora project doctor`
-   2.10 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
+   2.1 Complete [CLI readiness](../cli/README.md#cli-readiness-agents) — block if below `0.1.7` or PATH resolves an old binary
+   2.2 Log in: `agora login`
+   2.3 Verify CLI version with `agora version` (minimum `0.2.1`, floor `0.1.7`)
+   2.4 Prefer `agora init <name> --template <template> --json` where `<template>` matches the selected baseline (`python` or `nextjs`)
+   2.5 For an existing official quickstart, use `agora quickstart env write <repo> --project <project>` — not `project env write`
+   2.6 If decomposing the flow, prefer the current selected project only if it is directly usable for first-success
+   2.7 Otherwise select another directly usable project, or ask before creating a new dedicated token-ready project
+   2.8 Ensure `rtc`, `rtm`, and `convoai` are enabled for the first-success path
+   2.9 Use `agora project env --with-secrets --json` only when direct raw credential values are explicitly needed outside `init` / `quickstart env write`
+   2.10 Check `agora project doctor`
+   2.11 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
 3. Official sample baseline
    3.1 Clone the selected official quickstart (`agent-quickstart-python` or `agent-quickstart-nextjs`) directly or through `agora init`
    3.2 Install and start with the selected sample's documented commands:
@@ -428,7 +429,7 @@ I can check your environment and handle normal quickstart setup in one approved 
 
 ### Environment Check
 
-Before starting the CLI readiness flow, verify that all runtime dependencies are installed. Run read-only checks first, then use the approved setup scope for non-system quickstart tools.
+Before starting the CLI readiness flow, complete [CLI readiness](../cli/README.md#cli-readiness-agents) and verify runtime dependencies. Run read-only checks first, then use the approved setup scope for non-system quickstart tools.
 
 | Dependency                     | Check command                                    | Minimum version                         | Install if missing                                                               |
 | ------------------------------ | ------------------------------------------------ | --------------------------------------- | -------------------------------------------------------------------------------- |
@@ -436,7 +437,7 @@ Before starting the CLI readiness flow, verify that all runtime dependencies are
 | pnpm or npm (Node/TS baseline) | `pnpm --version`, then `npm --version` if needed | pnpm 8+ preferred; npm fallback allowed | Use npm if pnpm is unavailable and the sample supports it                        |
 | Bun (Python baseline)          | `bun --version`                                  | 1.0+                                    | `npm install -g bun`                                                             |
 | Python (Python baseline)       | `python3 --version`                              | 3.8+                                    | Direct the user to https://python.org                                            |
-| Agora CLI (all baselines)      | `agora version`                                  | 0.2.0+                                  | `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh \| sh` |
+| Agora CLI (all baselines)      | `agora version`                                  | Verified `0.2.1`; block if below `0.1.7` | Follow [CLI readiness](../cli/README.md#cli-readiness-agents): curl install first, npm alternate |
 
 Execution rules:
 
@@ -445,8 +446,8 @@ Execution rules:
 - For Node.js and Python, if they are not installed, tell the user what to install and wait — do not attempt to install system-level runtimes.
 - For Python baseline, install Bun only when covered by the approved setup scope.
 - For Node/TS baseline, use pnpm if available; otherwise use npm if the sample supports it. Do not install pnpm just because it is preferred.
-- For Agora CLI, install with the official curl installer only when covered by the approved setup scope. `npm install -g agoraio-cli` is acceptable when Node 18+ is available and the package is acting as the Go binary install wrapper.
-- If Agora CLI is installed but outdated, use `agora upgrade --check` for package-manager-specific guidance or reinstall from the official installer.
+- For Agora CLI below minimum, follow [CLI readiness](../cli/README.md#cli-readiness-agents) — curl installer first, `npm install -g agoraio-cli` as alternate, then re-verify `agora version` and `which -a agora`. Do not use `--add-to-path` or invented `--force` flags.
+- If Agora CLI is installed but outdated, use `agora upgrade --check --json` for channel-specific guidance or re-run the curl installer.
 - Only proceed to project readiness after all required checks for the selected baseline pass.
 
 ### Project Readiness

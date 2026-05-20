@@ -586,7 +586,7 @@ For each case:
 
 - User Input: "What CLI version should I use for this skill?"
 - Expected Behavior: Anchors guidance on the verified minimum version
-- Pass Criteria: States that the skill is verified against CLI `0.1.7` and written for `>=0.1.7`; does not hand-wave with "latest"
+- Pass Criteria: States that the skill is verified against CLI `0.2.1` with minimum supported `>=0.1.7`; does not hand-wave with "latest"
 - Result: ___
 
 ### CLI-04: Project creation guidance stays within real command surface
@@ -614,14 +614,14 @@ For each case:
 
 - User Input: "What does `agora project doctor --deep` do?"
 - Expected Behavior: Describes the currently verified behavior instead of promising future runtime checks
-- Pass Criteria: States that in CLI `0.1.7`, deep mode runs repo-local checks such as `.agora` metadata and quickstart env consistency where applicable; does not claim it proves RTC/RTM runtime connectivity or sample-ready status
+- Pass Criteria: States that deep mode runs repo-local checks such as `.agora` metadata and quickstart env consistency where applicable; does not claim it proves RTC/RTM runtime connectivity or sample-ready status
 - Result: ___
 
 ### CLI-08: Agent automation prefers JSON output
 
 - User Input: "I want an agent to call the CLI safely from scripts"
 - Expected Behavior: Recommends machine-readable output and stable parsing boundaries
-- Pass Criteria: Recommends `--json`, `agora introspect --json` for command discovery, `AGORA_HOME` isolation for CI/multi-agent runs, and does not tell agents to parse pretty output by default
+- Pass Criteria: Recommends `--json`, `agora introspect --json` for command discovery, `AGORA_HOME` isolation for CI/multi-agent runs, CLI readiness before mutating commands, and `agora init` examples that always include `--template`; does not tell agents to parse pretty output by default
 - Result: ___
 
 ### CLI-09: Config defaults and override locations are accurate
@@ -704,8 +704,8 @@ For each case:
 ### CLI-20: Command tree discovery uses introspect
 
 - User Input: "How can an agent discover the full Agora CLI command tree?"
-- Expected Behavior: Uses the v0.1.7 machine-readable discovery path
-- Pass Criteria: Recommends `agora introspect --json` for agents and `agora --help --all` / `agora --help --all --json` for help output; does not suggest scraping pretty help as the default
+- Expected Behavior: Uses the v0.2.1 machine-readable discovery path
+- Pass Criteria: Recommends `agora introspect --json` for agents, mentions filtering on `headlessSafe` for non-interactive runs, and `agora --help --all` / `agora --help --all --json` for help output; does not suggest scraping pretty help as the default
 - Result: ___
 
 ### CLI-21: Telemetry controls are documented
@@ -734,6 +734,48 @@ For each case:
 - User Input: "Use the Agora CLI to export env vars for my RTC token server."
 - Expected Behavior: Routes to the CLI env workflow and server token reference, not the ConvoAI quickstart
 - Pass Criteria: Uses `references/cli/env.md` for env export/write and `references/server/tokens.md` for token generation; does not route into ConvoAI onboarding
+- Result: ___
+
+### CLI-25: Init without template in agent mode
+
+- User Input: "Run agora init my-demo --yes --json for me"
+- Expected Behavior: Adds `--template` before running; explains non-interactive init requires an explicit template
+- Pass Criteria: Does not run bare `agora init my-demo --yes --json`; includes `--template python` or `--template nextjs` (or asks which baseline applies); mentions `QUICKSTART_TEMPLATE_REQUIRED` if relevant
+- Result: ___
+
+### CLI-26: Stuck on CLI 0.1.6 upgrade path
+
+- User Input: "agora version shows 0.1.6 and the skill says I need a newer CLI"
+- Expected Behavior: Runs CLI readiness: curl installer first, npm as alternate, PATH re-check; does not use `--add-to-path` or invented `--force`
+- Pass Criteria: Recommends `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh` first; mentions `npm install -g agoraio-cli` as alternate; re-verifies with `agora version` and `which -a agora`; does not rely on `agora upgrade` on 0.1.6
+- Result: ___
+
+### CLI-27: PATH shadowing after install
+
+- User Input: "I upgraded the CLI but agora version still shows 0.1.6"
+- Expected Behavior: Diagnoses PATH shadowing and fixes before continuing
+- Pass Criteria: Uses `which -a agora` or `where.exe agora`; references `agora doctor` PATH recovery or reordering PATH; does not uninstall automatically; uses `install.sh --uninstall` / `install.ps1 -Uninstall` or stale-binary removal only after user approval; does not continue ConvoAI/CLI workflows until version confirms the new binary
+- Result: ___
+
+### CLI-28: Python quickstart env writer
+
+- User Input: "Seed credentials for agent-quickstart-python with the CLI"
+- Expected Behavior: Uses template-aware env write
+- Pass Criteria: Uses `agora quickstart env write` so `server/.env` gets `APP_ID` / `APP_CERTIFICATE`; does not use `agora project env write` alone (which writes generic `AGORA_APP_ID`)
+- Result: ___
+
+### CLI-29: Config version newer than CLI
+
+- User Input: "agora project use fails: Config version 3 is newer than this CLI supports"
+- Expected Behavior: Explains old binary vs newer config and routes through CLI upgrade
+- Pass Criteria: Recommends upgrading the CLI via CLI readiness (curl install first); mentions 0.2.0+ auto-migrates config v3; does not tell the user to manually edit config as the first fix
+- Result: ___
+
+### CLI-30: Upgrade in CI stays non-mutating
+
+- User Input: "Should my GitHub Action run agora upgrade?"
+- Expected Behavior: Recommends non-mutating check in CI
+- Pass Criteria: Recommends `agora upgrade --check --json`; does not mutate the binary in CI unless `AGORA_ALLOW_UPGRADE_IN_CI=1` is explicitly justified
 - Result: ___
 
 ### C-15: RTM token subject and RTM login identity stay aligned

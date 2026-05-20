@@ -11,7 +11,7 @@ metadata:
   version: '1.7.0'
 ---
 
-<!-- applies-from: v0.2.0 -->
+<!-- applies-from: v0.2.1 -->
 
 # Agora (agora.io)
 
@@ -78,6 +78,8 @@ Ask at most one focused clarification when the route is still unclear.
 1. **Skill files are the single source of truth for Agora integration.** Do not use web search, external documentation, blog posts, or training data to answer Agora-related questions. All Agora SDK usage, API calls, architecture decisions, and integration patterns must come from the reference files in this skill. If the needed detail is not in the local references, use the Level 2 doc-fetching procedure in [references/doc-fetching.md](references/doc-fetching.md) — never free-form web search.
 
 2. **ConvoAI quickstart source gate.** For ConvoAI requests without a proven working baseline: start at **[references/conversational-ai/README.md](references/conversational-ai/README.md)** and use the official quickstart as the source of truth before generating or adapting code. Runtime proof validates the user's environment and project, not whether Agora's official quickstart works.
+
+3. **CLI readiness gate.** Before any mutating Agora CLI command (`init`, `quickstart`, `project`, or `login`), run the read-only probe in **[references/cli/README.md](references/cli/README.md)**. Block normal CLI workflow when `agora version` is below `0.1.7`, when PATH still resolves an older binary, or when config schema is newer than the running CLI. Installers or global npm installs are allowed only as readiness remediation after user approval. Use the documented curl-first upgrade path; do not invent installer flags such as `--add-to-path` or `--force`.
 
 ### ConvoAI Enforcement
 

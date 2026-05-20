@@ -85,10 +85,11 @@ When updating CLI guidance:
 
 1. Install or update the CLI from the canonical installer, or use the npm wrapper once it maps to the same Go binary:
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh -s -- --add-to-path
+   curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh
    agora version
+   which -a agora
    ```
-2. Pin the verified release in the CLI reference files, for example `Verified against Agora CLI 0.1.7`.
+2. Pin the verified release in the CLI reference files, for example `Verified against Agora CLI 0.2.1`.
 3. Diff the command surface against upstream sources:
    - `agora --help --all`
    - `agora introspect --json`

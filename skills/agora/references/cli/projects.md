@@ -1,10 +1,10 @@
 # Agora CLI Projects
 
-<!-- applies-from: v0.2.0 -->
+<!-- applies-from: v0.2.1 -->
 
 Use this file when the user needs to create, select, inspect, or feature-enable Agora projects from the CLI.
 
-Verified against Agora CLI `0.2.0`.
+Verified against Agora CLI `0.2.1`.
 
 ## Core Workflow
 
@@ -30,7 +30,7 @@ agora project create <name> --idempotency-key <key>
 agora project create <name> --rtm-data-center EU
 ```
 
-For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow. In `0.2.0`, omitted `--feature` defaults to `rtc`, `rtm`, and `convoai`, and `convoai` implies `rtm`.
+For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow. Omitted `--feature` defaults to `rtc`, `rtm`, and `convoai`, and `convoai` implies `rtm`.
 
 ### List
 
@@ -74,7 +74,7 @@ agora project env write
 
 ## Feature Commands
 
-Valid verified feature names in `0.2.0`:
+Valid verified feature names:
 
 - `rtc`
 - `rtm`
