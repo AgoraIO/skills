@@ -106,6 +106,20 @@ For each case:
 - Pass Criteria: Does not route the whole request to the standalone CLI module first; keeps the conversation in the ConvoAI onboarding flow
 - Result: ___
 
+### R-14: Existing app routes to ConvoAI integration
+
+- User Input: "Add ConvoAI to my existing Next.js app"
+- Expected Behavior: Routes to `references/conversational-ai/README.md`, classifies the request as `integration`, clones or inspects the official quickstart source in a separate folder or branch, then routes to `references/conversational-ai/integration-from-quickstart.md`
+- Pass Criteria: Does not scaffold a replacement standalone app in the user's repo; does not edit the existing app before quickstart source inspection and copy map
+- Result: ___
+
+### R-15: ConvoAI architecture question routes to architecture.md
+
+- User Input: "How does the ConvoAI call sequence work between my server, the agent, and the client?"
+- Expected Behavior: Routes to `references/conversational-ai/architecture.md` (via README or directly) and explains server `/join`, client RTC/RTM join order, and agent lifecycle at a high level
+- Pass Criteria: References the architecture topic file; does not invent a custom architecture or skip the server-start / client-join distinction
+- Result: ___
+
 ---
 
 ## 2. Code Generation Quality (C-series)
@@ -254,6 +268,18 @@ For each case:
 - Expected Behavior: Enters the ConvoAI quickstart flow unless a working baseline is already confirmed
 - Pass Criteria: Does not generate a `/join` payload before the baseline path and readiness gates are resolved
 
+### F-08: No scaffold before baseline
+
+- User Input: "Scaffold a ConvoAI backend for me"
+- Expected Behavior: Explains in natural language that custom scaffolding is blocked until the official quickstart source is inspected, then gives the next official quickstart step
+- Pass Criteria: Does not generate `package.json`, backend routes, UI code, SDK files, or a `/join` payload from memory; includes source/baseline status and the next official quickstart command when action is blocked
+
+### F-09: Existing app edit is blocked before baseline
+
+- User Input: "Add the ConvoAI route directly to my app now"
+- Expected Behavior: Refuses the edit in natural language if the quickstart source has not been inspected or no copy map exists, then gives the step that unblocks it
+- Pass Criteria: Does not use "policy violation" or "Track A/B" in user-visible wording; does not edit the user's app before source inspection and copy map
+
 ---
 
 ## 4. Intake Accuracy (I-series)
@@ -289,7 +315,7 @@ For each case:
 ### I-05: Cloned repo is not a working baseline
 
 - User Input: "I cloned agent-quickstart-nextjs, but the ConvoAI agent has never connected"
-- Expected Behavior: Treats this as `integration`, not a completed baseline
+- Expected Behavior: Treats this as `quickstart`, not a completed baseline
 - Pass Criteria: Stays in the ConvoAI quickstart flow; does not skip directly to advanced implementation guidance
 - Result: ___
 
@@ -445,6 +471,97 @@ For each case:
 - User Input: "The official sample starts but a bug inside the sample itself blocks first success."
 - Expected Behavior: Quickstart stays on the official sample path but allows a minimal upstream-shaped workaround
 - Pass Criteria: Does not jump to a self-built replacement implementation; allows only the minimal fix needed to restore the official path
+- Result: ___
+
+### I-28: First ConvoAI reply includes full baseline status
+
+- User Input: "Help me build a ConvoAI voice agent"
+- Expected Behavior: First ConvoAI reply includes the official template, exact next command or next setup step, full `baseline_gate`, and `blocked` status
+- Pass Criteria: Uses checkmark glyphs for baseline status instead of raw booleans; does not generate custom code or app scaffolding
+- Result: ___
+
+### I-40: Starting from scratch customizes agent prompt in quickstart
+
+- User Input: "Start from the official quickstart and make the agent a Spanish-speaking sales coach with this prompt: ..."
+- Expected Behavior: Clones or opens the official quickstart, then updates the documented agent prompt/greeting/persona or join/config details inside the quickstart source
+- Pass Criteria: Preserves the sample architecture, env names, token flow, lifecycle, and documented commands; does not self-build a replacement app
+- Result: ___
+
+### I-29: Recovery after custom-server deviation
+
+- User Input: "You already built me a custom ConvoAI server, but the official sample never worked"
+- Expected Behavior: Acknowledges the deviation in natural language, stops the custom path, emits current `baseline_gate`, and proposes the next official sample command
+- Pass Criteria: Does not continue editing the custom server; does not use "policy violation" phrasing in the user-visible response
+- Result: ___
+
+### I-30: Copy map before existing-app edits
+
+- User Input: "The quickstart works now; integrate it into my existing app"
+- Expected Behavior: Produces a copy map with source quickstart files, destination app files, and adaptation notes before editing the user repo
+- Pass Criteria: Does not edit the existing app until the copy map exists and is approved or the user explicitly says to proceed
+- Result: ___
+
+### I-31: Routine quickstart reply has no footer
+
+- User Input: "What does the baseline prove?"
+- Expected Behavior: Answers the question naturally
+- Pass Criteria: Does not include a full status footer because no state changed and the user did not ask for status
+- Result: ___
+
+### I-32: Gate flip emits one-line status
+
+- User Input: "The quickstart repo is cloned now"
+- Expected Behavior: Marks the relevant baseline gate as advanced and emits a one-line status such as `baseline_gate: 0/4 -> 1/4; next: <command>`
+- Pass Criteria: Does not dump the full footer for a simple gate flip
+- Result: ___
+
+### I-33: Status request emits full footer
+
+- User Input: "Where are we with the ConvoAI setup?"
+- Expected Behavior: Emits the full status footer on demand
+- Pass Criteria: Includes official template, next command or step, all four baseline gate fields, and blocked status
+- Result: ___
+
+### I-34: Do-not-re-ask uses session memory
+
+- User Input: In turn 1 the user says "I'm using FastAPI with Next.js"; later the agent needs the backend language
+- Expected Behavior: Uses the prior user statement before workspace detection or asking
+- Pass Criteria: Does not ask again for the backend or frontend stack unless the user later changed it
+- Result: ___
+
+### I-35: Conflicting frontend frameworks produce medium confidence
+
+- User Input: "Add ConvoAI to this app" with `package.json` containing both `next` and `vite`
+- Expected Behavior: Emits `app_inventory` with `detection_confidence: medium`, names both detected frontend candidates, and asks one focused question about the active app
+- Pass Criteria: Does not silently choose Next.js or Vite; does not ask a broad intake questionnaire
+- Result: ___
+
+### I-36: Scan error produces low confidence
+
+- User Input: "Add ConvoAI to this app" when a candidate config file cannot be read
+- Expected Behavior: Reports which file could not be read, degrades to `detection_confidence: low`, and asks one focused question
+- Pass Criteria: Does not fabricate `baseline_track` or silently guess the project structure
+- Result: ___
+
+### I-37: Multi-project workspace lists candidates before asking
+
+- User Input: "Add ConvoAI to this repo" with `apps/web` (Next.js), `apps/api` (FastAPI), and `apps/mobile` (React Native)
+- Expected Behavior: Emits `app_inventory` listing all three projects, explains that ConvoAI needs a backend plus at least one client, and asks whether to wire web+api or include mobile too
+- Pass Criteria: Does not silently pick a target; does not scan or modify projects outside chosen targets
+- Result: ___
+
+### I-38: Client/backend split confirms both targets
+
+- User Input: "Add ConvoAI to this app" with `client/` (Next.js) and `server/` (Express)
+- Expected Behavior: Detects a client/backend split, explains that the backend starts the agent and the client joins RTC, then asks one question to confirm both are integration targets
+- Pass Criteria: Does not ask blind "which project?"; lists detected paths and stacks before asking
+- Result: ___
+
+### I-39: Unsupported backend still uses official source first
+
+- User Input: "Add ConvoAI to my Rails app"
+- Expected Behavior: Detects Rails as an unsupported direct quickstart target, offers Python or Node as the official source/first-success baseline, then routes to `auth-flow.md` for the Rails REST integration
+- Pass Criteria: Does not pretend there is an official Rails quickstart; does not generate Rails ConvoAI code from memory before inspecting the official quickstart/API source
 - Result: ___
 
 ---
