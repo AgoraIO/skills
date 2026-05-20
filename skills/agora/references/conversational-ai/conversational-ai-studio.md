@@ -39,6 +39,8 @@ If the Studio Agent ID path is chosen:
 4. Use the Studio Agent ID as `pipeline_id` in the request body.
 5. Before generating exact request code, still verify the current official ConvoAI docs for any other request-shape changes. Do not fabricate undocumented fields beyond the confirmed `pipeline_id` mapping.
 
+For an existing app, still use the official quickstart as the Studio-managed source path first. After the source is inspected, use [integration-from-quickstart.md](integration-from-quickstart.md) to detect the app shape and create a copy map before editing the existing app. Runtime proof is required before claiming the integrated app works.
+
 ## Goal
 
 Reuse the official sample repo as the structural baseline, but replace the default provider-selection path with the user's existing Studio-managed agent path.
@@ -162,6 +164,7 @@ For the Studio-managed path, the skill may assume:
 Once the Studio Agent ID is collected:
 
 - keep quickstart in the selected baseline path
+- for existing apps, continue through [integration-from-quickstart.md](integration-from-quickstart.md) after the Studio quickstart source is inspected
 - use the official current ConvoAI docs to verify the exact start flow
 - then continue with the appropriate backend/client reference:
   - [server-sdks.md](server-sdks.md)
