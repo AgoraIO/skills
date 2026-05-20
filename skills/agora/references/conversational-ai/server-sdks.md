@@ -13,6 +13,8 @@ metadata:
 
 # ConvoAI Server SDKs
 
+> **Architecture first:** For call sequence and lifecycle overview before SDK details, read [architecture.md](architecture.md).
+
 TypeScript, Go, and Python SDKs — convenience wrappers around the ConvoAI REST API. For any other backend language, call the REST API directly. Fetch the live OpenAPI spec for the full schema: `https://docs-md.agora.io/api/conversational-ai-api-v2.x.yaml`
 
 ## TypeScript — `agora-agent-server-sdk`
