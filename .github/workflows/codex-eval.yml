@@ -168,7 +168,11 @@ jobs:
       - name: Fail if Codex evaluator did not complete
         if: steps.run_codex.outcome == 'failure'
         run: |
-          echo "::error::Codex evaluator failed (often Responses API stream disconnect)"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "::error::Codex evaluator failed (often response stream disconnect). Re-run workflow or check RESPONSES_API_ENDPOINT."
+          else
+            echo "::error::Codex evaluator failed (often response stream disconnect). Re-run workflow or check RESPONSES_API_ENDPOINT."
+          fi
           exit 1
 
       - name: Locate run artifacts
@@ -233,8 +237,8 @@ jobs:
           PASS=$(grep -rl '"status": "pass"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
           BLOCKED=$(grep -rl '"status": "blocked"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
           echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
-          if [ "$FAIL" -gt 0 ]; then
-            echo "::error::${FAIL} case(s) failed — see report for details"
+          if [ "$FAIL" -gt 0 ] || [ "$BLOCKED" -gt 0 ]; then
+            echo "::error::${FAIL} fail, ${BLOCKED} blocked — see report for details"
             exit 1
           fi
 
