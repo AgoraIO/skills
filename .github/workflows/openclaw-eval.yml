@@ -36,6 +36,7 @@ jobs:
       - name: Checkout skills repo
         uses: actions/checkout@v5
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: skills-repo
 
       - name: Setup Node.js
