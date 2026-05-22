@@ -157,22 +157,6 @@ jobs:
 
       - name: Run Codex evaluator
         id: run_codex
-        continue-on-error: true
-        uses: openai/codex-action@v1
-        env:
-          AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
-          AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
-        with:
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          responses-api-endpoint: ${{ secrets.RESPONSES_API_ENDPOINT }}
-          prompt-file: /tmp/eval-prompt.txt
-          working-directory: agentic-evals
-          sandbox: danger-full-access
-          model: ${{ github.event.inputs.model || '' }}
-
-      - name: Retry Codex evaluator on stream disconnect
-        id: run_codex_retry
-        if: steps.run_codex.outcome == 'failure'
         uses: openai/codex-action@v1
         env:
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
@@ -186,9 +170,9 @@ jobs:
           model: ${{ github.event.inputs.model || '' }}
 
       - name: Fail if Codex evaluator did not complete
-        if: steps.run_codex.outcome == 'failure' && steps.run_codex_retry.outcome != 'success'
+        if: steps.run_codex.outcome == 'failure'
         run: |
-          echo "::error::Codex evaluator failed after retry (often Responses API stream disconnect)"
+          echo "::error::Codex evaluator failed (often Responses API stream disconnect)"
           exit 1
 
       - name: Locate run artifacts
