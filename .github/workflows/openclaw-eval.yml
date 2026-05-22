@@ -46,6 +46,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
+
       - name: Setup eval harness
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
@@ -255,8 +258,8 @@ jobs:
           PASS=$(grep -rl '"status": "pass"' "$RESULTS_DIR" 2>/dev/null | wc -l | tr -d ' ')
           BLOCKED=$(grep -rl '"status": "blocked"' "$RESULTS_DIR" 2>/dev/null | wc -l | tr -d ' ')
           echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
-          if [ "$FAIL" -gt 0 ]; then
-            echo "::error::${FAIL} case(s) failed — see report for details"
+          if [ "$FAIL" -gt 0 ] || [ "$BLOCKED" -gt 0 ]; then
+            echo "::error::${FAIL} fail, ${BLOCKED} blocked — see report for details"
             exit 1
           fi
 
