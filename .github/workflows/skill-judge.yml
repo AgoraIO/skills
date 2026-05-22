@@ -83,7 +83,7 @@ jobs:
       - name: Fail if Codex judge did not complete
         if: steps.run_judge.outcome == 'failure'
         run: |
-          echo "::error::Codex judge failed (often Responses API stream disconnect)"
+          echo "::error::Codex judge failed (often response stream disconnect). Re-run workflow or check RESPONSES_API_ENDPOINT."
           exit 1
 
       - name: Upload report
