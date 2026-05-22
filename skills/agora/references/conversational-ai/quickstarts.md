@@ -29,6 +29,35 @@ If the user already has a working baseline, exit this file and route back throug
 
 ## Quickstart Source and Runtime Proof
 
+### Official repo (Path A)
+
+For this flow, pick the correct official template by stack:
+
+- Python baseline (`agent-quickstart-python`) with Bun, using
+  `https://github.com/AgoraIO-Conversational-AI/agent-quickstart-python`
+- Next.js baseline (`agent-quickstart-nextjs`) with pnpm, using
+  `https://github.com/AgoraIO-Conversational-AI/agent-quickstart-nextjs`
+- Go baseline (`agent-quickstart-go`) with Makefile-based startup, using the official Go quickstart template for the `go` template family in Agora CLI.
+
+Use this official sample as-is and only adapt documented fields once clone + runtime checks pass.
+
+### Required env mapping by template
+
+Use template-specific env files/keys for the selected official template:
+
+- Next.js quickstart (`agent-quickstart-nextjs`):
+  - write `.env.local`
+  - `AGORA_APP_ID` -> `NEXT_PUBLIC_AGORA_APP_ID`
+  - `AGORA_APP_CERTIFICATE` -> `NEXT_AGORA_APP_CERTIFICATE`
+- Python quickstart (`agent-quickstart-python`):
+  - write `server/.env`
+  - `AGORA_APP_ID` -> `APP_ID`
+  - `AGORA_APP_CERTIFICATE` -> `APP_CERTIFICATE`
+- Go quickstart (`agent-quickstart-go`):
+  - write `server-go/.env`
+  - `AGORA_APP_ID` -> `APP_ID`
+  - `AGORA_APP_CERTIFICATE` -> `APP_CERTIFICATE`
+
 The quickstart is the source of truth for code shape. The agent does not need to prove Agora's official quickstart works in the abstract before reading or adapting it. It does need runtime proof before claiming the user's environment, Agora project, and customized flow work end to end.
 
 Track runtime proof with this artifact:
@@ -298,13 +327,14 @@ If no stack preference is provided, default to:
    2.10 Check `agora project doctor`
    2.11 If RTM was just enabled, allow bounded wait/retry before concluding runtime failure
 3. Official sample baseline
-   3.1 Clone the selected official quickstart (`agent-quickstart-python` or `agent-quickstart-nextjs`) directly or through `agora init`
+   3.1 Clone the selected official quickstart (`agent-quickstart-python`, `agent-quickstart-nextjs`, or `agent-quickstart-go`) directly or through `agora init`
    3.2 Install and start with the selected sample's documented commands:
    - Python baseline: `bun install` then `bun run dev`
    - Node/TS baseline: run `pnpm install` then `pnpm dev` when pnpm is available; otherwise fall back to `npm install` then `npm run dev` when the sample supports npm
-     3.3 Ensure the expected env file is present:
+   3.3 Ensure the expected env file is present:
    - Python baseline: `server/.env` with `APP_ID` + `APP_CERTIFICATE`
    - Node/TS baseline: `.env.local` with `NEXT_PUBLIC_AGORA_APP_ID` + `NEXT_AGORA_APP_CERTIFICATE`
+   - Go baseline: `server-go/.env` with `APP_ID` + `APP_CERTIFICATE`
      (`agora quickstart env write` is the default seeding path)
      3.4 Do not rename the sample's env variables during first success
 4. Success gate
@@ -517,6 +547,7 @@ Run these commands in order. Use `--json` where available so you can parse the o
 6. **Auto-populate env** — once control-plane readiness passes, seed the official quickstart env with `agora quickstart env write` when possible.
    - Python quickstart target: `server/.env` with `APP_ID` and `APP_CERTIFICATE`.
    - Node/TS quickstart target: `.env.local` with `NEXT_PUBLIC_AGORA_APP_ID` and `NEXT_AGORA_APP_CERTIFICATE`.
+   - Go quickstart target: `server-go/.env` with `APP_ID` and `APP_CERTIFICATE`.
      No manual copy-paste needed when template-aware write succeeds.
    - When `AGORA_APP_ID` and `AGORA_APP_CERTIFICATE` are already exported in the shell (common in CI and local setups), the env file must contain **resolved literal values**, not unexpanded placeholders. Wrong: `NEXT_PUBLIC_AGORA_APP_ID=$AGORA_APP_ID` written as text. Right: expand variables when writing (e.g. `agora quickstart env write`, or a heredoc/`printf` that substitutes current env values). Verify the file has non-empty values before starting the dev server.
 
