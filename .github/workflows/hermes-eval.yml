@@ -74,6 +74,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
+
       - name: Install runtime dependencies
         run: |
           pip install pyyaml
@@ -92,6 +95,14 @@ jobs:
           RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
           HERMES_MODEL: ${{ github.event.inputs.hermes_model || '' }}
         run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY is not set"
+            exit 1
+          fi
+          if [ -z "$RESPONSES_API_ENDPOINT" ]; then
+            echo "::error::RESPONSES_API_ENDPOINT is not set"
+            exit 1
+          fi
           export PATH="$HOME/.local/bin:$PATH"
           mkdir -p ~/.hermes
 
@@ -114,6 +125,26 @@ jobs:
           echo "OPENAI_API_KEY=${OPENAI_API_KEY}" > ~/.hermes/.env
 
           echo "Hermes configured: provider=custom, base_url=${BASE_URL}, model=${MODEL}"
+
+      - name: Hermes auth smoke test
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -e
+          if hermes run --max-turns 1 "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
+            echo "Hermes smoke test passed via hermes run."
+          elif hermes chat --yolo --quiet -q "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
+            echo "Hermes smoke test passed via hermes chat."
+          else
+            echo "::error::Hermes auth smoke test failed. Confirm RESPONSES_API_ENDPOINT and OPENAI_API_KEY are valid."
+            cat /tmp/hermes-smoke.log
+            exit 1
+          fi
+          if grep -q "INVALID_API_KEY" /tmp/hermes-smoke.log; then
+            echo "::error::Hermes returned INVALID_API_KEY during smoke test."
+            cat /tmp/hermes-smoke.log
+            exit 1
+          fi
 
       - name: Write credentials file
         env:
@@ -237,8 +268,8 @@ jobs:
           PASS=$(grep -rl '"status": "pass"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
           BLOCKED=$(grep -rl '"status": "blocked"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
           echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
-          if [ "$FAIL" -gt 0 ]; then
-            echo "::error::${FAIL} case(s) failed — see report for details"
+          if [ "$FAIL" -gt 0 ] || [ "$BLOCKED" -gt 0 ]; then
+            echo "::error::${FAIL} fail, ${BLOCKED} blocked — see report for details"
             exit 1
           fi
 
