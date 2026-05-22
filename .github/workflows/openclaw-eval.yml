@@ -13,6 +13,10 @@ on:
         description: "Single case ID (leave empty for full suite)"
         required: false
         default: "convoai-e2e-first-success"
+      eval_ref:
+        description: "agentic-evals ref (branch/tag/SHA; default pinned in .github/eval-pin.env)"
+        required: false
+        default: ""
 
   pull_request:
     paths:
@@ -21,8 +25,6 @@ on:
 
 env:
   TARGET_ID: agora
-  EVAL_REPO: AgoraIO/agentic-evals
-  EVAL_REF: main
 
 jobs:
   evaluate:
@@ -44,14 +46,10 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Clone agentic-evals
-        run: git clone --depth 1 --branch "${EVAL_REF}" "https://github.com/${EVAL_REPO}.git" agentic-evals
-
-      - name: Copy skill into agentic-evals
-        run: |
-          rm -rf agentic-evals/.agents/skills/agora
-          mkdir -p agentic-evals/.agents/skills/agora
-          cp -r skills-repo/skills/agora/* agentic-evals/.agents/skills/agora/
+      - name: Setup eval harness
+        uses: ./skills-repo/.github/actions/setup-eval-harness
+        with:
+          eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Setup Python
         uses: actions/setup-python@v5

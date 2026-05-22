@@ -9,14 +9,15 @@ on:
         description: "Path to skill to evaluate (relative to skills-repo)"
         required: false
         default: "skills/agora"
+      eval_ref:
+        description: "agentic-evals ref (branch/tag/SHA; default pinned in .github/eval-pin.env)"
+        required: false
+        default: ""
 
   pull_request:
     paths:
       - "skills/**/*.md"
       - ".github/workflows/**"
-
-env:
-  EVAL_REPO: AgoraIO/agentic-evals
 
 jobs:
   judge:
@@ -33,14 +34,10 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: skills-repo
 
-      - name: Clone agentic-evals
-        run: git clone --depth 1 "https://github.com/${EVAL_REPO}.git" agentic-evals
-
-      - name: Copy skill into agentic-evals
-        run: |
-          rm -rf agentic-evals/.agents/skills/agora
-          mkdir -p agentic-evals/.agents/skills/agora
-          cp -r skills-repo/skills/agora/* agentic-evals/.agents/skills/agora/
+      - name: Setup eval harness
+        uses: ./skills-repo/.github/actions/setup-eval-harness
+        with:
+          eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Build judge prompt
         env:
