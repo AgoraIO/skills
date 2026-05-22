@@ -6,13 +6,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-05-22
+
+### Added
+
+- `skills/agora/references/conversational-ai/architecture.md` — ConvoAI call sequence, server `/join`, client RTC/RTM join order, and agent lifecycle overview
+- `skills/agora/references/conversational-ai/integration-from-quickstart.md` — existing-app integration workflow from official quickstart source with copy-map gating
+- `tests/eval-cases.md`: expanded ConvoAI architecture, integration, baseline-gate footer, recovery, and copy-map regression cases (I-28 through I-40)
+- `tests/eval-cases.md`: I-41 regression case — `[ERR_PNPM_IGNORED_BUILDS]` after Node/TS `pnpm install` is non-blocking and must not trigger pnpm build-approval remediation
+
+### Changed
+
+- `skills/agora/SKILL.md`, `skills/agora/references/conversational-ai/README.md`, `skills/agora/references/conversational-ai/quickstarts.md`: hardened ConvoAI quickstart enforcement with `baseline_gate` runtime proof, recovery rules, silent-by-default status footers, source-scope stop, and integration routing
+- `skills/agora/references/conversational-ai/quickstarts.md`: restored stack intake (`python` vs `node/ts`), consent-first setup scope, and baseline selection for `agent-quickstart-python` / `agent-quickstart-nextjs`
+- `skills/agora/references/conversational-ai/quickstarts.md` (v1.5.0): hardened Node/TS first-success install handling — `[ERR_PNPM_IGNORED_BUILDS]` is a known non-blocking warning; read output before treating non-zero exit as failure, proceed to `pnpm dev`, and do not run `pnpm approve-builds` or edit pnpm config during setup; added matching Failure Attribution and Recovery Rule deviation triggers
+- `skills/agora/references/rtc/web.md`, `skills/agora/references/server/tokens.md`, `skills/agora/references/rtm/web.md`, `skills/agora/references/integration-patterns.md`: clarified integer UID limits and account-name / RTM login-identity alignment rules
+- `skills/agora/references/cli/README.md` and related CLI references: raised verified CLI baseline to `0.2.1` (floor `0.1.7`) and hardened agent readiness / PATH recovery guidance
+- `skills/agora/references/conversational-ai/agent-client-toolkit-react.md`: include `agora-rtm` in React agent toolkit install instructions
+
+## [1.6.1] - 2026-05-12
+
+### Added
+
+- `agora/.cursor-plugin/` — lightweight Cursor plugin wrapper that references the canonical Agora skills
+
+### Changed
+
+- `skills/agora/SKILL.md`: refined capability-first trigger description and routing workflow
+- `skills/agora/SKILL.md`: tightened skill trigger recall for voice AI, RTC, RTM, and CLI requests
+- Skill install and runtime guidance aligned across references
+- `skills/agora/references/cli/`: updated CLI reference coverage
+
+## [1.6.0] - 2026-04-30
+
 ### Added
 
 - `skills/agora/references/cli/quickstarts.md` — Agora CLI `init`, `quickstart create`, `quickstart env write`, and repo-local `.agora/project.json` binding guidance verified against CLI `0.1.7`
-- CLI eval coverage for `agora introspect --json`, telemetry controls, auth JSON unauthenticated handling, quickstart env vs project env, installed `agora` notation, and non-ConvoAI CLI routing
 - `skills/agora/references/cli/env.md` — dedicated Agora CLI `project env` reference covering export formats, `AGORA_` variable names, secret opt-in behavior, managed-block writes, and default `.env*` target selection
+- CLI eval coverage for `agora introspect --json`, telemetry controls, auth JSON unauthenticated handling, quickstart env vs project env, installed `agora` notation, and non-ConvoAI CLI routing
 - CLI eval coverage in `tests/eval-cases.md` for `project env` export-first semantics, `--with-secrets`, default write-target safety, and OAuth loopback redirect mismatch guidance
 - README prompt templates for explicitly telling agents to use the Agora skill, stay on the official sample-first path, and avoid undocumented CLI commands
+- Anthropic fork sync automation for downstream skill distribution
 
 ### Changed
 
@@ -23,11 +57,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `skills/agora/references/cli/README.md`, `skills/agora/SKILL.md`: updated CLI routing and examples to include `agora project env` and `agora project env write` as first-class workflows
 - `skills/agora/references/cli/automation.md`, `skills/agora/references/cli/projects.md`: shifted env guidance from `project show --json` toward `project env` / `project env write`, while keeping `project show --json` as metadata inspection
 - `skills/agora/references/cli/install-auth.md`: documented the verified OAuth loopback rule that authorize and token-exchange `redirect_uri` values must match exactly, with `localhost` vs `127.0.0.1` mismatch called out explicitly
-- `skills/agora/references/cli/README.md`, `skills/agora/references/cli/automation.md`, `skills/agora/references/cli/projects.md`, `skills/agora/references/cli/install-auth.md`, `skills/agora/references/cli/doctor.md`: raised the verified CLI baseline from `0.1.1` to `0.1.3`
 - `skills/agora/references/conversational-ai/README.md`, `skills/agora/references/conversational-ai/quickstarts.md`, `skills/agora/references/cli/doctor.md`: split ConvoAI onboarding into control-plane, runtime, and sample readiness so `doctor` no longer overclaims first-success readiness
 - `skills/agora/references/conversational-ai/quickstarts.md`: replaced the old “use current project or create one” shortcut with a deterministic first-success project-selection policy that prefers the current project only when it is directly usable, otherwise selects a usable candidate or creates a new token-ready project
 - `skills/agora/references/conversational-ai/auth-flow.md`, `skills/agora/references/integration-patterns.md`, `skills/agora/references/conversational-ai/agent-toolkit.md`, `skills/agora/references/conversational-ai/agent-client-toolkit-react.md`: added explicit RTM token-subject / login-identity alignment guidance and the RTM propagation-delay rule for first-success troubleshooting
 - `tests/eval-cases.md`: added coverage for first-success project selection, RTM propagation delay, minimal sample workarounds, explicit skill prompting, `doctor` boundary checks, and rejection of invented CLI shortcuts
+
+## [1.5.1] - 2026-04-29
+
+### Added
+
+- `skills/agora/references/cli/` — initial Agora CLI skill references (install, auth, projects, doctor, automation)
+- CLI-assisted ConvoAI quickstart flow with agent-driven project readiness and auto env population
+- Hermes Agent eval workflow
+- ConvoAI quickstart hard gates: SAMPLE INTEGRITY, official-demo-first, and skill-only doc source rules
+- Environment check step in the ConvoAI quickstart state machine
+
+### Changed
+
+- `skills/agora/references/conversational-ai/quickstarts.md`: default first-success path to `agent-quickstart-python`; removed baseline-path choices before first success
+- `skills/agora/references/conversational-ai/quickstarts.md`: tightened first-success guidance and CLI version check requirements
+- `skills/agora/references/cli/`: aligned CLI skill with `0.1.3` env workflows before the `0.1.7` expansion in v1.6.0
+- `README.md`: capability-first rewrite and SEO/GEO optimization
+- Skill and plugin versions aligned to `1.5.1`
 
 ## [1.4.0]
 
