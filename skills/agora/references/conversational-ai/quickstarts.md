@@ -7,7 +7,7 @@ description: |
 license: MIT
 metadata:
   author: agora
-  version: '1.4.0'
+  version: '1.5.0'
 ---
 
 # Conversational AI Quickstart
@@ -98,6 +98,7 @@ Deviation triggers:
 - created SDK implementation files in the user's repo before inspecting quickstart source and producing a copy map
 - created a new `package.json`, `routes/`, or scaffold for a ConvoAI app instead of adapting the official quickstart source
 - changed documented sample command semantics, such as replacing the README start command with a custom wrapper
+- attempted to fix `[ERR_PNPM_IGNORED_BUILDS]` or configure pnpm build approvals instead of proceeding to the documented start command
 
 Recovery response:
 
@@ -173,6 +174,17 @@ Ask again before:
 - installing or upgrading system runtimes such as Node.js or Python
 - changing files or settings outside the selected quickstart repo and selected Agora project
 
+## Known Non-Blocking Warnings
+
+Exit code alone does not determine whether to proceed. Read command output and match it against known non-blocking patterns before treating a non-zero exit as failure requiring remediation.
+
+### Node/TS baseline (`agent-quickstart-nextjs`)
+
+After `pnpm install`:
+
+- **`[ERR_PNPM_IGNORED_BUILDS]`** is not a blocking error. The sample's dev script uses `next dev --webpack` explicitly — esbuild, sharp, and unrs-resolver build scripts are not required for the dev path. If packages were added and the only non-zero exit is this warning, proceed directly to `pnpm dev`.
+- Do not run `pnpm approve-builds`, edit `package.json` with pnpm config fields, create `pnpm.yaml`, or change global pnpm build-approval settings to resolve this warning during first-success setup.
+
 ## Command Integrity Under Environment Restrictions
 
 For the first-success gate, treat the sample README commands as exact.
@@ -204,6 +216,13 @@ Typical signals include:
 - sandbox-denied network or local resource access
 
 Do **not** reinterpret these failures as sample misconfiguration and do **not** change the command to work around them.
+
+### Install warnings (Node/TS baseline)
+
+When `pnpm install` exits non-zero:
+
+- If the output is caused solely by `[ERR_PNPM_IGNORED_BUILDS]`, classify it as a **warning**, not a failure. Continue to the next documented command (`pnpm dev`). Do not attempt to resolve it before starting the app.
+- Do not treat this warning as sample misconfiguration or as proof that dependencies failed to install.
 
 ## First-Success Readiness Layers
 
@@ -500,6 +519,7 @@ Run these commands in order. Use `--json` where available so you can parse the o
 
 7. **Sample-ready gate**
    - Install dependencies and start the official sample using the documented commands.
+   - If `pnpm install` exits non-zero with only `[ERR_PNPM_IGNORED_BUILDS]`, treat install as complete and continue to `pnpm dev` — see [Known Non-Blocking Warnings](#known-non-blocking-warnings).
    - The quickstart is only fully ready when the app opens, the user can press `Try it now`, the agent joins, and the frontend stays up.
    - If a failure is localized to the official sample itself rather than the environment or project readiness, a minimal upstream-shaped workaround is allowed. Do not replace the sample with a self-built implementation.
 

@@ -487,6 +487,13 @@ For each case:
 - Pass Criteria: Preserves the sample architecture, env names, token flow, lifecycle, and documented commands; does not self-build a replacement app
 - Result: ___
 
+### I-41: ERR_PNPM_IGNORED_BUILDS is non-blocking during Node/TS install
+
+- User Input: "`pnpm install` finished adding packages but exited 1 with `[ERR_PNPM_IGNORED_BUILDS]` for esbuild, sharp, and unrs-resolver. What next?"
+- Expected Behavior: Classifies the warning as non-blocking and continues to the documented start command
+- Pass Criteria: Proceeds to `pnpm dev`; does not run `pnpm approve-builds`, edit `package.json`/`pnpm.yaml`, or change global pnpm build settings; cites that the sample dev script uses `next dev --webpack`
+- Result: ___
+
 ### I-29: Recovery after custom-server deviation
 
 - User Input: "You already built me a custom ConvoAI server, but the official sample never worked"
