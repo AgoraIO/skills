@@ -71,7 +71,7 @@ jobs:
       - name: Install runtime dependencies
         run: |
           pip install pyyaml
-          npm install -g agent-browser
+          npm install -g agent-browser @openai/codex
 
       - name: Write credentials file
         env:
@@ -151,29 +151,74 @@ jobs:
           echo "" >> /tmp/eval-prompt.txt
           echo "Begin the evaluation now." >> /tmp/eval-prompt.txt
 
-      - name: Run Codex evaluator
+      - name: Run Codex evaluator with stream-safe retry
         id: run_codex
-        uses: openai/codex-action@v1
         env:
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
           AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
-        with:
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          responses-api-endpoint: ${{ secrets.RESPONSES_API_ENDPOINT }}
-          prompt-file: /tmp/eval-prompt.txt
-          working-directory: agentic-evals
-          sandbox: danger-full-access
-          model: ${{ github.event.inputs.model || '' }}
-
-      - name: Fail if Codex evaluator did not complete
-        if: steps.run_codex.outcome == 'failure'
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          MODEL: ${{ github.event.inputs.model || 'gpt-5.4' }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "::error::Codex evaluator failed (often response stream disconnect). Re-run workflow or check RESPONSES_API_ENDPOINT."
+          set -e
+
+          run_codex_once() {
+            local attempt="$1"
+            local log_file="$2"
+            local output_file="$3"
+            mkdir -p "$HOME/.codex"
+            base_url="${RESPONSES_API_ENDPOINT%/responses}"
+            base_url="${base_url%/}/v1"
+            cat > "$HOME/.codex/config.toml" << EOF
+          model_provider = "OpenAI"
+          model = "${MODEL}"
+          disable_response_storage = true
+
+          [model_providers.OpenAI]
+          name = "OpenAI"
+          base_url = "${base_url}"
+          wire_api = "responses"
+          requires_openai_auth = true
+          EOF
+            if [ -n "$OPENAI_API_KEY" ]; then
+              cat > "$HOME/.codex/auth.json" << EOF
+          {"auth_mode":"apikey","OPENAI_API_KEY":"${OPENAI_API_KEY}"}
+          EOF
+            fi
+
+            codex exec --skip-git-repo-check --sandbox danger-full-access \
+              --output-last-message "${output_file}" < /tmp/eval-prompt.txt \
+              > "${log_file}" 2>&1
+          }
+
+          attempt=1
+          first_rc=0
+          run_codex_once 1 "/tmp/codex-run-attempt-1.log" "/tmp/codex-eval-output.md" || first_rc=$?
+
+          if [ "$first_rc" -ne 0 ] && \
+            grep -E "stream disconnected|stream closed before response\\.completed" \
+            "/tmp/codex-run-attempt-1.log" >/dev/null 2>&1; then
+            echo "Detected stream-disconnect on attempt 1, retrying once."
+            attempt=2
+            second_rc=0
+            run_codex_once 2 "/tmp/codex-run-attempt-2.log" "/tmp/codex-eval-output.md" || second_rc=$?
+            final_rc="$second_rc"
           else
-            echo "::error::Codex evaluator failed (often response stream disconnect). Re-run workflow or check RESPONSES_API_ENDPOINT."
+            final_rc="$first_rc"
           fi
-          exit 1
+
+          if [ "${final_rc}" -ne 0 ]; then
+            echo "::error::Codex evaluator failed (response stream disconnect or endpoint issue). Re-run workflow or check RESPONSES_API_ENDPOINT."
+            if [ "$attempt" -eq 1 ]; then
+              cat /tmp/codex-run-attempt-1.log
+            else
+              cat /tmp/codex-run-attempt-2.log
+            fi
+            exit 1
+          fi
+
+          mkdir -p agentic-evals
+          cp /tmp/codex-eval-output.md agentic-evals/codex-final-message.md
 
       - name: Locate run artifacts
         id: artifacts
