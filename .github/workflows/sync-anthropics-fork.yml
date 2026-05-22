@@ -26,6 +26,7 @@ permissions:
 
 jobs:
   sync:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     env:
       TARGET_REPO: AgoraIO/skills
@@ -75,6 +76,12 @@ jobs:
           fi
 
           git commit -m "Sync voice-ai-integration from AgoraIO/skills"
+          git remote get-url origin
+          git push --dry-run origin "$TARGET_BRANCH" >/tmp/sync-push-dryrun.log 2>&1 || {
+            echo "::error::Dry-run push failed. Check ANTHROPICS_SKILLS_SYNC_TOKEN permissions."
+            cat /tmp/sync-push-dryrun.log
+            exit 1
+          }
           git push --force-with-lease origin "$TARGET_BRANCH"
 
       - name: Print upstream PR URL
