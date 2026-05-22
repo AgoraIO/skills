@@ -25,7 +25,7 @@ on:
 
 env:
   TARGET_ID: agora
-  EVAL_REPO: Jiayi-Ye02/agentic-evals
+  EVAL_REPO: AgoraIO/agentic-evals
   EVAL_REF: main
 
 jobs:
@@ -156,6 +156,7 @@ jobs:
 
       - name: Run Codex evaluator
         id: run_codex
+        continue-on-error: true
         uses: openai/codex-action@v1
         env:
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
@@ -167,6 +168,27 @@ jobs:
           working-directory: agentic-evals
           sandbox: danger-full-access
           model: ${{ github.event.inputs.model || '' }}
+
+      - name: Retry Codex evaluator on stream disconnect
+        id: run_codex_retry
+        if: steps.run_codex.outcome == 'failure'
+        uses: openai/codex-action@v1
+        env:
+          AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
+          AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          responses-api-endpoint: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          prompt-file: /tmp/eval-prompt.txt
+          working-directory: agentic-evals
+          sandbox: danger-full-access
+          model: ${{ github.event.inputs.model || '' }}
+
+      - name: Fail if Codex evaluator did not complete
+        if: steps.run_codex.outcome == 'failure' && steps.run_codex_retry.outcome != 'success'
+        run: |
+          echo "::error::Codex evaluator failed after retry (often Responses API stream disconnect)"
+          exit 1
 
       - name: Locate run artifacts
         id: artifacts
@@ -231,7 +253,8 @@ jobs:
           BLOCKED=$(grep -rl '"status": "blocked"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
           echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
           if [ "$FAIL" -gt 0 ]; then
-            echo "::warning::${FAIL} case(s) failed — see report for details"
+            echo "::error::${FAIL} case(s) failed — see report for details"
+            exit 1
           fi
 
       - name: Notify Feishu

@@ -99,6 +99,7 @@ Deviation triggers:
 - created a new `package.json`, `routes/`, or scaffold for a ConvoAI app instead of adapting the official quickstart source
 - changed documented sample command semantics, such as replacing the README start command with a custom wrapper
 - attempted to fix `[ERR_PNPM_IGNORED_BUILDS]` or configure pnpm build approvals instead of proceeding to the documented start command
+- wrote `.env` / `.env.local` with literal `$AGORA_APP_ID` or `$AGORA_APP_CERTIFICATE` strings instead of expanded credential values
 
 Recovery response:
 
@@ -183,7 +184,8 @@ Exit code alone does not determine whether to proceed. Read command output and m
 After `pnpm install`:
 
 - **`[ERR_PNPM_IGNORED_BUILDS]`** is not a blocking error. The sample's dev script uses `next dev --webpack` explicitly — esbuild, sharp, and unrs-resolver build scripts are not required for the dev path. If packages were added and the only non-zero exit is this warning, proceed directly to `pnpm dev`.
-- Do not run `pnpm approve-builds`, edit `package.json` with pnpm config fields, create `pnpm.yaml`, or change global pnpm build-approval settings to resolve this warning during first-success setup.
+- If `pnpm dev` re-runs an install check and prints the same ignored-builds warning, treat that as non-blocking too — run the README `pnpm dev` again or start the documented dev script from the quickstart directory. Do not stop before a dev server is listening.
+- Do not run `pnpm approve-builds`, `pnpm config set onlyBuiltDependencies`, `pnpm dev --ignore-scripts`, edit `package.json` with pnpm config fields, create `pnpm.yaml`, or change global pnpm build-approval settings to resolve this warning during first-success setup.
 
 ## Command Integrity Under Environment Restrictions
 
@@ -516,6 +518,7 @@ Run these commands in order. Use `--json` where available so you can parse the o
    - Python quickstart target: `server/.env` with `APP_ID` and `APP_CERTIFICATE`.
    - Node/TS quickstart target: `.env.local` with `NEXT_PUBLIC_AGORA_APP_ID` and `NEXT_AGORA_APP_CERTIFICATE`.
      No manual copy-paste needed when template-aware write succeeds.
+   - When `AGORA_APP_ID` and `AGORA_APP_CERTIFICATE` are already exported in the shell (common in CI and local setups), the env file must contain **resolved literal values**, not unexpanded placeholders. Wrong: `NEXT_PUBLIC_AGORA_APP_ID=$AGORA_APP_ID` written as text. Right: expand variables when writing (e.g. `agora quickstart env write`, or a heredoc/`printf` that substitutes current env values). Verify the file has non-empty values before starting the dev server.
 
 7. **Sample-ready gate**
    - Install dependencies and start the official sample using the documented commands.

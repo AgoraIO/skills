@@ -25,7 +25,7 @@ on:
 
 env:
   TARGET_ID: agora
-  EVAL_REPO: Jiayi-Ye02/agentic-evals
+  EVAL_REPO: AgoraIO/agentic-evals
   EVAL_REF: main
 
 jobs:

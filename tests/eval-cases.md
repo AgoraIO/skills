@@ -494,6 +494,13 @@ For each case:
 - Pass Criteria: Proceeds to `pnpm dev`; does not run `pnpm approve-builds`, edit `package.json`/`pnpm.yaml`, or change global pnpm build settings; cites that the sample dev script uses `next dev --webpack`
 - Result: ___
 
+### I-42: Expand exported Agora credentials into quickstart env file
+
+- User Input: "AGORA_APP_ID and AGORA_APP_CERTIFICATE are already in my shell. Write the Node quickstart `.env.local` and start the dev server."
+- Expected Behavior: Writes `.env.local` with resolved `NEXT_PUBLIC_AGORA_APP_ID` and `NEXT_AGORA_APP_CERTIFICATE` values (not literal `$AGORA_APP_ID` placeholders), then runs the documented start command
+- Pass Criteria: Env file contains non-empty concrete values; does not leave shell-variable names as literal text in the file; proceeds to `pnpm dev` after install warnings per I-41
+- Result: ___
+
 ### I-29: Recovery after custom-server deviation
 
 - User Input: "You already built me a custom ConvoAI server, but the official sample never worked"

@@ -16,7 +16,7 @@ on:
       - ".github/workflows/**"
 
 env:
-  EVAL_REPO: Jiayi-Ye02/agentic-evals
+  EVAL_REPO: AgoraIO/agentic-evals
 
 jobs:
   judge:
@@ -74,12 +74,30 @@ jobs:
           HEREDOC
 
       - name: Run Codex judge
+        id: run_judge
+        continue-on-error: true
         uses: openai/codex-action@v1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           responses-api-endpoint: ${{ secrets.RESPONSES_API_ENDPOINT }}
           prompt-file: /tmp/judge-prompt.txt
           sandbox: danger-full-access
+
+      - name: Retry Codex judge on stream disconnect
+        id: run_judge_retry
+        if: steps.run_judge.outcome == 'failure'
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          responses-api-endpoint: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          prompt-file: /tmp/judge-prompt.txt
+          sandbox: danger-full-access
+
+      - name: Fail if Codex judge did not complete
+        if: steps.run_judge.outcome == 'failure' && steps.run_judge_retry.outcome != 'success'
+        run: |
+          echo "::error::Codex judge failed after retry (often Responses API stream disconnect)"
+          exit 1
 
       - name: Upload report
         if: always() && github.event_name != 'pull_request'
