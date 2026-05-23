@@ -1,12 +1,12 @@
 # Agora CLI Init and Quickstarts
 
-<!-- applies-from: v0.2.0 -->
+<!-- applies-from: v0.2.1 -->
 
 Use this file when the user wants `agora init`, `agora quickstart ...`, or repo-local project binding for an official quickstart.
 
-Verified against Agora CLI `0.2.0`.
+Verified against Agora CLI `0.2.1`.
 
-Use this file for `agora init`, `agora quickstart ...`, and repo-local project binding.
+> **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any command here.
 
 ## Core Decision
 
@@ -41,7 +41,15 @@ agora init my-rtm-demo --template nextjs --new-project --feature rtc --feature r
 agora init my-app --template nextjs --add-agent-rules cursor
 ```
 
-`agora init` creates or binds an Agora project, clones the selected quickstart, writes its env file, persists repo-local project context, and prints next steps. In `0.2.0`, newly created projects default to `rtc`, `rtm`, and `convoai`; `convoai` also implies `rtm`.
+Agent-safe non-interactive example:
+
+```bash
+agora init my-python-demo --template python --new-project --json
+```
+
+`agora init` creates or binds an Agora project, clones the selected quickstart, writes its env file, persists repo-local project context, and prints next steps. Newly created projects default to `rtc`, `rtm`, and `convoai`; `convoai` also implies `rtm`.
+
+In `--json`, `--yes`, CI, or non-TTY runs, **`--template` is required**. Without it the CLI fails fast with `QUICKSTART_TEMPLATE_REQUIRED`. Do not run bare `agora init <name>` in agent terminals — interactive template prompts cannot be answered there.
 
 ```bash
 agora quickstart list
@@ -52,7 +60,15 @@ agora quickstart env write my-python-demo --project my-project
 agora quickstart env write /abs/path/to/my-python-demo --json
 ```
 
-`quickstart create` shells out to `git clone`; if it fails, check `git`, network access to GitHub, and whether the target directory already exists.
+`quickstart create` shells out to `git clone`. Clone subprocesses disable git credential helpers so agent and CI runs do not hang on macOS keychain prompts.
+
+Typed clone failures:
+
+| Code | Recovery |
+|------|----------|
+| `QUICKSTART_GIT_MISSING` | Install `git` and retry |
+| `QUICKSTART_REF_INVALID` | Pass a valid `--ref` (no leading `-`) |
+| `QUICKSTART_REPO_OVERRIDE_INVALID` | Fix or unset `AGORA_QUICKSTART_<TEMPLATE>_REPO_URL` |
 
 > ⚠️ Removed in v0.2.0: `agora quickstart list --verbose`. Use `agora quickstart list --details` instead.
 
@@ -64,7 +80,7 @@ The CLI writes repo-local non-secret project metadata to:
 .agora/project.json
 ```
 
-Verified `0.2.0` resolution order:
+Resolution order:
 
 1. explicit `--project` or positional project argument
 2. repo-local `.agora/project.json` resolved from the target repo path
@@ -83,14 +99,19 @@ Verified `0.2.0` resolution order:
 | Python quickstart | `server/.env` | `APP_ID`, `APP_CERTIFICATE` |
 | Go quickstart | `server-go/.env` | `APP_ID`, `APP_CERTIFICATE` |
 
+**Agent rule:** for official quickstarts, always use **`agora quickstart env write`**, not `agora project env write`. Using the generic writer leaves Python samples with `AGORA_APP_ID` while the backend reads `APP_ID` — the service starts but credentials are empty.
+
 Existing `.env` and `.env.local` files are preserved. The CLI updates existing credential keys, appends missing credentials, and comments duplicate or stale Agora credential aliases for the selected runtime.
 
 Use [env.md](env.md) for generic `agora project env` and `agora project env write` behavior.
 
 ## Agent Guidance
 
-- Prefer `agora init ... --json` for one-shot onboarding that agents can parse.
-- Prefer `agora quickstart env write ... --json` when re-syncing a cloned quickstart after changing projects.
+- Complete [CLI readiness](README.md#cli-readiness-agents) before `init` or env writes.
+- Prefer `agora init <name> --template <template> --json` for one-shot onboarding.
+- Always pass `--template` in agent, CI, and `--json` runs.
+- Prefer `agora quickstart env write ... --json` when seeding or re-syncing official quickstart repos.
+- Do not substitute manual `git clone` until `init` / `quickstart create` fails with a documented error code and recovery is exhausted.
 - Use `agora project doctor --json` after binding to check control-plane readiness, but do not treat it as proof that the sample can run end to end.
-- Use `agora doctor --json` first when the failure looks local to the CLI install rather than to the project.
+- Use `agora doctor --json` when available (`0.2.0+`) and the failure looks local to the CLI install rather than to the project.
 - Use `agora` in user-facing commands for an installed CLI. Use `./agora` only when running a local binary built from the CLI repository.

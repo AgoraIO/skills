@@ -9,14 +9,15 @@ on:
         description: "Path to skill to evaluate (relative to skills-repo)"
         required: false
         default: "skills/agora"
+      eval_ref:
+        description: "agentic-evals ref (branch/tag/SHA; default pinned in .github/eval-pin.env)"
+        required: false
+        default: ""
 
   pull_request:
     paths:
       - "skills/**/*.md"
       - ".github/workflows/**"
-
-env:
-  EVAL_REPO: Jiayi-Ye02/agentic-evals
 
 jobs:
   judge:
@@ -30,16 +31,16 @@ jobs:
       - name: Checkout skills repo
         uses: actions/checkout@v5
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: skills-repo
 
-      - name: Clone agentic-evals
-        run: git clone --depth 1 "https://github.com/${EVAL_REPO}.git" agentic-evals
+      - name: Setup eval harness
+        uses: ./skills-repo/.github/actions/setup-eval-harness
+        with:
+          eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
-      - name: Copy skill into agentic-evals
-        run: |
-          rm -rf agentic-evals/.agents/skills/agora
-          mkdir -p agentic-evals/.agents/skills/agora
-          cp -r skills-repo/skills/agora/* agentic-evals/.agents/skills/agora/
+      - name: Install Codex CLI
+        run: npm install -g @openai/codex
 
       - name: Build judge prompt
         env:
@@ -73,13 +74,66 @@ jobs:
           Write the report to skill-judge-report.md in the current directory.
           HEREDOC
 
-      - name: Run Codex judge
-        uses: openai/codex-action@v1
-        with:
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          responses-api-endpoint: ${{ secrets.RESPONSES_API_ENDPOINT }}
-          prompt-file: /tmp/judge-prompt.txt
-          sandbox: danger-full-access
+      - name: Run Codex judge with stream-safe retry
+        id: run_judge
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          MODEL: gpt-5.4
+        run: |
+          set -e
+          mkdir -p "$HOME/.codex"
+          base_url="${RESPONSES_API_ENDPOINT%/responses}"
+          base_url="${base_url%/}/v1"
+          cat > "$HOME/.codex/config.toml" << EOF
+          model_provider = "OpenAI"
+          model = "${MODEL}"
+          disable_response_storage = true
+
+          [model_providers.OpenAI]
+          name = "OpenAI"
+          base_url = "${base_url}"
+          wire_api = "responses"
+          requires_openai_auth = true
+          EOF
+          if [ -n "$OPENAI_API_KEY" ]; then
+            cat > "$HOME/.codex/auth.json" << EOF
+          {"auth_mode":"apikey","OPENAI_API_KEY":"${OPENAI_API_KEY}"}
+          EOF
+          fi
+
+          run_codex_once() {
+            local log_file="$1"
+            codex exec --skip-git-repo-check --sandbox danger-full-access \
+              --output-last-message /tmp/skill-judge-report.md < /tmp/judge-prompt.txt \
+              > "${log_file}" 2>&1
+          }
+
+          attempt=1
+          first_rc=0
+          run_codex_once "/tmp/codex-judge-attempt-1.log" || first_rc=$?
+
+          if [ "$first_rc" -ne 0 ] && \
+            grep -E "stream disconnected|stream closed before response\\.completed" \
+            "/tmp/codex-judge-attempt-1.log" >/dev/null 2>&1; then
+            echo "Detected stream-disconnect on attempt 1, retrying once."
+            attempt=2
+            second_rc=0
+            run_codex_once "/tmp/codex-judge-attempt-2.log" || second_rc=$?
+            final_rc="$second_rc"
+          else
+            final_rc="$first_rc"
+          fi
+
+          if [ "$final_rc" -ne 0 ]; then
+            echo "::error::Codex judge failed (response stream disconnect or endpoint issue). Re-run workflow or check RESPONSES_API_ENDPOINT."
+            if [ "$attempt" -eq 1 ]; then
+              cat /tmp/codex-judge-attempt-1.log
+            else
+              cat /tmp/codex-judge-attempt-2.log
+            fi
+            exit 1
+          fi
 
       - name: Upload report
         if: always() && github.event_name != 'pull_request'

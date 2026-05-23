@@ -28,7 +28,7 @@ Client-side SDK for adding Agora Conversational AI features to applications alre
 npm install agora-agent-client-toolkit agora-rtc-sdk-ng agora-rtm
 
 # React
-npm install agora-agent-client-toolkit-react agora-rtc-react
+npm install agora-agent-client-toolkit-react agora-rtc-react agora-rtm
 ```
 
 ## Initialization
@@ -62,22 +62,22 @@ ai.subscribeMessage('CHANNEL');
 
 ## Configuration
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `rtcEngine` | `IAgoraRTCClient` | Yes | Your existing Agora RTC client |
-| `rtmConfig` | `{ rtmEngine: RTMClient }` | No | Pass your RTM client for sendText/interrupt |
-| `renderMode` | `TranscriptHelperMode` | No | `TEXT`, `WORD`, `CHUNK`, `AUTO` (default: `AUTO`) — see table below |
-| `enableLog` | `boolean` | No | Debug logging (default: `false`) |
-| `enableAgoraMetrics` | `boolean` | No | Load `@agora-js/report` for usage metrics |
+| Field                | Type                       | Required | Description                                                         |
+| -------------------- | -------------------------- | -------- | ------------------------------------------------------------------- |
+| `rtcEngine`          | `IAgoraRTCClient`          | Yes      | Your existing Agora RTC client                                      |
+| `rtmConfig`          | `{ rtmEngine: RTMClient }` | No       | Pass your RTM client for sendText/interrupt                         |
+| `renderMode`         | `TranscriptHelperMode`     | No       | `TEXT`, `WORD`, `CHUNK`, `AUTO` (default: `AUTO`) — see table below |
+| `enableLog`          | `boolean`                  | No       | Debug logging (default: `false`)                                    |
+| `enableAgoraMetrics` | `boolean`                  | No       | Load `@agora-js/report` for usage metrics                           |
 
 ### Render Modes
 
-| Mode | Update cadence | Word timing in metadata | PTS required | When to use |
-|------|---------------|------------------------|--------------|-------------|
-| `TEXT` | Per sentence (`final: true`) | No | No | Lowest overhead; subtitles |
-| `WORD` | Per word | Yes (`words[].start_ms`, `duration_ms`) | **Yes** (before RTC client creation) | Karaoke-style highlight |
-| `CHUNK` | When all parts reassembled | No | No | Fragmented transport |
-| `AUTO` | Detected from first message | Depends on detected mode | If WORD detected | Default; fine unless you need WORD and must pre-configure PTS |
+| Mode    | Update cadence               | Word timing in metadata                 | PTS required                         | When to use                                                   |
+| ------- | ---------------------------- | --------------------------------------- | ------------------------------------ | ------------------------------------------------------------- |
+| `TEXT`  | Per sentence (`final: true`) | No                                      | No                                   | Lowest overhead; subtitles                                    |
+| `WORD`  | Per word                     | Yes (`words[].start_ms`, `duration_ms`) | **Yes** (before RTC client creation) | Karaoke-style highlight                                       |
+| `CHUNK` | When all parts reassembled   | No                                      | No                                   | Fragmented transport                                          |
+| `AUTO`  | Detected from first message  | Depends on detected mode                | If WORD detected                     | Default; fine unless you need WORD and must pre-configure PTS |
 
 ## Events
 
@@ -132,7 +132,10 @@ ai.on(AgoraVoiceAIEvents.DEBUG_LOG, (message) => {});
 Requires `rtmConfig` — throws `RTMRequiredError` if called without RTM.
 
 ```typescript
-import { ChatMessageType, ChatMessagePriority } from 'agora-agent-client-toolkit';
+import {
+  ChatMessageType,
+  ChatMessagePriority,
+} from 'agora-agent-client-toolkit';
 
 // Send text to the agent
 await ai.sendText(agentUserId, {
@@ -155,28 +158,28 @@ await ai.interrupt(agentUserId);
 
 ### `ChatMessagePriority` values
 
-| Value | Behavior |
-|-------|----------|
-| `INTERRUPTED` | Sends the message and immediately interrupts any speech the agent is currently producing |
-| `APPEND` | Queues the message to be processed after the agent finishes its current speech turn |
-| `IGNORE` | Drops the message silently if the agent is busy — use for low-priority updates only relevant when idle |
+| Value         | Behavior                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------ |
+| `INTERRUPTED` | Sends the message and immediately interrupts any speech the agent is currently producing               |
+| `APPEND`      | Queues the message to be processed after the agent finishes its current speech turn                    |
+| `IGNORE`      | Drops the message silently if the agent is busy — use for low-priority updates only relevant when idle |
 
 `responseInterruptable: boolean` on `ChatMessageText` — when `true`, the agent's response to this message can itself be interrupted by subsequent user input.
 
 ### `ChatMessageImage` fields
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `messageType` | Yes | Must be `ChatMessageType.IMAGE` |
-| `uuid` | Yes | Caller-generated unique ID for receipt correlation via `MESSAGE_RECEIPT_UPDATED` |
-| `url` | One of url/base64 | Publicly accessible image URL |
-| `base64` | One of url/base64 | Inline image data |
+| Field         | Required          | Description                                                                      |
+| ------------- | ----------------- | -------------------------------------------------------------------------------- |
+| `messageType` | Yes               | Must be `ChatMessageType.IMAGE`                                                  |
+| `uuid`        | Yes               | Caller-generated unique ID for receipt correlation via `MESSAGE_RECEIPT_UPDATED` |
+| `url`         | One of url/base64 | Publicly accessible image URL                                                    |
+| `base64`      | One of url/base64 | Inline image data                                                                |
 
 ## Cleanup
 
 ```typescript
 ai.unsubscribe(); // stop receiving channel messages
-ai.destroy();     // remove all event handlers, clear singleton
+ai.destroy(); // remove all event handlers, clear singleton
 
 await rtmClient.logout(); // you manage RTM lifecycle
 ```

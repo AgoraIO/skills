@@ -2,9 +2,11 @@
 
 REST API-driven voice AI agents. Create agents that join RTC channels and converse with users via speech. Front-end clients connect via RTC+RTM.
 
-> **HARD GATE:** If the user does not have a working ConvoAI baseline, route to [quickstarts.md](quickstarts.md) and stay there. Do not generate code, scaffold projects, propose custom architecture, or write files until the quickstart state machine reaches `complete`. This is not a suggestion — it is a blocking constraint.
+> **HARD GATE:** If the user does not have a working ConvoAI baseline, route to [quickstarts.md](quickstarts.md) and use the official quickstart as the source of truth. Do not generate code from memory, scaffold a replacement project, or invent custom architecture. Runtime proof validates the user's environment and Agora project before declaring success.
 
-> **OFFICIAL DEMO FIRST:** When the user wants to try ConvoAI, build a demo, or prototype a voice AI agent, always clone and run the official sample repo first. Use the official repo and the official documented startup commands for the first-success gate. Do not replace the flow with a self-built implementation. Do not use web search for Agora integration details — use only the skill reference files.
+> **OFFICIAL SOURCE FIRST:** When the user wants to try ConvoAI, build a demo, or prototype a voice AI agent, always clone or inspect the official sample repo first. Use its source files and documented startup commands for the first-success path. Do not replace the flow with a self-built implementation. Do not use web search for Agora integration details — use only the skill reference files.
+
+> **POLICY CHECK:** Generating `package.json`, backend routes, UI/client code, SDK implementation files, or `/join` payloads from memory before inspecting the official quickstart source is a policy violation. In user-visible replies, explain this in plain language: "I need to pull this from the official quickstart first, then adapt it to your app."
 
 ## Routing: Classify the Request
 
@@ -15,29 +17,35 @@ The key question: does the user already have a **working ConvoAI baseline**?
 
 | Mode | When | Route to |
 |---|---|---|
-| `quickstart` | Starting from scratch, first demo, wants the official baseline | [quickstarts.md](quickstarts.md) |
-| `integration` | Has an app or repo, but the ConvoAI path is not proven end to end yet | [quickstarts.md](quickstarts.md) |
+| `quickstart` | New project, first demo, wants the official baseline, or has a cloned sample that is not proven end to end | [quickstarts.md](quickstarts.md) |
+| `integration` | Has an existing application or multi-project workspace and wants ConvoAI added | [quickstarts.md](quickstarts.md) to clone/inspect the official source, then [integration-from-quickstart.md](integration-from-quickstart.md) for app integration |
 | `backend-implementation` | Working baseline confirmed, now needs server code or lifecycle/auth changes | [server-sdks.md](server-sdks.md), [python-sdk.md](python-sdk.md), [go-sdk.md](go-sdk.md), or [auth-flow.md](auth-flow.md) |
 | `client-customization` | Working baseline confirmed, now needs transcripts, hooks, UI, or mobile client work | [agent-toolkit.md](agent-toolkit.md), [agent-client-toolkit-react.md](agent-client-toolkit-react.md), [agent-ui-kit.md](agent-ui-kit.md), [agent-toolkit-ios.md](agent-toolkit-ios.md), [agent-toolkit-android.md](agent-toolkit-android.md) |
 | `studio-agent` | The user already has an Agora Studio Agent ID and wants to reuse that Studio-managed agent config | [quickstarts.md](quickstarts.md), then [conversational-ai-studio.md](conversational-ai-studio.md) |
 | `advanced-feature` / `debugging` / `ops-hardening` | Working baseline confirmed, wants custom LLM, memory, webhooks, production hardening, or error diagnosis | Start in this file, then route to the relevant reference below |
+| `architecture` / `call sequence` / `how does ConvoAI work` | Needs system overview, init order, token roles, or start/stop lifecycle before implementation | [architecture.md](architecture.md) |
 
 ### Routing Rules
 
 - If the user does **not** have a working baseline yet, read only this file and [quickstarts.md](quickstarts.md).
 - While quickstart is unresolved, do **not** generate `/join` payloads, propose a custom project structure, or jump straight into SDK code.
-- Existing RTC code or a checked-out repo is not enough to skip quickstart; the ConvoAI path must already work once.
+- Existing RTC code, a checked-out repo, or a cloned quickstart is not enough to skip quickstart; the ConvoAI path must already work once.
+- If the user has an existing app, classify the request as `integration`: first clone or inspect the official quickstart as source, then use [integration-from-quickstart.md](integration-from-quickstart.md) to detect the app shape, produce a copy map, and adapt only the needed pieces. Runtime proof should happen before declaring the integration works, but the reason for the quickstart is source alignment, not proving Agora's sample exists.
+- For `integration`, detect first and ask last: use session memory, then read-only workspace detection, then one focused question only if required. Do not re-ask for values the user already provided.
+- Follow the silent-by-default response contract and recovery rule from [../../SKILL.md](../../SKILL.md) and [quickstarts.md](quickstarts.md): check the baseline gate internally on every actionable reply, but show user-facing state only on first reply, gate flips, blocked actions, or status requests.
 - If the user explicitly says the baseline already works, skip quickstart and route directly to the relevant implementation file.
 - If the user explicitly says they already have an **Agora Studio Agent ID** from `https://console.agora.io/studio/agents`, treat that as a dedicated ConvoAI path rather than re-running the provider-choice flow.
 - If the user needs Java, Ruby, PHP, C#, or another non-SDK backend language, use [auth-flow.md](auth-flow.md) after the quickstart path is chosen.
 - If the user asks to use the CLI to speed up ConvoAI onboarding, keep the request in the ConvoAI path first. Use the CLI as an onboarding helper for login, project binding, official quickstart cloning, env writing, feature readiness, and `project doctor`, then continue the ConvoAI quickstart.
 - For the first-success gate, treat the sample README commands as exact. If a documented command fails because of sandbox, permission, port-binding, filesystem, or network restrictions, re-run the exact documented command with escalation if available. Do not add flags, host overrides, alternate entrypoints, or equivalent replacement commands.
+- When starting from scratch in the official quickstart, it is allowed and expected to update the agent's prompt, greeting, persona, scenario details, or documented join/config fields to match the user's requested agent. Keep the sample architecture, env names, token flow, lifecycle, and documented commands intact.
 
 ## Fast Onboarding With Agora CLI
 
 For `quickstart` and `integration` mode, the fastest first-mile path is often:
 
-1. use `agora init` for a new official quickstart, or `agora quickstart env write` to bind an existing official quickstart
+0. run **[CLI readiness](../cli/README.md#cli-readiness-agents)** — version gate, upgrade if below `0.1.7`, confirm PATH before any mutating CLI command
+1. use `agora init <name> --template <template> --json` for a new official quickstart, or `agora quickstart env write` to bind an existing official quickstart
 2. use the Agora CLI to verify login, current project, `convoai` feature readiness, and other basic project checks such as App ID/App Certificate presence
 3. run `project doctor` to catch missing setup early
 4. then run the official sample's documented startup commands until the agent joins a real RTC channel and completes one end-to-end conversation
@@ -76,6 +84,10 @@ GET https://docs-md.agora.io/api/conversational-ai-api-v2.x.yaml
 
 ## Architecture
 
+For system components, call sequence, initialization order, token roles, agent lifecycle, and stop/cleanup flow, read **[architecture.md](architecture.md)** first.
+
+Quick overview:
+
 ```text
 Your Server (REST API calls)
     ↓ POST /join with config
@@ -86,10 +98,7 @@ Agent joins RTC channel ←→ Front-end client (RTC + RTM)
 ASR → LLM → TTS             Receives audio + transcripts
 ```
 
-1. Your server calls the REST API to create an agent with LLM/TTS/ASR config
-2. The agent joins an Agora RTC channel and subscribes to the user's audio
-3. ASR converts speech to text → LLM generates response → TTS converts to speech
-4. The agent publishes audio back to the channel; transcripts arrive via RTC data channel or RTM
+Cross-product RTC + RTM coordination: [../integration-patterns.md](../integration-patterns.md).
 
 ## Documentation Lookup
 
@@ -217,7 +226,9 @@ Use the file that matches what the user is building:
 
 | User's question / task | Read this file |
 |---|---|
+| How ConvoAI works — components, call sequence, init order, lifecycle, start/stop flow | [architecture.md](architecture.md) |
 | No working ConvoAI baseline yet — choose the baseline path, setup order, and readiness gates | [quickstarts.md](quickstarts.md) |
+| Existing app integration — detect app shape, create a copy map, and adapt from the official baseline after first success | [integration-from-quickstart.md](integration-from-quickstart.md) |
 | Node.js/Python/Go backend — starting agent, auth, session lifecycle | [server-sdks.md](server-sdks.md) |
 | Python SDK specifics (async, deprecations, debug) | [python-sdk.md](python-sdk.md) |
 | Go SDK specifics (context, builder, status constants) | [go-sdk.md](go-sdk.md) |

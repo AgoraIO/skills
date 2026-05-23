@@ -17,6 +17,10 @@ on:
         description: "Hermes model (e.g. openai/gpt-4o)"
         required: false
         default: ""
+      eval_ref:
+        description: "agentic-evals ref (branch/tag/SHA; default pinned in .github/eval-pin.env)"
+        required: false
+        default: ""
 
   pull_request:
     paths:
@@ -25,8 +29,6 @@ on:
 
 env:
   TARGET_ID: agora
-  EVAL_REPO: Jiayi-Ye02/agentic-evals
-  EVAL_REF: main
 
 jobs:
   evaluate:
@@ -41,18 +43,14 @@ jobs:
       - name: Checkout skills repo
         uses: actions/checkout@v5
         with:
+          # PR: test the pushed branch head; dispatch/schedule: use the triggering ref
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: skills-repo
 
-      - name: Clone agentic-evals
-        run: |
-          git clone --depth 1 "https://github.com/${EVAL_REPO}.git" agentic-evals
-
-      - name: Copy skill into agentic-evals
-        run: |
-          rm -rf agentic-evals/.agents/skills/agora
-          mkdir -p agentic-evals/.agents/skills/agora
-          cp -r skills-repo/skills/agora/* agentic-evals/.agents/skills/agora/
-          echo "Skill copied from skills-repo into agentic-evals/.agents/skills/agora/"
+      - name: Setup eval harness
+        uses: ./skills-repo/.github/actions/setup-eval-harness
+        with:
+          eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Validate YAML
         working-directory: agentic-evals
@@ -76,6 +74,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
+
       - name: Install runtime dependencies
         run: |
           pip install pyyaml
@@ -94,6 +95,14 @@ jobs:
           RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
           HERMES_MODEL: ${{ github.event.inputs.hermes_model || '' }}
         run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY is not set"
+            exit 1
+          fi
+          if [ -z "$RESPONSES_API_ENDPOINT" ]; then
+            echo "::error::RESPONSES_API_ENDPOINT is not set"
+            exit 1
+          fi
           export PATH="$HOME/.local/bin:$PATH"
           mkdir -p ~/.hermes
 
@@ -116,6 +125,26 @@ jobs:
           echo "OPENAI_API_KEY=${OPENAI_API_KEY}" > ~/.hermes/.env
 
           echo "Hermes configured: provider=custom, base_url=${BASE_URL}, model=${MODEL}"
+
+      - name: Hermes auth smoke test
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -e
+          if hermes run --max-turns 1 "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
+            echo "Hermes smoke test passed via hermes run."
+          elif hermes chat --yolo --quiet -q "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
+            echo "Hermes smoke test passed via hermes chat."
+          else
+            echo "::error::Hermes auth smoke test failed. Confirm RESPONSES_API_ENDPOINT and OPENAI_API_KEY are valid."
+            cat /tmp/hermes-smoke.log
+            exit 1
+          fi
+          if grep -q "INVALID_API_KEY" /tmp/hermes-smoke.log; then
+            echo "::error::Hermes returned INVALID_API_KEY during smoke test."
+            cat /tmp/hermes-smoke.log
+            exit 1
+          fi
 
       - name: Write credentials file
         env:
@@ -239,8 +268,9 @@ jobs:
           PASS=$(grep -rl '"status": "pass"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
           BLOCKED=$(grep -rl '"status": "blocked"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
           echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
-          if [ "$FAIL" -gt 0 ]; then
-            echo "::warning::${FAIL} case(s) failed — see report for details"
+          if [ "$FAIL" -gt 0 ] || [ "$BLOCKED" -gt 0 ]; then
+            echo "::error::${FAIL} fail, ${BLOCKED} blocked — see report for details"
+            exit 1
           fi
 
       - name: Notify Feishu

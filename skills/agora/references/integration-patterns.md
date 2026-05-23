@@ -81,6 +81,8 @@ For Level 2 fetch: fetch `https://docs.agora.io/en/llms.txt`, find the token man
 
 ## RTC + RTM + ConvoAI
 
+Before wiring ConvoAI into an existing multi-product app, read [conversational-ai/architecture.md](conversational-ai/architecture.md) for the end-to-end call sequence, then use the official quickstart as the source of truth for code shape and commands. For existing-app work, use [conversational-ai/integration-from-quickstart.md](conversational-ai/integration-from-quickstart.md) after the quickstart source is inspected; runtime proof is required before claiming the integrated flow works.
+
 ### How the Products Connect
 
 ```

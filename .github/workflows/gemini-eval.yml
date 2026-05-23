@@ -17,6 +17,10 @@ on:
         description: "Gemini model"
         required: false
         default: ""
+      eval_ref:
+        description: "agentic-evals ref (branch/tag/SHA; default pinned in .github/eval-pin.env)"
+        required: false
+        default: ""
 
   pull_request:
     paths:
@@ -25,8 +29,6 @@ on:
 
 env:
   TARGET_ID: agora
-  EVAL_REPO: Jiayi-Ye02/agentic-evals
-  EVAL_REF: main
 
 jobs:
   evaluate:
@@ -40,16 +42,13 @@ jobs:
       - name: Checkout skills repo
         uses: actions/checkout@v5
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: skills-repo
 
-      - name: Clone agentic-evals
-        run: git clone --depth 1 "https://github.com/${EVAL_REPO}.git" agentic-evals
-
-      - name: Copy skill into agentic-evals
-        run: |
-          rm -rf agentic-evals/.agents/skills/agora
-          mkdir -p agentic-evals/.agents/skills/agora
-          cp -r skills-repo/skills/agora/* agentic-evals/.agents/skills/agora/
+      - name: Setup eval harness
+        uses: ./skills-repo/.github/actions/setup-eval-harness
+        with:
+          eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -126,14 +125,14 @@ jobs:
           python3 scripts/run_gemini_eval.py
 
       - name: Generate report
-        if: always() && github.event_name != 'pull_request'
+        if: always()
         working-directory: agentic-evals
         env:
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
         run: python3 scripts/generate_report.py
 
       - name: Upload artifacts
-        if: always() && github.event_name != 'pull_request'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: eval-run-gemini-${{ env.TARGET_ID }}-${{ github.run_id }}
@@ -142,7 +141,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Post report to job summary
-        if: always() && github.event_name != 'pull_request'
+        if: always()
         env:
           RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
         run: |
@@ -171,6 +170,22 @@ jobs:
               issue_number: context.payload.pull_request.number,
               body: `## Skill Eval Report (Gemini CLI)\n\n${report}\n\n---\n[Download artifacts](${process.env.RUN_URL})`,
             });
+
+      - name: Report results
+        if: always()
+        env:
+          RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
+        run: |
+          RESULTS_DIR="${RUN_DIR}/case-results"
+          [ -d "$RESULTS_DIR" ] || { echo "::warning::No case-results"; exit 0; }
+          FAIL=$(grep -rl '"status": "fail"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
+          PASS=$(grep -rl '"status": "pass"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
+          BLOCKED=$(grep -rl '"status": "blocked"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
+          echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
+          if [ "$FAIL" -gt 0 ] || [ "$BLOCKED" -gt 0 ]; then
+            echo "::error::${FAIL} fail, ${BLOCKED} blocked — see report for details"
+            exit 1
+          fi
 
       - name: Notify Feishu
         if: always() && github.event_name != 'pull_request'

@@ -1,10 +1,12 @@
 # Agora CLI Doctor
 
-<!-- applies-from: v0.2.0 -->
+<!-- applies-from: v0.2.1 -->
 
 Use this file when the user needs either local CLI install diagnostics (`agora doctor`) or project readiness diagnostics (`agora project doctor`).
 
-Verified against Agora CLI `0.2.0`.
+Verified against Agora CLI `0.2.1`.
+
+> **Agents:** run [CLI readiness](README.md#cli-readiness-agents) before doctor-driven recovery loops.
 
 ## Purpose
 
@@ -16,13 +18,15 @@ Use `agora doctor` first when the failure looks local to the workstation or shel
 
 ## Install Doctor
 
+Top-level `agora doctor` is available in `0.2.0+`. For `0.1.7–0.1.x`, use the read-only version and PATH checks in [CLI readiness](README.md#cli-readiness-agents), then prefer upgrading to the verified `0.2.1` baseline before deeper diagnostics.
+
 ```bash
 agora doctor
 agora doctor --json
 agora doctor --quiet
 ```
 
-Verified `0.2.0` install-doctor checks include:
+Verified `0.2.1` install-doctor checks include:
 
 - binary path and PATH resolution
 - installed version
@@ -31,7 +35,7 @@ Verified `0.2.0` install-doctor checks include:
 - auth/session state
 - known MCP host detection
 
-Verified `0.2.0` install-doctor exit codes:
+Verified `0.2.1` install-doctor exit codes:
 
 - `0`: healthy
 - `1`: blocking install issues
@@ -40,7 +44,8 @@ Verified `0.2.0` install-doctor exit codes:
 
 Common recovery paths:
 
-- PATH issue: run the shell-specific command printed by `agora doctor`
+- PATH issue: run the shell-specific command printed by `agora doctor`, or use `which -a agora` to find a shadowing old binary. Do not uninstall automatically; ask before removing a stale binary — see [README.md](README.md#cli-readiness-agents)
+- CLI below `0.1.7` or config schema newer than the running binary: follow the curl-first upgrade path in [install-auth.md](install-auth.md#version-gate-and-upgrade)
 - network or DNS issue: fix connectivity or proxy settings before retrying auth
 - auth issue: run `agora login`
 
@@ -67,14 +72,14 @@ agora project doctor --deep
 
 ## Interpreting Results
 
-Verified result states in `0.2.0`:
+Verified result states in `0.2.1`:
 
 - `healthy`: project is ready from the CLI's current checks
 - `warning`: partially ready, but not fully clean
 - `not_ready`: blocking issues were found
 - `auth_error`: not logged in or project context cannot be resolved
 
-Exit behavior verified in `0.2.0`:
+Exit behavior verified in `0.2.1`:
 
 - healthy doctor run exits `0`
 - blocking readiness issues exit `1`
@@ -105,7 +110,7 @@ If RTM or a related capability was just enabled and the first run still fails, a
 
 ## Deep Mode
 
-`--deep` is part of the verified CLI surface in `0.2.0`. It runs deeper repo-local checks for `.agora` metadata and quickstart env consistency where applicable.
+`--deep` is part of the verified CLI surface. It runs deeper repo-local checks for `.agora` metadata and quickstart env consistency where applicable.
 
 Do not claim `--deep` proves RTC or RTM runtime connectivity. It remains a CLI readiness check.
 
@@ -119,6 +124,6 @@ Treat doctor results as **control-plane readiness only**:
 
 ## Fix Mode
 
-`--fix` is not in the verified `0.2.0` command surface. Do not claim broad automatic remediation behavior unless a future CLI version documents it.
+`--fix` is not in the verified command surface. Do not claim broad automatic remediation behavior unless a future CLI version documents it.
 
 For safe guidance, prefer explicit remediation commands over "the CLI will fix this automatically."

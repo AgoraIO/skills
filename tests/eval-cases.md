@@ -106,6 +106,20 @@ For each case:
 - Pass Criteria: Does not route the whole request to the standalone CLI module first; keeps the conversation in the ConvoAI onboarding flow
 - Result: ___
 
+### R-14: Existing app routes to ConvoAI integration
+
+- User Input: "Add ConvoAI to my existing Next.js app"
+- Expected Behavior: Routes to `references/conversational-ai/README.md`, classifies the request as `integration`, clones or inspects the official quickstart source in a separate folder or branch, then routes to `references/conversational-ai/integration-from-quickstart.md`
+- Pass Criteria: Does not scaffold a replacement standalone app in the user's repo; does not edit the existing app before quickstart source inspection and copy map
+- Result: ___
+
+### R-15: ConvoAI architecture question routes to architecture.md
+
+- User Input: "How does the ConvoAI call sequence work between my server, the agent, and the client?"
+- Expected Behavior: Routes to `references/conversational-ai/architecture.md` (via README or directly) and explains server `/join`, client RTC/RTM join order, and agent lifecycle at a high level
+- Pass Criteria: References the architecture topic file; does not invent a custom architecture or skip the server-start / client-join distinction
+- Result: ___
+
 ---
 
 ## 2. Code Generation Quality (C-series)
@@ -254,6 +268,18 @@ For each case:
 - Expected Behavior: Enters the ConvoAI quickstart flow unless a working baseline is already confirmed
 - Pass Criteria: Does not generate a `/join` payload before the baseline path and readiness gates are resolved
 
+### F-08: No scaffold before baseline
+
+- User Input: "Scaffold a ConvoAI backend for me"
+- Expected Behavior: Explains in natural language that custom scaffolding is blocked until the official quickstart source is inspected, then gives the next official quickstart step
+- Pass Criteria: Does not generate `package.json`, backend routes, UI code, SDK files, or a `/join` payload from memory; includes source/baseline status and the next official quickstart command when action is blocked
+
+### F-09: Existing app edit is blocked before baseline
+
+- User Input: "Add the ConvoAI route directly to my app now"
+- Expected Behavior: Refuses the edit in natural language if the quickstart source has not been inspected or no copy map exists, then gives the step that unblocks it
+- Pass Criteria: Does not use "policy violation" or "Track A/B" in user-visible wording; does not edit the user's app before source inspection and copy map
+
 ---
 
 ## 4. Intake Accuracy (I-series)
@@ -289,7 +315,7 @@ For each case:
 ### I-05: Cloned repo is not a working baseline
 
 - User Input: "I cloned agent-quickstart-nextjs, but the ConvoAI agent has never connected"
-- Expected Behavior: Treats this as `integration`, not a completed baseline
+- Expected Behavior: Treats this as `quickstart`, not a completed baseline
 - Pass Criteria: Stays in the ConvoAI quickstart flow; does not skip directly to advanced implementation guidance
 - Result: ___
 
@@ -447,6 +473,111 @@ For each case:
 - Pass Criteria: Does not jump to a self-built replacement implementation; allows only the minimal fix needed to restore the official path
 - Result: ___
 
+### I-28: First ConvoAI reply includes full baseline status
+
+- User Input: "Help me build a ConvoAI voice agent"
+- Expected Behavior: First ConvoAI reply includes the official template, exact next command or next setup step, full `baseline_gate`, and `blocked` status
+- Pass Criteria: Uses checkmark glyphs for baseline status instead of raw booleans; does not generate custom code or app scaffolding
+- Result: ___
+
+### I-40: Starting from scratch customizes agent prompt in quickstart
+
+- User Input: "Start from the official quickstart and make the agent a Spanish-speaking sales coach with this prompt: ..."
+- Expected Behavior: Clones or opens the official quickstart, then updates the documented agent prompt/greeting/persona or join/config details inside the quickstart source
+- Pass Criteria: Preserves the sample architecture, env names, token flow, lifecycle, and documented commands; does not self-build a replacement app
+- Result: ___
+
+### I-41: ERR_PNPM_IGNORED_BUILDS is non-blocking during Node/TS install
+
+- User Input: "`pnpm install` finished adding packages but exited 1 with `[ERR_PNPM_IGNORED_BUILDS]` for esbuild, sharp, and unrs-resolver. What next?"
+- Expected Behavior: Classifies the warning as non-blocking and continues to the documented start command
+- Pass Criteria: Proceeds to `pnpm dev`; does not run `pnpm approve-builds`, edit `package.json`/`pnpm.yaml`, or change global pnpm build settings; cites that the sample dev script uses `next dev --webpack`
+- Result: ___
+
+### I-42: Expand exported Agora credentials into quickstart env file
+
+- User Input: "AGORA_APP_ID and AGORA_APP_CERTIFICATE are already in my shell. Write the Node quickstart `.env.local` and start the dev server."
+- Expected Behavior: Writes `.env.local` with resolved `NEXT_PUBLIC_AGORA_APP_ID` and `NEXT_AGORA_APP_CERTIFICATE` values (not literal `$AGORA_APP_ID` placeholders), then runs the documented start command
+- Pass Criteria: Env file contains non-empty concrete values; does not leave shell-variable names as literal text in the file; proceeds to `pnpm dev` after install warnings per I-41
+- Result: ___
+
+### I-29: Recovery after custom-server deviation
+
+- User Input: "You already built me a custom ConvoAI server, but the official sample never worked"
+- Expected Behavior: Acknowledges the deviation in natural language, stops the custom path, emits current `baseline_gate`, and proposes the next official sample command
+- Pass Criteria: Does not continue editing the custom server; does not use "policy violation" phrasing in the user-visible response
+- Result: ___
+
+### I-30: Copy map before existing-app edits
+
+- User Input: "The quickstart works now; integrate it into my existing app"
+- Expected Behavior: Produces a copy map with source quickstart files, destination app files, and adaptation notes before editing the user repo
+- Pass Criteria: Does not edit the existing app until the copy map exists and is approved or the user explicitly says to proceed
+- Result: ___
+
+### I-31: Routine quickstart reply has no footer
+
+- User Input: "What does the baseline prove?"
+- Expected Behavior: Answers the question naturally
+- Pass Criteria: Does not include a full status footer because no state changed and the user did not ask for status
+- Result: ___
+
+### I-32: Gate flip emits one-line status
+
+- User Input: "The quickstart repo is cloned now"
+- Expected Behavior: Marks the relevant baseline gate as advanced and emits a one-line status such as `baseline_gate: 0/4 -> 1/4; next: <command>`
+- Pass Criteria: Does not dump the full footer for a simple gate flip
+- Result: ___
+
+### I-33: Status request emits full footer
+
+- User Input: "Where are we with the ConvoAI setup?"
+- Expected Behavior: Emits the full status footer on demand
+- Pass Criteria: Includes official template, next command or step, all four baseline gate fields, and blocked status
+- Result: ___
+
+### I-34: Do-not-re-ask uses session memory
+
+- User Input: In turn 1 the user says "I'm using FastAPI with Next.js"; later the agent needs the backend language
+- Expected Behavior: Uses the prior user statement before workspace detection or asking
+- Pass Criteria: Does not ask again for the backend or frontend stack unless the user later changed it
+- Result: ___
+
+### I-35: Conflicting frontend frameworks produce medium confidence
+
+- User Input: "Add ConvoAI to this app" with `package.json` containing both `next` and `vite`
+- Expected Behavior: Emits `app_inventory` with `detection_confidence: medium`, names both detected frontend candidates, and asks one focused question about the active app
+- Pass Criteria: Does not silently choose Next.js or Vite; does not ask a broad intake questionnaire
+- Result: ___
+
+### I-36: Scan error produces low confidence
+
+- User Input: "Add ConvoAI to this app" when a candidate config file cannot be read
+- Expected Behavior: Reports which file could not be read, degrades to `detection_confidence: low`, and asks one focused question
+- Pass Criteria: Does not fabricate `baseline_track` or silently guess the project structure
+- Result: ___
+
+### I-37: Multi-project workspace lists candidates before asking
+
+- User Input: "Add ConvoAI to this repo" with `apps/web` (Next.js), `apps/api` (FastAPI), and `apps/mobile` (React Native)
+- Expected Behavior: Emits `app_inventory` listing all three projects, explains that ConvoAI needs a backend plus at least one client, and asks whether to wire web+api or include mobile too
+- Pass Criteria: Does not silently pick a target; does not scan or modify projects outside chosen targets
+- Result: ___
+
+### I-38: Client/backend split confirms both targets
+
+- User Input: "Add ConvoAI to this app" with `client/` (Next.js) and `server/` (Express)
+- Expected Behavior: Detects a client/backend split, explains that the backend starts the agent and the client joins RTC, then asks one question to confirm both are integration targets
+- Pass Criteria: Does not ask blind "which project?"; lists detected paths and stacks before asking
+- Result: ___
+
+### I-39: Unsupported backend still uses official source first
+
+- User Input: "Add ConvoAI to my Rails app"
+- Expected Behavior: Detects Rails as an unsupported direct quickstart target, offers Python or Node as the official source/first-success baseline, then routes to `auth-flow.md` for the Rails REST integration
+- Pass Criteria: Does not pretend there is an official Rails quickstart; does not generate Rails ConvoAI code from memory before inspecting the official quickstart/API source
+- Result: ___
+
 ---
 
 ## 5. CLI Skill Coverage (CLI-series)
@@ -469,7 +600,7 @@ For each case:
 
 - User Input: "What CLI version should I use for this skill?"
 - Expected Behavior: Anchors guidance on the verified minimum version
-- Pass Criteria: States that the skill is verified against CLI `0.1.7` and written for `>=0.1.7`; does not hand-wave with "latest"
+- Pass Criteria: States that the skill is verified against CLI `0.2.1` with minimum supported `>=0.1.7`; does not hand-wave with "latest"
 - Result: ___
 
 ### CLI-04: Project creation guidance stays within real command surface
@@ -497,14 +628,14 @@ For each case:
 
 - User Input: "What does `agora project doctor --deep` do?"
 - Expected Behavior: Describes the currently verified behavior instead of promising future runtime checks
-- Pass Criteria: States that in CLI `0.1.7`, deep mode runs repo-local checks such as `.agora` metadata and quickstart env consistency where applicable; does not claim it proves RTC/RTM runtime connectivity or sample-ready status
+- Pass Criteria: States that deep mode runs repo-local checks such as `.agora` metadata and quickstart env consistency where applicable; does not claim it proves RTC/RTM runtime connectivity or sample-ready status
 - Result: ___
 
 ### CLI-08: Agent automation prefers JSON output
 
 - User Input: "I want an agent to call the CLI safely from scripts"
 - Expected Behavior: Recommends machine-readable output and stable parsing boundaries
-- Pass Criteria: Recommends `--json`, `agora introspect --json` for command discovery, `AGORA_HOME` isolation for CI/multi-agent runs, and does not tell agents to parse pretty output by default
+- Pass Criteria: Recommends `--json`, `agora introspect --json` for command discovery, `AGORA_HOME` isolation for CI/multi-agent runs, CLI readiness before mutating commands, and `agora init` examples that always include `--template`; does not tell agents to parse pretty output by default
 - Result: ___
 
 ### CLI-09: Config defaults and override locations are accurate
@@ -587,8 +718,8 @@ For each case:
 ### CLI-20: Command tree discovery uses introspect
 
 - User Input: "How can an agent discover the full Agora CLI command tree?"
-- Expected Behavior: Uses the v0.1.7 machine-readable discovery path
-- Pass Criteria: Recommends `agora introspect --json` for agents and `agora --help --all` / `agora --help --all --json` for help output; does not suggest scraping pretty help as the default
+- Expected Behavior: Uses the v0.2.1 machine-readable discovery path
+- Pass Criteria: Recommends `agora introspect --json` for agents, mentions filtering on `headlessSafe` for non-interactive runs, and `agora --help --all` / `agora --help --all --json` for help output; does not suggest scraping pretty help as the default
 - Result: ___
 
 ### CLI-21: Telemetry controls are documented
@@ -617,6 +748,48 @@ For each case:
 - User Input: "Use the Agora CLI to export env vars for my RTC token server."
 - Expected Behavior: Routes to the CLI env workflow and server token reference, not the ConvoAI quickstart
 - Pass Criteria: Uses `references/cli/env.md` for env export/write and `references/server/tokens.md` for token generation; does not route into ConvoAI onboarding
+- Result: ___
+
+### CLI-25: Init without template in agent mode
+
+- User Input: "Run agora init my-demo --yes --json for me"
+- Expected Behavior: Adds `--template` before running; explains non-interactive init requires an explicit template
+- Pass Criteria: Does not run bare `agora init my-demo --yes --json`; includes `--template python` or `--template nextjs` (or asks which baseline applies); mentions `QUICKSTART_TEMPLATE_REQUIRED` if relevant
+- Result: ___
+
+### CLI-26: Stuck on CLI 0.1.6 upgrade path
+
+- User Input: "agora version shows 0.1.6 and the skill says I need a newer CLI"
+- Expected Behavior: Runs CLI readiness: curl installer first, npm as alternate, PATH re-check; does not use `--add-to-path` or invented `--force`
+- Pass Criteria: Recommends `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh` first; mentions `npm install -g agoraio-cli` as alternate; re-verifies with `agora version` and `which -a agora`; does not rely on `agora upgrade` on 0.1.6
+- Result: ___
+
+### CLI-27: PATH shadowing after install
+
+- User Input: "I upgraded the CLI but agora version still shows 0.1.6"
+- Expected Behavior: Diagnoses PATH shadowing and fixes before continuing
+- Pass Criteria: Uses `which -a agora` or `where.exe agora`; references `agora doctor` PATH recovery or reordering PATH; does not uninstall automatically; uses `install.sh --uninstall` / `install.ps1 -Uninstall` or stale-binary removal only after user approval; does not continue ConvoAI/CLI workflows until version confirms the new binary
+- Result: ___
+
+### CLI-28: Python quickstart env writer
+
+- User Input: "Seed credentials for agent-quickstart-python with the CLI"
+- Expected Behavior: Uses template-aware env write
+- Pass Criteria: Uses `agora quickstart env write` so `server/.env` gets `APP_ID` / `APP_CERTIFICATE`; does not use `agora project env write` alone (which writes generic `AGORA_APP_ID`)
+- Result: ___
+
+### CLI-29: Config version newer than CLI
+
+- User Input: "agora project use fails: Config version 3 is newer than this CLI supports"
+- Expected Behavior: Explains old binary vs newer config and routes through CLI upgrade
+- Pass Criteria: Recommends upgrading the CLI via CLI readiness (curl install first); mentions 0.2.0+ auto-migrates config v3; does not tell the user to manually edit config as the first fix
+- Result: ___
+
+### CLI-30: Upgrade in CI stays non-mutating
+
+- User Input: "Should my GitHub Action run agora upgrade?"
+- Expected Behavior: Recommends non-mutating check in CI
+- Pass Criteria: Recommends `agora upgrade --check --json`; does not mutate the binary in CI unless `AGORA_ALLOW_UPGRADE_IN_CI=1` is explicitly justified
 - Result: ___
 
 ### C-15: RTM token subject and RTM login identity stay aligned

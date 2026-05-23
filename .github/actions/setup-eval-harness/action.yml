@@ -1,0 +1,75 @@
+name: Setup eval harness
+description: Clone agentic-evals at pinned ref and overlay agora skill from skills-repo
+inputs:
+  eval_ref:
+    description: Optional agentic-evals ref override (branch, tag, or SHA)
+    required: false
+    default: ""
+  eval_repo:
+    description: agentic-evals GitHub owner/repo
+    required: false
+    default: AgoraIO/agentic-evals
+  skills_path:
+    description: Path to skills-repo checkout
+    required: false
+    default: skills-repo
+runs:
+  using: composite
+  steps:
+    - name: Resolve eval ref
+      id: ref
+      shell: bash
+      env:
+        INPUT_REF: ${{ inputs.eval_ref }}
+        SKILLS_PATH: ${{ inputs.skills_path }}
+      run: |
+        REF="${INPUT_REF}"
+        if [ -z "$REF" ]; then
+          REF=$(grep '^EVAL_REF=' "${SKILLS_PATH}/.github/eval-pin.env" | cut -d= -f2- | tr -d '\r')
+        fi
+        if [ -z "$REF" ]; then
+          echo "::error::No eval ref resolved (set eval_ref input or .github/eval-pin.env)"
+          exit 1
+        fi
+        echo "ref=${REF}" >> "$GITHUB_OUTPUT"
+
+    - name: Clone agentic-evals
+      shell: bash
+      env:
+        EVAL_REPO: ${{ inputs.eval_repo }}
+        EVAL_REF: ${{ steps.ref.outputs.ref }}
+      run: |
+        git init agentic-evals
+        git -C agentic-evals remote add origin "https://github.com/${EVAL_REPO}.git"
+        git -C agentic-evals fetch --depth 1 origin "${EVAL_REF}"
+        git -C agentic-evals checkout FETCH_HEAD
+
+    - name: Copy skill into agentic-evals
+      shell: bash
+      env:
+        SKILLS_PATH: ${{ inputs.skills_path }}
+      run: |
+        rm -rf agentic-evals/.agents/skills/agora
+        mkdir -p agentic-evals/.agents/skills/agora
+        cp -r "${SKILLS_PATH}/skills/agora/"* agentic-evals/.agents/skills/agora/
+
+    - name: Log eval refs
+      shell: bash
+      env:
+        EVAL_REF: ${{ steps.ref.outputs.ref }}
+        SKILLS_PATH: ${{ inputs.skills_path }}
+      run: |
+        SKILL_SHA=$(git -C "${SKILLS_PATH}" rev-parse HEAD)
+        EVAL_SHA=$(git -C agentic-evals rev-parse HEAD)
+        echo "Skill SHA: ${SKILL_SHA}"
+        echo "Eval ref:  ${EVAL_REF}"
+        echo "Eval SHA:  ${EVAL_SHA}"
+        {
+          echo "## Eval setup"
+          echo ""
+          echo "| | |"
+          echo "|---|---|"
+          echo "| Skill SHA | \`${SKILL_SHA}\` |"
+          echo "| Eval ref | \`${EVAL_REF}\` |"
+          echo "| Eval SHA | \`${EVAL_SHA}\` |"
+        } >> "$GITHUB_STEP_SUMMARY"

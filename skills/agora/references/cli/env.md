@@ -1,14 +1,24 @@
 # Agora CLI Project Environment Export
 
-<!-- applies-from: v0.2.0 -->
+<!-- applies-from: v0.2.1 -->
 
 Use this file when the user needs to export project credentials, write dotenv files, or explain the difference between generic project env and quickstart env commands.
 
-Verified against Agora CLI `0.2.0`.
+Verified against Agora CLI `0.2.1`.
+
+> **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) first. For official quickstarts, **`quickstart env write` is mandatory** — see warning below.
 
 `agora project env` is the CLI's primary generic project-environment export command. Official quickstart repos have a separate template-aware writer: `agora quickstart env write`.
 
-## Core Rule
+## Critical Agent Rule
+
+Using `agora project env write` on an official Python or Go quickstart writes **`AGORA_APP_ID`** to a generic dotenv path. Those samples read **`APP_ID`** from `server/.env` or `server-go/.env`. The backend starts with empty credentials.
+
+For official quickstarts, always use:
+
+```bash
+agora quickstart env write [repo-path]
+```
 
 Use:
 
@@ -74,7 +84,7 @@ Option rules:
 
 ## Project Env Variables
 
-The verified `0.2.0` project env export contract focuses on:
+The verified `0.2.1` project env export contract focuses on:
 
 - `AGORA_APP_ID`
 - `AGORA_APP_CERTIFICATE` only when `--with-secrets` is provided
@@ -116,13 +126,13 @@ Ask for explicit approval before running `--overwrite`, and state the target pat
 
 Do not use template files such as `.env.example`, `.env.sample`, or `.env.template` as write targets for real values or secrets.
 
-In `0.2.0`, `project env write` updates or creates repo-local `.agora/project.json` metadata and records detected `projectType` / `envPath` when missing.
+In `0.2.1`, `project env write` updates or creates repo-local `.agora/project.json` metadata and records detected `projectType` / `envPath` when missing.
 
 ## Quickstart Env Writing
 
 Official quickstarts use template-specific env names and file paths. Use [quickstarts.md](quickstarts.md) for the full flow.
 
-Verified `0.2.0` examples:
+Verified `0.2.1` examples:
 
 ```bash
 agora quickstart env write my-python-demo --project my-project
