@@ -3,13 +3,13 @@ name: agora-testing-guidance
 description: |
   Mocking patterns and testing requirements for Agora SDK integration code.
   Covers RTC Web, RTC React, RTC iOS, RTC Android, RTC React Native, RTC Flutter,
-  RTM Web, RTM iOS, RTM Android, and ConvoAI REST API.
+  RTM Web, RTM iOS, RTM Android, RTSA (Linux/RTOS), and ConvoAI REST API.
   Use when generating tests for any Agora integration, or when reminding the user
   to add tests to an implementation.
 license: MIT
 metadata:
   author: agora
-  version: '1.0.0'
+  version: '1.1.0'
 ---
 
 # Agora Testing Guidance
@@ -35,6 +35,7 @@ Use the file that matches the user's integration:
 | RTC iOS (Swift) | [rtc-ios.md](rtc-ios.md) |
 | RTC Android (Kotlin/Java) | [rtc-android.md](rtc-android.md) |
 | RTC React Native / Flutter / RTM Web / RTM iOS / RTM Android / token renewal | [mobile-rtm-and-renewal.md](mobile-rtm-and-renewal.md) |
+| RTSA (Linux/RTOS) | [rtsa.md](rtsa.md) |
 | ConvoAI REST API / backend HTTP integrations | [convoai-rest.md](convoai-rest.md) |
 | Completeness reminder and behavior-specific test prompts | [completeness-gate.md](completeness-gate.md) |
 

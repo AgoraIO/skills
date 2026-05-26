@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This repository contains AI agent skills for building with [Agora](https://www.agora.io) — covering RTC, RTM, Conversational AI, Agora CLI workflows, server-side tokens, and Cloud Recording.
+This repository contains AI agent skills for building with [Agora](https://www.agora.io) — covering RTC, RTM, RTSA, Conversational AI, Agora CLI workflows, server-side tokens, and Cloud Recording.
 
 ## Repository Structure
 
@@ -16,6 +16,7 @@ skills/
         ├── integration-patterns.md # RTC + RTM + ConvoAI coordination
         ├── cli/                    # Agora CLI: install, auth, init, quickstarts, env, doctor, automation
         ├── rtc/                    # RTC: Web, React, Next.js, iOS, Android, RN, Flutter
+        ├── rtsa/                   # RTSA: Linux/RTOS SDK for embedded systems
         ├── rtm/                    # RTM v2: Web, iOS, Android
         ├── conversational-ai/      # ConvoAI: REST, SDKs, toolkits, auth flow
         ├── server/                 # Token generation

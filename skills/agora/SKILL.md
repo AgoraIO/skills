@@ -5,7 +5,8 @@ description: >-
   live streaming, screen sharing, in-app messaging and presence, recording,
   token or auth flows, or use the `agora` CLI for login, quickstarts, env
   setup, diagnostics, introspection, skills, or MCP serving, especially when
-  integrating Agora into an app.
+  integrating Agora into an app. Also activate for RTSA (Real-Time Streaming
+  Acceleration) SDK on Linux/RTOS/embedded systems (ARM/AARCH64/MIPS/RISC-V).
 metadata:
   author: agora
   version: '1.7.0'
@@ -33,6 +34,8 @@ Top-level workflow for selecting the right Agora path and loading only the refer
   Route to **[references/rtc/README.md](references/rtc/README.md)**.
 - **RTM**: chat, signaling, presence, metadata, notifications inside the client
   Route to **[references/rtm/README.md](references/rtm/README.md)**.
+- **RTSA**: Linux/RTOS SDK, embedded systems, ARM/AARCH64/MIPS/RISC-V, server-side media, IoT devices
+  Route to **[references/rtsa/README.md](references/rtsa/README.md)**.
 - **ConvoAI**: AI assistant, voice bot, agent demo, provider choice, MLLM, Studio Agent ID, agent backend
   Route to **[references/conversational-ai/README.md](references/conversational-ai/README.md)**.
 - **ConvoAI + existing app**: user already has a codebase and wants ConvoAI added
@@ -56,6 +59,8 @@ For cross-product coordination as a primary question, use **[references/integrat
 - AI voice assistant → ConvoAI first; RTC client is expected, RTM is optional
 - AI voice assistant + chat history → ConvoAI first, then RTM and [references/integration-patterns.md](references/integration-patterns.md)
 - RTC recording → Cloud Recording first, then RTC if client details matter
+- RTSA + RTC/Web clients in same channel → RTSA first for server/embedded side, then RTC for client interop
+- RTSA + ConvoAI → RTSA first, enable `enable_audio_ai_qos` for optimized audio acceleration
 - test generation or review for Agora integration code → [references/testing-guidance/SKILL.md](references/testing-guidance/SKILL.md) after the product route is clear
 
 ## Ambiguity Handling
