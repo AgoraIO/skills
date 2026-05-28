@@ -22,10 +22,11 @@ Top-level workflow for selecting the right Agora path and loading only the refer
 1. Identify the user's primary goal from the problem they are solving.
 2. Choose exactly one primary route first: RTC, RTM, ConvoAI, CLI, Cloud Recording, Server, Server Gateway, or Cross-product coordination.
 3. Load only the primary product README first.
-4. If the task clearly spans multiple products, add the minimum supporting references after the primary route is chosen.
-5. If the request matches ConvoAI and there is no proven working baseline yet, stop and follow the quickstart path before generating custom code from memory or scaffolding a replacement app.
-6. Ask one short clarification only if the route is still ambiguous after checking the obvious cues below.
-7. Use Level 2 documentation lookup only when the local references do not cover the needed detail.
+4. When the ConvoAI route is chosen and read-only workspace detection finds outdated server SDK package or module names — or the user asks to migrate — load **[references/conversational-ai/server-sdk-rename.md](references/conversational-ai/server-sdk-rename.md)** before editing manifests or imports. Do not load it for greenfield ConvoAI work.
+5. If the task clearly spans multiple products, add the minimum supporting references after the primary route is chosen.
+6. If the request matches ConvoAI and there is no proven working baseline yet, stop and follow the quickstart path before generating custom code from memory or scaffolding a replacement app.
+7. Ask one short clarification only if the route is still ambiguous after checking the obvious cues below.
+8. Use Level 2 documentation lookup only when the local references do not cover the needed detail.
 
 ## Route Selection
 
