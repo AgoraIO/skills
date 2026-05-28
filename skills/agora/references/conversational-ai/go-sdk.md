@@ -3,8 +3,8 @@ name: agora-server-sdk-go
 description: |
   Go SDK for Agora Conversational AI server-side integration. Use when the user is
   building a Go backend to start/stop/manage ConvoAI agents. Triggers on:
-  agora-agent-server-sdk-go, agentkit Go, AgentSession Go, Go ConvoAI server,
-  context.Context agent, go get agora agent.
+  agora-agents-go, github.com/AgoraIO/agora-agents-go, agentkit Go,
+  AgentSession Go, Go ConvoAI server, context.Context agent, go get agora agent.
 license: MIT
 metadata:
   author: agora
@@ -15,14 +15,14 @@ metadata:
 
 Go SDK for managing Agora Conversational AI agents from a server-side application. Wraps the ConvoAI REST API.
 
-**Module:** `github.com/AgoraIO-Community/agora-agent-server-sdk-go`
+**Module:** `github.com/AgoraIO/agora-agents-go`
 **Minimum Go version:** 1.21
-**Repo:** <https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-go>
+**Repo:** <https://github.com/AgoraIO/agora-agents-go>
 
 ## Installation
 
 ```bash
-go get github.com/AgoraIO-Community/agora-agent-server-sdk-go
+go get github.com/AgoraIO/agora-agents-go
 ```
 
 ## Quick Start
@@ -36,7 +36,7 @@ import (
     "log"
     "time"
 
-    "github.com/AgoraIO-Community/agora-agent-server-sdk-go/agentkit"
+    "github.com/AgoraIO/agora-agents-go/agentkit"
 )
 
 func main() {

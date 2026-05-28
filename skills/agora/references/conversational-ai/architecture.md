@@ -132,7 +132,7 @@ See [auth-flow.md](auth-flow.md) and [../server/tokens.md](../server/tokens.md).
 
 ### Server SDK session states
 
-When using `agora-agent-server-sdk`, map platform lifecycle to SDK session states:
+When using `agora-agents`, map platform lifecycle to SDK session states:
 
 | SDK state           | Typical action                               |
 | ------------------- | -------------------------------------------- |

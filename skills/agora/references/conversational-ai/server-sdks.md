@@ -3,7 +3,7 @@ name: agora-convoai-server-sdks
 description: |
   Server-side SDKs for Agora Conversational AI: TypeScript, Python, and Go wrappers around the
   ConvoAI REST API. Use when the user is building a backend to start/stop/manage ConvoAI agents.
-  Triggers on: agora-agent-server-sdk, AgoraClient, AgentSession, session.start, session.stop,
+  Triggers on: agora-agents, AgoraClient, AgentSession, session.start, session.stop,
   agent server SDK, ConvoAI backend, ConvoAI server, withStt, withLlm, withTts.
 license: MIT
 metadata:
@@ -17,16 +17,16 @@ metadata:
 
 TypeScript, Go, and Python SDKs — convenience wrappers around the ConvoAI REST API. For any other backend language, call the REST API directly. Fetch the live OpenAPI spec for the full schema: `https://docs-md.agora.io/api/conversational-ai-api-v2.x.yaml`
 
-## TypeScript — `agora-agent-server-sdk`
+## TypeScript — `agora-agents`
 
 ```bash
-npm install agora-agent-server-sdk
+npm install agora-agents
 ```
 
 Builder pattern — configure the AI pipeline then create sessions:
 
 ```typescript
-import { AgoraClient, Agent, Area } from 'agora-agent-server-sdk';
+import { AgoraClient, Agent, Area } from 'agora-agents';
 
 const client = new AgoraClient({
   area: Area.US,

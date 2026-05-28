@@ -81,7 +81,7 @@ const rtmToken = RtmTokenBuilder.buildToken(
 Using App Credentials mode — the SDK generates the ConvoAI token automatically:
 
 ```typescript
-import { AgoraClient, Agent } from 'agora-agent-server-sdk';
+import { AgoraClient, Agent } from 'agora-agents';
 
 const client = new AgoraClient({
   appId: process.env.AGORA_APP_ID,

@@ -3,8 +3,8 @@ name: agora-server-sdk-python
 description: |
   Python SDK for Agora Conversational AI server-side integration. Use when the user is
   building a Python backend to start/stop/manage ConvoAI agents. Triggers on:
-  agora-agent Python, agent_server_sdk_python, AsyncAgora, AsyncAgentSession, pip install
-  agora-agent, Python ConvoAI server, agora_agent.
+  agora-agents Python, agent_server_sdk_python, AsyncAgora, AsyncAgentSession,
+  pip install agora-agents, Python ConvoAI server, agora_agent.
 license: MIT
 metadata:
   author: agora
@@ -15,15 +15,15 @@ metadata:
 
 Python SDK for managing Agora Conversational AI agents from a server-side application. Wraps the ConvoAI REST API.
 
-**Package:** `agora-agent`
+**Package:** `agora-agents`
 **Repo:** <https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-python>
 
 ## Installation
 
 ```bash
-pip install agora-agent
+pip install agora-agents
 # or with Poetry:
-poetry add agora-agent
+poetry add agora-agents
 ```
 
 ## Sync vs Async
