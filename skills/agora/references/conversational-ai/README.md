@@ -20,6 +20,7 @@ The key question: does the user already have a **working ConvoAI baseline**?
 | `quickstart` | New project, first demo, wants the official baseline, or has a cloned sample that is not proven end to end | [quickstarts.md](quickstarts.md) |
 | `integration` | Has an existing application or multi-project workspace and wants ConvoAI added | [quickstarts.md](quickstarts.md) to clone/inspect the official source, then [integration-from-quickstart.md](integration-from-quickstart.md) for app integration |
 | `backend-implementation` | Working baseline confirmed, now needs server code or lifecycle/auth changes | [server-sdks.md](server-sdks.md), [python-sdk.md](python-sdk.md), [go-sdk.md](go-sdk.md), or [auth-flow.md](auth-flow.md) |
+| `server-sdk-rename` | Existing project uses outdated server SDK package/module names, or user asks to migrate | [server-sdk-rename.md](server-sdk-rename.md) |
 | `client-customization` | Working baseline confirmed, now needs transcripts, hooks, UI, or mobile client work | [agent-toolkit.md](agent-toolkit.md), [agent-client-toolkit-react.md](agent-client-toolkit-react.md), [agent-ui-kit.md](agent-ui-kit.md), [agent-toolkit-ios.md](agent-toolkit-ios.md), [agent-toolkit-android.md](agent-toolkit-android.md) |
 | `studio-agent` | The user already has an Agora Studio Agent ID and wants to reuse that Studio-managed agent config | [quickstarts.md](quickstarts.md), then [conversational-ai-studio.md](conversational-ai-studio.md) |
 | `advanced-feature` / `debugging` / `ops-hardening` | Working baseline confirmed, wants custom LLM, memory, webhooks, production hardening, or error diagnosis | Start in this file, then route to the relevant reference below |
@@ -31,6 +32,7 @@ The key question: does the user already have a **working ConvoAI baseline**?
 - While quickstart is unresolved, do **not** generate `/join` payloads, propose a custom project structure, or jump straight into SDK code.
 - Existing RTC code, a checked-out repo, or a cloned quickstart is not enough to skip quickstart; the ConvoAI path must already work once.
 - If the user has an existing app, classify the request as `integration`: first clone or inspect the official quickstart as source, then use [integration-from-quickstart.md](integration-from-quickstart.md) to detect the app shape, produce a copy map, and adapt only the needed pieces. Runtime proof should happen before declaring the integration works, but the reason for the quickstart is source alignment, not proving Agora's sample exists.
+- Before generating server SDK install or import changes in an existing codebase, scan dependency manifests and import strings. If outdated server SDK names are present, load [server-sdk-rename.md](server-sdk-rename.md) first, apply the rename map, then continue in [server-sdks.md](server-sdks.md) / [python-sdk.md](python-sdk.md) / [go-sdk.md](go-sdk.md).
 - For `integration`, detect first and ask last: use session memory, then read-only workspace detection, then one focused question only if required. Do not re-ask for values the user already provided.
 - Follow the silent-by-default response contract and recovery rule from [../../SKILL.md](../../SKILL.md) and [quickstarts.md](quickstarts.md): check the baseline gate internally on every actionable reply, but show user-facing state only on first reply, gate flips, blocked actions, or status requests.
 - If the user explicitly says the baseline already works, skip quickstart and route directly to the relevant implementation file.
@@ -70,9 +72,9 @@ Important:
 
 | Backend language | Path |
 |---|---|
-| TypeScript / Node.js | `agora-agent-server-sdk` — see [server-sdks.md](server-sdks.md) |
-| Python | `agora-agent` — see [python-sdk.md](python-sdk.md) |
-| Go | `agora-agent-server-sdk-go` — see [go-sdk.md](go-sdk.md) |
+| TypeScript / Node.js | `agora-agents` — see [server-sdks.md](server-sdks.md) |
+| Python | `agora-agents` (import `agora_agent`) — see [python-sdk.md](python-sdk.md) |
+| Go | `github.com/AgoraIO/agora-agents-go` — see [go-sdk.md](go-sdk.md) |
 | Java, Ruby, PHP, C#, other | Call the REST API directly — see [auth-flow.md](auth-flow.md) |
 
 Direct REST API use is fully supported for languages without an SDK. The [auth-flow.md](auth-flow.md) file covers the end-to-end auth and token flow for REST API implementors. If the user has an SDK available, start with that instead — the SDK eliminates the need to manually build tokens for the ConvoAI server.

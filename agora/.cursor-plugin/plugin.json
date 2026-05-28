@@ -1,7 +1,7 @@
 {
   "name": "agora",
   "displayName": "Agora",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Official Agora workflows for voice AI, RTC, RTM, token generation, recording, and CLI onboarding.",
   "author": {
     "name": "Agora",
