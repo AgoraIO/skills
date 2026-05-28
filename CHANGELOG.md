@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-05-27
+
+### Added
+
+- `skills/agora/references/conversational-ai/server-sdk-rename.md`: opt-in migration reference for projects using outdated ConvoAI server SDK package names.
+
+### Changed
+
+- `skills/agora/SKILL.md` and `skills/agora/references/conversational-ai/README.md`: route existing projects with outdated server SDK package names through the migration reference before changing manifests or imports.
+- `skills/agora/references/conversational-ai/server-sdks.md`, `python-sdk.md`, `go-sdk.md`, `auth-flow.md`, and `architecture.md`: updated default ConvoAI server SDK references to `agora-agents` and `github.com/AgoraIO/agora-agents-go`.
+
 ## [1.7.0] - 2026-05-22
 
 ### Added
