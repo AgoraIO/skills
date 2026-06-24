@@ -1,8 +1,6 @@
 name: Skills Evaluation (Hermes Agent)
 
 on:
-  schedule:
-    - cron: '0 16 * * *'
   workflow_dispatch:
     inputs:
       suite_ids:
@@ -43,7 +41,7 @@ jobs:
       - name: Checkout skills repo
         uses: actions/checkout@v5
         with:
-          # PR: test the pushed branch head; dispatch/schedule: use the triggering ref
+          # PR: test the pushed branch head; dispatch: use the triggering ref
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: skills-repo
 
