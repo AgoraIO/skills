@@ -124,11 +124,11 @@ The skill files are plain markdown. Use `skills/agora/SKILL.md` as the entry poi
 
 ## Contributing
 
-See[ `CONTRIBUTING.md`](https://github.com/AgoraIO/skills/blob/feat/readme-and-description-rewrite/CONTRIBUTING.md).
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 ## About
 
-Powered by [Agora](agora.io)(agora.io) — the real-time engagement platform behind voice, video, messaging, and interactive AI experiences.
+Powered by [Agora](https://agora.io) — the real-time engagement platform behind voice, video, messaging, and interactive AI experiences.
 
 - Agora Documentation: [https://docs.agora.io/](https://docs.agora.io/)
 - Agora Console: [https://console.agora.io/](https://console.agora.io/)
