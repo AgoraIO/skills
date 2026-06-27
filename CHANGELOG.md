@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-06-26
+
+### Fixed
+
+- `.claude-plugin/mcp-config.json`: wrap server definition with `mcpServers` key and rename the server `agora-docs` → `agora-docs-mcp` so the Claude Code plugin loader registers it under the name referenced in `skills/agora/SKILL.md` and `skills/agora/references/mcp-tools.md`.
+- `.claude-plugin/marketplace.json`: align version with `plugin.json` and `skills/agora/SKILL.md` (1.7.0 → 1.8.1).
+- `README.md`: fix malformed "Powered by Agora" link and point Contributing at the in-repo `CONTRIBUTING.md` instead of a feature branch.
+
+### Changed
+
+- `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `skills/agora/SKILL.md`: bump version to 1.8.1 so anyone who installed 1.8.0 picks up the working `mcp-config.json`.
+- `skills/agora/references/mcp-tools.md`: update install command and remove the obsolete "configured here as `agora-docs`" caveat now that the server name matches.
+
 ## [1.8.0] - 2026-05-27
 
 ### Added
