@@ -1,6 +1,8 @@
 {
-  "agora-docs": {
-    "type": "http",
-    "url": "https://mcp.agora.io"
+  "mcpServers": {
+    "agora-docs-mcp": {
+      "type": "http",
+      "url": "https://mcp.agora.io"
+    }
   }
 }

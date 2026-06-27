@@ -2,8 +2,7 @@
 
 <!-- applies-from: v0.2.0 -->
 
-The Agora Docs MCP server (`agora-docs-mcp`, configured here as `agora-docs`)
-gives AI assistants direct tool-call access to Agora documentation. It is an
+The Agora Docs MCP server (`agora-docs-mcp`) gives AI assistants direct tool-call access to Agora documentation. It is an
 optional enhancement — the skill works without it using the two-tier fetch
 approach in [doc-fetching.md](doc-fetching.md).
 
@@ -32,7 +31,7 @@ directly when the URI is known.
 
 **Claude Code:**
 ```bash
-claude mcp add agora-docs --transport http https://mcp.agora.io
+claude mcp add agora-docs-mcp --transport http https://mcp.agora.io
 ```
 
 **Cursor / Windsurf / other MCP-compatible tools:** Add `https://mcp.agora.io` as
