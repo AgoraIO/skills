@@ -586,21 +586,21 @@ For each case:
 
 - User Input: "How do I install the Agora CLI and log in?"
 - Expected Behavior: Routes to the top-level CLI module rather than RTC / ConvoAI / intake
-- Pass Criteria: Uses the CLI references, recommends the `https://github.com/AgoraIO/cli` curl installer, names the installed `agora` command, mentions npm `agoraio-cli` only as a thin install wrapper path, and includes `agora login`
+- Pass Criteria: Uses the CLI references, recommends `curl -fsSL https://dl.agora.io/cli/install.sh | sh`, names the installed `agora` command, and includes `agora login`; does not recommend npm
 - Result: ___
 
 ### CLI-02: Deprecated preview package migration
 
 - User Input: "I still have agora-cli-preview installed. What should I do?"
 - Expected Behavior: Explains the stable package migration path
-- Pass Criteria: Tells the user not to use `agora-cli-preview`; routes to the current `agora` install path via the AgoraIO/cli installer or npm `agoraio-cli` wrapper; does not present the preview package as current
+- Pass Criteria: Tells the user not to use `agora-cli-preview`; routes to the current `agora` install path via the `dl.agora.io` installer; does not present the preview package as current; does not recommend `npm install -g agoraio-cli` as the replacement
 - Result: ___
 
 ### CLI-03: Version-aware minimum support
 
 - User Input: "What CLI version should I use for this skill?"
 - Expected Behavior: Anchors guidance on the verified minimum version
-- Pass Criteria: States that the skill is verified against CLI `0.2.1` with minimum supported `>=0.1.7`; does not hand-wave with "latest"
+- Pass Criteria: States Minimum CLI `0.2.1`, and that install/auth guidance was last verified against `0.2.7`; does not hand-wave with "latest"
 - Result: ___
 
 ### CLI-04: Project creation guidance stays within real command surface
@@ -760,8 +760,8 @@ For each case:
 ### CLI-26: Stuck on CLI 0.1.6 upgrade path
 
 - User Input: "agora version shows 0.1.6 and the skill says I need a newer CLI"
-- Expected Behavior: Runs CLI readiness: curl installer first, npm as alternate, PATH re-check; does not use `--add-to-path` or invented `--force`
-- Pass Criteria: Recommends `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh` first; mentions `npm install -g agoraio-cli` as alternate; re-verifies with `agora version` and `which -a agora`; does not rely on `agora upgrade` on 0.1.6
+- Expected Behavior: Runs CLI readiness: `dl.agora.io` curl installer, then PATH re-check; does not use `--add-to-path`, invented `--force`, or npm
+- Pass Criteria: Recommends `curl -fsSL https://dl.agora.io/cli/install.sh | sh`; re-verifies with `agora version` and `which -a agora`; does not offer `npm install -g agoraio-cli` as an alternate
 - Result: ___
 
 ### CLI-27: PATH shadowing after install
@@ -790,6 +790,20 @@ For each case:
 - User Input: "Should my GitHub Action run agora upgrade?"
 - Expected Behavior: Recommends non-mutating check in CI
 - Pass Criteria: Recommends `agora upgrade --check --json`; does not mutate the binary in CI unless `AGORA_ALLOW_UPGRADE_IN_CI=1` is explicitly justified
+- Result: ___
+
+### CLI-31: npm install path is declined
+
+- User Input: "Should I install the Agora CLI with npm?"
+- Expected Behavior: Declines npm and routes to the standalone installer
+- Pass Criteria: Does not recommend `npm install -g agoraio-cli`; states that the published npm package is stale at `0.1.6` and below Minimum CLI `0.2.1`; recommends `curl -fsSL https://dl.agora.io/cli/install.sh | sh`; if the user already has an npm-managed install, offers `--replace-npm` on macOS/Linux or `npm uninstall -g agoraio-cli` followed by the PowerShell installer on Windows
+- Result: ___
+
+### CLI-32: Region is detected, never asked
+
+- User Input: "Set up the Agora CLI for my project"
+- Expected Behavior: Completes login without interrogating the user about regions
+- Pass Criteria: Runs bare `agora login` when the repo has no `.agora/project.json` and no prior session region; does **not** ask the user to choose between `global` and `cn`; raises `--region` only when a repo binding, a prior session region, or a `PROJECT_REGION_MISMATCH` error indicates it. Scoped to *asking the user to choose* — a passing mention of regions is not a failure.
 - Result: ___
 
 ### C-15: RTM token subject and RTM login identity stay aligned
