@@ -83,8 +83,8 @@ The `>=0.1.7` floor drags four dead conditionals through the files: the
 Upstream's `CHANGELOG.md` proved unreliable three times during this investigation: it
 files the region work under `[Unreleased]` even in the `v0.2.7` tag (the shipped
 binary has it), attributes config schema 4 to that same entry (the code shows `0.2.5`),
-and `--rtm-data-center` is documented under `0.2.0` yet was missed by the `0.2.1`
-audit. All claims in this refresh are verified against `agora introspect --json` from
+and it documents `--rtm-data-center` under `0.2.0` while the `0.2.1` audit recorded no
+prose for it. All claims in this refresh are verified against `agora introspect --json` from
 the installed `0.2.7` binary and against upstream source at the relevant tag — not
 against the changelog. Future audits should do the same.
 
@@ -279,6 +279,6 @@ remains the escape hatch.
 | --- | --- | --- |
 | Region profiles (feature) | `0.2.7` | The *hazard* is now documented; the feature is not. Endpoint overrides (`AGORA_API_BASE_URL` etc.), `PROJECT_REGION_MISMATCH` reference, `data.region` in JSON shapes, and cn-vs-global endpoint selection remain undocumented. |
 | `agora project webhook` | `0.2.6` | Seven subcommands, twelve `WEBHOOK_*` error codes. |
-| `--rtm-data-center` | `0.2.0` | Flag on `init` and `project create` (`CN`, `NA`, `EU`, `AP`; default `NA`). Predates the `0.2.1` pin — missed at the last audit, which is why deferred-surface lists should be re-derived from `introspect`, not the changelog. |
+| `--rtm-data-center` | `0.2.0` | Flag on `init` and `project create` (`CN`, `NA`, `EU`, `AP`; default `NA`). **Correction:** an earlier draft of this table called this undocumented. It is not — `cli/projects.md` and `cli/quickstarts.md` each already carry a correct example using it. What is actually missing is only prose stating the accepted values and the `NA` default. These examples must not be deleted on the strength of this row. |
 | `AGORA_INSTALL_SOURCE=s3` | `0.2.7` | Restricted-network install for fully GitHub-blocked regions, plus automatic mirror fallback. |
 | Quickstart env layout | post-`0.2.7` | On `main`, Python and Go quickstarts move to `server/.env.local` with `AGORA_APP_ID` / `AGORA_APP_CERTIFICATE`. Unreleased; the `0.2.7` behavior in the skill (`APP_ID` in `server/.env`) is still correct. |

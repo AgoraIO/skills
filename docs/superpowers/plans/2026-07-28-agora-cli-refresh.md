@@ -18,7 +18,7 @@
 - **npm is not an `install path`.** `npm install -g agoraio-cli` and `npm update -g agoraio-cli` must not appear as instructions. Two exceptions are deliberate and required: the `npm uninstall -g` commands (removal, not installation) and the explanatory inline note in `install-auth.md`.
 - **State no config schema number.** Not `v3`, not `v4`, not `"version": 2`. The supported range spans schema 3 (`0.2.1`–`0.2.4`) and 4 (`0.2.5`+).
 - **Never instruct an agent to ask the user which region they want.** Region is resolved by *detect-don't-ask*.
-- **Do not document the deferred surface:** `project webhook`, region profiles as a feature, `--rtm-data-center`, `AGORA_INSTALL_SOURCE=s3`. The region *hazard* in `install-auth.md` is the single approved exception.
+- **Do not ADD documentation for the deferred surface:** `project webhook`, region profiles as a feature, `--rtm-data-center`, `AGORA_INSTALL_SOURCE=s3`. The region *hazard* in `install-auth.md` is the single approved exception. This constraint forbids writing *new* coverage of those features; it does **not** authorize deleting accurate documentation that already exists. `--rtm-data-center` in particular already appears in two correct examples (`cli/projects.md`, `cli/quickstarts.md`) — leave them.
 - **The `<!-- applies-from: vX -->` marker is a repo-wide convention** (also in `SKILL.md`, `mcp-tools.md`). It means "Minimum CLI" and stays at `v0.2.1` in all seven `references/cli/` files. Do not rename it. *Last verified* is carried in prose.
 - **Protected files** (per `CLAUDE.md`) must not be touched: `references/rtc/{web,react,ios,android}.md`, `references/rtm/web.md`.
 - **Every commit must leave `bash scripts/validate-skills.sh` passing.**
