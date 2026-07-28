@@ -4,7 +4,9 @@
 
 Use this file when the user needs to export project credentials, write dotenv files, or explain the difference between generic project env and quickstart env commands.
 
-Verified against Agora CLI `0.2.1`.
+Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
+
+> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
 
 > **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) first. For official quickstarts, **`quickstart env write` is mandatory** — see warning below.
 

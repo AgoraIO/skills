@@ -4,7 +4,9 @@
 
 Use this file when the user wants `agora init`, `agora quickstart ...`, or repo-local project binding for an official quickstart.
 
-Verified against Agora CLI `0.2.1`.
+Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
+
+> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
 
 > **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any command here.
 
@@ -37,7 +39,7 @@ agora init my-python-demo --template python
 agora init my-go-demo --template go
 agora init my-demo --template python --project my-existing-project
 agora init my-demo --template python --new-project
-agora init my-rtm-demo --template nextjs --new-project --feature rtc --feature rtm --rtm-data-center AP
+agora init my-rtm-demo --template nextjs --new-project --feature rtc --feature rtm
 agora init my-app --template nextjs --add-agent-rules cursor
 ```
 
@@ -113,5 +115,5 @@ Use [env.md](env.md) for generic `agora project env` and `agora project env writ
 - Prefer `agora quickstart env write ... --json` when seeding or re-syncing official quickstart repos.
 - Do not substitute manual `git clone` until `init` / `quickstart create` fails with a documented error code and recovery is exhausted.
 - Use `agora project doctor --json` after binding to check control-plane readiness, but do not treat it as proof that the sample can run end to end.
-- Use `agora doctor --json` when available (`0.2.0+`) and the failure looks local to the CLI install rather than to the project.
+- Use `agora doctor --json` when the failure looks local to the CLI install rather than to the project.
 - Use `agora` in user-facing commands for an installed CLI. Use `./agora` only when running a local binary built from the CLI repository.

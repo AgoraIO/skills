@@ -4,7 +4,9 @@
 
 Use this file when the user needs to create, select, inspect, or feature-enable Agora projects from the CLI.
 
-Verified against Agora CLI `0.2.1`.
+Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
+
+> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
 
 ## Core Workflow
 
@@ -27,7 +29,6 @@ agora project list --refresh-cache
 agora project create <name> [--region global|cn] [--template voice-agent] [--feature rtc|rtm|convoai]
 agora project create <name> --dry-run
 agora project create <name> --idempotency-key <key>
-agora project create <name> --rtm-data-center EU
 ```
 
 For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow. Omitted `--feature` defaults to `rtc`, `rtm`, and `convoai`, and `convoai` implies `rtm`.
