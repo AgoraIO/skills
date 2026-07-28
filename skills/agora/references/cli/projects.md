@@ -29,6 +29,7 @@ agora project list --refresh-cache
 agora project create <name> [--region global|cn] [--template voice-agent] [--feature rtc|rtm|convoai]
 agora project create <name> --dry-run
 agora project create <name> --idempotency-key <key>
+agora project create <name> --rtm-data-center EU
 ```
 
 For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow. Omitted `--feature` defaults to `rtc`, `rtm`, and `convoai`, and `convoai` implies `rtm`.

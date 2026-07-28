@@ -39,7 +39,7 @@ agora init my-python-demo --template python
 agora init my-go-demo --template go
 agora init my-demo --template python --project my-existing-project
 agora init my-demo --template python --new-project
-agora init my-rtm-demo --template nextjs --new-project --feature rtc --feature rtm
+agora init my-rtm-demo --template nextjs --new-project --feature rtc --feature rtm --rtm-data-center AP
 agora init my-app --template nextjs --add-agent-rules cursor
 ```
 
