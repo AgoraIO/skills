@@ -48,10 +48,10 @@ npx skills add github:AgoraIO/skills
 ### Agora CLI (for local onboarding)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh
+curl -fsSL https://dl.agora.io/cli/install.sh | sh
 ```
 
-The npm path, `npm install -g agoraio-cli`, is also supported as an install wrapper for the same Go-based `agora` command when Node.js 18+ is available.
+The installer is served from the Agora CDN, so it works in networks where GitHub is blocked. On Windows, use `irm https://dl.agora.io/cli/install.ps1 | iex`.
 
 ### Claude Code Plugin
 
