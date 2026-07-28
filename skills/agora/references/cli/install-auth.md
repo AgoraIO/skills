@@ -6,7 +6,7 @@ Use this file when the user needs to install the Agora CLI, authenticate, or ver
 
 Last verified against Agora CLI `0.2.7`. Minimum CLI `0.2.1`.
 
-> **Agents:** start with the read-only **CLI readiness** probe in [README.md](README.md). Installers and global npm installs are allowed only as readiness remediation after user approval. That section is the single source of truth for version gates, curl-first upgrade, PATH recovery, and config mismatch errors.
+> **Agents:** start with the read-only **CLI readiness** probe in [README.md](README.md). Installers are allowed only as readiness remediation after user approval. That section is the single source of truth for version gates, curl-first upgrade, PATH recovery, and config mismatch errors.
 
 ## Install
 
@@ -81,7 +81,7 @@ npm uninstall -g agora-cli-preview
 curl -fsSL https://dl.agora.io/cli/install.sh | sh
 ```
 
-For pinned versions, uninstall, custom install directories, Windows details, npm details, or source builds, use the upstream install docs in <https://github.com/AgoraIO/cli>.
+For pinned versions, uninstall, custom install directories, Windows details, or source builds, use the upstream install docs in <https://github.com/AgoraIO/cli>.
 
 > ⚠️ Removed in v0.2.0: the `--add-to-path` installer flag. Use `curl -fsSL https://dl.agora.io/cli/install.sh | sh` instead; PATH wiring is on by default.
 
