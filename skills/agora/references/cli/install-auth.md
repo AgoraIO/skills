@@ -10,7 +10,7 @@ Last verified against Agora CLI `0.2.7`. Minimum CLI `0.2.1`.
 
 ## Install
 
-Ask for user approval before running installers, global package installs, shell-profile updates, or package removal commands.
+Ask for user approval before running installers, shell-profile updates, or package removal commands.
 
 ## Version Gate and Upgrade
 
