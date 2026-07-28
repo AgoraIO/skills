@@ -44,7 +44,7 @@ irm https://dl.agora.io/cli/install.ps1 | iex
 
 npm `agoraio-cli` is **not** a current install path. Never recommend it for install or upgrade.
 
-Surface the migration below **only when detection shows an npm-managed install** — the readiness gate already runs `which -a agora`; if the resolved binary sits under `npm prefix -g`, it is npm-managed. Otherwise this section does not apply and should not be mentioned.
+Surface the migration below **only when detection shows an npm-managed install** — the readiness gate already runs `which -a agora`; if the resolved binary sits under `npm prefix -g`, it is npm-managed. If npm is not installed on the machine, the install cannot be npm-managed — skip this check. Otherwise this section does not apply and should not be mentioned.
 
 macOS / Linux:
 
@@ -113,8 +113,8 @@ If browser auto-open fails, use `agora login --no-browser` so the CLI prints a U
 
 `agora login` without `--region` sets the active region to `global` and discards the previous project context. Resolve the region from state:
 
-1. If `.agora/project.json` records a `region`, pass it: `agora login --region <region>`
-2. Otherwise, if a prior session recorded `data.region` via `agora auth status --json`, preserve it
+1. If `.agora/project.json` records a **non-empty** `region`, pass it: `agora login --region <region>`. An empty `region` value means "no opinion" — do not pass `--region ""`; the flag only accepts `global` or `cn` and rejects an empty string.
+2. Otherwise, if a prior session recorded `data.region` via `agora auth status --json`, preserve it by passing that value the same way: `agora login --region <region>`
 3. Otherwise run bare `agora login` — `global` is correct for the large majority
 
 Never prompt the user to choose a region. If the CLI returns `PROJECT_REGION_MISMATCH`, its error names both regions and the exact command to run — follow that.

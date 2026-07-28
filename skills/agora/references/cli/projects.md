@@ -8,6 +8,8 @@ Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
 
 > Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
 
+> **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any command here.
+
 ## Core Workflow
 
 Use `agora init` for the fastest end-to-end demo setup. Use low-level project commands when the workflow must be decomposed:

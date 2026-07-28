@@ -76,6 +76,8 @@ Verified in CLI `0.2.1`:
 - telemetry group: `telemetry status`, `telemetry enable`, `telemetry disable`
 - upgrade aliases: `agora update`, `agora self-update`
 
+This list was compiled at CLI `0.2.1` and is not exhaustive of later releases: `0.2.6` added a `project webhook` command group that is not enumerated here. `agora introspect --json` is authoritative for the live command tree — treat it as the source of truth before telling a user a command doesn't exist.
+
 For agents, `agora introspect --json` is the preferred way to discover the current command tree programmatically. `agora --help --all` is the human-readable equivalent.
 
 If the user asks for a command outside this surface, do not invent it. Route them to the closest real command or say it is not part of the verified CLI. For example, `agora convoai init` and `agora project doctor all` are still not verified commands; use `agora init`, `agora quickstart ...`, or `agora project doctor --feature convoai` instead.
@@ -100,9 +102,11 @@ Run `agora doctor --json` after the read-only probe. It is available in every su
 
 **Upgrade order** (ask for user approval before running installers):
 
-1. **Preferred:** `curl -fsSL https://dl.agora.io/cli/install.sh | sh`
-   - Never use `--add-to-path` (removed in 0.2.0) or invent `--force` flags.
-2. **Confirm:** `agora version` shows `>=0.2.1`, then run `agora doctor --json` before continuing.
+1. **Preferred (macOS / Linux):** `curl -fsSL https://dl.agora.io/cli/install.sh | sh`
+   **Preferred (Windows PowerShell):** `irm https://dl.agora.io/cli/install.ps1 | iex`
+   - `--add-to-path` was removed in 0.2.0 — do not use it. `--force` / `-Force` do exist, but they install alongside a managed install and create PATH shadowing; do not use them to bypass a refusal.
+2. **npm-managed installs:** if `which -a agora` (or `where.exe agora`) resolves the binary under `npm prefix -g`, the standalone installer refuses with exit `7` and suggests `npm update -g agoraio-cli` — do not follow that suggestion, it resolves to the stale `0.1.6`, below Minimum CLI. Do not pass `--force`/`-Force` to override the refusal either. See [install-auth.md](install-auth.md#npm-managed-installs) for the platform-specific migration commands.
+3. **Confirm:** `agora version` shows `>=0.2.1`, then run `agora doctor --json` before continuing.
 
 ### 3. PATH shadowing
 
@@ -114,7 +118,7 @@ which -a agora
 
 Run the shell-specific PATH fix printed by `agora doctor`, or reorder PATH so the new install directory wins. Do not continue agent workflows until the probed version matches.
 
-Do not uninstall binaries automatically. If an old `agora` binary still shadows the new install after PATH recovery, ask for user approval before removing it. For installer-managed installs, use the upstream uninstall path (`install.sh --uninstall` / `install.ps1 -Uninstall`); otherwise remove or rename only the specific stale binary the user approves.
+Do not uninstall binaries automatically. If an old `agora` binary still shadows the new install after PATH recovery, ask for user approval before removing it. For installer-managed installs, use the upstream uninstall path (`install.sh --uninstall` / `install.ps1 -Uninstall`). For npm-managed installs, remove with `npm uninstall -g agoraio-cli`, or migrate in place with `--replace-npm` (see [install-auth.md](install-auth.md#npm-managed-installs)) — do not delete an npm-managed binary by hand. Otherwise remove or rename only the specific stale binary the user approves.
 
 ### 4. Config schema mismatch
 

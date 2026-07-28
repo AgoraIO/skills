@@ -782,7 +782,7 @@ For each case:
 
 - User Input: "agora project use fails: Config version 3 is newer than this CLI supports"
 - Expected Behavior: Explains old binary vs newer config and routes through CLI upgrade
-- Pass Criteria: Recommends upgrading the CLI via CLI readiness (curl install first); mentions 0.2.0+ auto-migrates config v3; does not tell the user to manually edit config as the first fix
+- Pass Criteria: Recognizes the `Config version N is newer than this CLI supports` error as caused by an old `agora` binary on PATH reading a config file written by a newer CLI; recommends resolving it by upgrading through the CLI readiness flow (curl install first); treats hand-editing the config file as a last resort only after backing it up; does not name a specific config schema version number
 - Result: ___
 
 ### CLI-30: Upgrade in CI stays non-mutating
