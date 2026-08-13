@@ -35,6 +35,7 @@ jobs:
       - name: Setup eval harness
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
+          eval_repo: littleDogWang/agentic-evals
           eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Install Codex CLI
@@ -75,8 +76,8 @@ jobs:
       - name: Run Codex judge with stream-safe retry
         id: run_judge
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.TEST_RESPONSES_API_ENDPOINT }}
           MODEL: gpt-5.4
         run: |
           set -e

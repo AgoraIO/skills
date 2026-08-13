@@ -12,7 +12,7 @@ on:
         required: false
         default: "convoai-e2e-first-success"
       hermes_model:
-        description: "Hermes model (e.g. openai/gpt-4o)"
+        description: "Hermes model (e.g. gpt-5.4)"
         required: false
         default: ""
       eval_ref:
@@ -48,7 +48,9 @@ jobs:
       - name: Setup eval harness
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
-          eval_ref: ${{ github.event.inputs.eval_ref || '' }}
+          # Temporary fork pin for validating expanded Hermes runtime diagnostics.
+          eval_repo: littleDogWang/agentic-evals
+          eval_ref: ${{ github.event.inputs.eval_ref || 'fd1a5ae10ddbb53cc55e311079ca108ee23d36d4' }}
 
       - name: Validate YAML
         working-directory: agentic-evals
@@ -78,7 +80,11 @@ jobs:
       - name: Install runtime dependencies
         run: |
           pip install pyyaml
-          npm install -g agent-browser @openai/codex
+          npm install -g --allow-scripts=agent-browser agent-browser @openai/codex
+          agent-browser install
+          agent-browser --version
+          agent-browser --session hermes-preflight open about:blank
+          agent-browser --session hermes-preflight close
 
       - name: Install Hermes Agent
         run: |
@@ -89,8 +95,8 @@ jobs:
 
       - name: Configure Hermes
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.TEST_RESPONSES_API_ENDPOINT }}
           HERMES_MODEL: ${{ github.event.inputs.hermes_model || '' }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
@@ -109,12 +115,17 @@ jobs:
           BASE_URL="${BASE_URL%/}/v1"
 
           # Determine model
-          MODEL="${HERMES_MODEL:-openai/gpt-4o}"
+          MODEL="${HERMES_MODEL:-gpt-5.4}"
 
-          # Configure via hermes config set (proven working approach)
-          hermes config set model.provider custom
-          hermes config set model.base_url "${BASE_URL}"
-          hermes config set model.model "${MODEL}"
+          # Use a named custom provider so Hermes sends the API key to the
+          # non-OpenAI endpoint and uses the Responses API transport.
+          hermes config set providers.test-endpoint.name test-endpoint
+          hermes config set providers.test-endpoint.base_url "${BASE_URL}"
+          hermes config set providers.test-endpoint.key_env OPENAI_API_KEY
+          hermes config set providers.test-endpoint.transport codex_responses
+          hermes config set providers.test-endpoint.default_model "${MODEL}"
+          hermes config set model.provider custom:test-endpoint
+          hermes config set model.default "${MODEL}"
           hermes config set agent.max_turns 90
           hermes config set tools.profile coding
           hermes config set terminal.backend local
@@ -122,11 +133,11 @@ jobs:
           # Write .env for API key
           echo "OPENAI_API_KEY=${OPENAI_API_KEY}" > ~/.hermes/.env
 
-          echo "Hermes configured: provider=custom, base_url=${BASE_URL}, model=${MODEL}"
+          echo "Hermes configured: provider=custom:test-endpoint, base_url=${BASE_URL}, model=${MODEL}"
 
       - name: Hermes auth smoke test
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
         run: |
           set -e
           if hermes run --max-turns 1 "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
@@ -197,12 +208,13 @@ jobs:
       - name: Run two-phase evaluation
         working-directory: agentic-evals
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.TEST_RESPONSES_API_ENDPOINT }}
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
           AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
           HERMES_MODEL: ${{ github.event.inputs.hermes_model || '' }}
+          AGENT_BROWSER_DEBUG: "1"
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           source /tmp/agora-credentials.env

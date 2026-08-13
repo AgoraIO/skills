@@ -210,11 +210,11 @@ Exit code alone does not determine whether to proceed. Read command output and m
 
 ### Node/TS baseline (`agent-quickstart-nextjs`)
 
-After `pnpm install`:
+After `pnpm install` reports `[ERR_PNPM_IGNORED_BUILDS]`:
 
-- **`[ERR_PNPM_IGNORED_BUILDS]`** is not a blocking error. The sample's dev script uses `next dev --webpack` explicitly — esbuild, sharp, and unrs-resolver build scripts are not required for the dev path. If packages were added and the only non-zero exit is this warning, proceed directly to `pnpm dev`.
-- If `pnpm dev` re-runs an install check and prints the same ignored-builds warning, treat that as non-blocking too — run the README `pnpm dev` again or start the documented dev script from the quickstart directory. Do not stop before a dev server is listening.
-- Do not run `pnpm approve-builds`, `pnpm config set onlyBuiltDependencies`, `pnpm dev --ignore-scripts`, edit `package.json` with pnpm config fields, create `pnpm.yaml`, or change global pnpm build-approval settings to resolve this warning during first-success setup.
+- Run the documented `pnpm dev` once. The warning is non-blocking only if that command starts Next.js and a real GET of the local URL returns a non-empty successful response.
+- If `pnpm dev` exits before Next.js starts with the same ignored-builds error, use the sample's npm scripts without changing the quickstart's tracked configuration: `npm install --package-lock=false`, then `npm run dev`. This installs the required dependency scripts but does not create `package-lock.json`, `pnpm-workspace.yaml`, or `pnpm.yaml`.
+- Do not run `pnpm approve-builds`, set pnpm build-approval configuration, add pnpm configuration to `package.json`, or create `pnpm-workspace.yaml` / `pnpm.yaml`.
 
 ## Command Integrity Under Environment Restrictions
 
@@ -250,10 +250,7 @@ Do **not** reinterpret these failures as sample misconfiguration and do **not** 
 
 ### Install warnings (Node/TS baseline)
 
-When `pnpm install` exits non-zero:
-
-- If the output is caused solely by `[ERR_PNPM_IGNORED_BUILDS]`, classify it as a **warning**, not a failure. Continue to the next documented command (`pnpm dev`). Do not attempt to resolve it before starting the app.
-- Do not treat this warning as sample misconfiguration or as proof that dependencies failed to install.
+When `pnpm install` exits non-zero only for `[ERR_PNPM_IGNORED_BUILDS]`, packages may still be linked but required lifecycle scripts have not run. Start with `pnpm dev` and verify the page with a real GET. If that command exits before Next.js starts for the same reason, use the npm fallback in [Known Non-Blocking Warnings](#known-non-blocking-warnings). Do not describe the sample as ready until the page is actually reachable.
 
 ## First-Success Readiness Layers
 
@@ -553,7 +550,7 @@ Run these commands in order. Use `--json` where available so you can parse the o
 
 7. **Sample-ready gate**
    - Install dependencies and start the official sample using the documented commands.
-   - If `pnpm install` exits non-zero with only `[ERR_PNPM_IGNORED_BUILDS]`, treat install as complete and continue to `pnpm dev` — see [Known Non-Blocking Warnings](#known-non-blocking-warnings).
+   - If `pnpm install` exits non-zero with only `[ERR_PNPM_IGNORED_BUILDS]`, try `pnpm dev` once. If it exits before Next.js starts for the same reason, use the no-lockfile npm fallback in [Known Non-Blocking Warnings](#known-non-blocking-warnings).
    - The quickstart is only fully ready when the app opens, the user can press `Try it now`, the agent joins, and the frontend stays up.
    - If a failure is localized to the official sample itself rather than the environment or project readiness, a minimal upstream-shaped workaround is allowed. Do not replace the sample with a self-built implementation.
 

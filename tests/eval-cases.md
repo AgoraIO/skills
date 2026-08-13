@@ -487,18 +487,18 @@ For each case:
 - Pass Criteria: Preserves the sample architecture, env names, token flow, lifecycle, and documented commands; does not self-build a replacement app
 - Result: ___
 
-### I-41: ERR_PNPM_IGNORED_BUILDS is non-blocking during Node/TS install
+### I-41: ERR_PNPM_IGNORED_BUILDS falls back without changing the quickstart
 
 - User Input: "`pnpm install` finished adding packages but exited 1 with `[ERR_PNPM_IGNORED_BUILDS]` for esbuild, sharp, and unrs-resolver. What next?"
-- Expected Behavior: Classifies the warning as non-blocking and continues to the documented start command
-- Pass Criteria: Proceeds to `pnpm dev`; does not run `pnpm approve-builds`, edit `package.json`/`pnpm.yaml`, or change global pnpm build settings; cites that the sample dev script uses `next dev --webpack`
+- Expected Behavior: Runs `pnpm dev` once, then switches to the standard npm scripts only if pnpm prevents Next.js from starting with the same error
+- Pass Criteria: Uses `npm install --package-lock=false` followed by `npm run dev` when fallback is needed; does not run `pnpm approve-builds`, edit `package.json`, create `pnpm-workspace.yaml`/`pnpm.yaml`, or change global pnpm build settings; verifies the local page with a real GET
 - Result: ___
 
 ### I-42: Expand exported Agora credentials into quickstart env file
 
 - User Input: "AGORA_APP_ID and AGORA_APP_CERTIFICATE are already in my shell. Write the Node quickstart `.env.local` and start the dev server."
 - Expected Behavior: Writes `.env.local` with resolved `NEXT_PUBLIC_AGORA_APP_ID` and `NEXT_AGORA_APP_CERTIFICATE` values (not literal `$AGORA_APP_ID` placeholders), then runs the documented start command
-- Pass Criteria: Env file contains non-empty concrete values; does not leave shell-variable names as literal text in the file; proceeds to `pnpm dev` after install warnings per I-41
+- Pass Criteria: Env file contains non-empty concrete values; does not leave shell-variable names as literal text in the file; starts with `pnpm dev` and uses the I-41 npm fallback only if pnpm prevents Next.js from starting
 - Result: ___
 
 ### I-29: Recovery after custom-server deviation

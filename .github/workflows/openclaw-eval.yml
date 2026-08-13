@@ -50,7 +50,8 @@ jobs:
       - name: Setup eval harness
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
-          eval_ref: ${{ github.event.inputs.eval_ref || '' }}
+          eval_repo: littleDogWang/agentic-evals
+          eval_ref: fd1a5ae10ddbb53cc55e311079ca108ee23d36d4
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -67,8 +68,8 @@ jobs:
 
       - name: Configure OpenClaw
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.TEST_RESPONSES_API_ENDPOINT }}
         run: |
           mkdir -p ~/.openclaw/agents/main/sessions
           GATEWAY_TOKEN=$(openssl rand -hex 24)
@@ -189,8 +190,8 @@ jobs:
       - name: Run two-phase evaluation
         working-directory: agentic-evals
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.TEST_RESPONSES_API_ENDPOINT }}
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
           AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}

@@ -46,6 +46,7 @@ jobs:
       - name: Setup eval harness
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
+          eval_repo: littleDogWang/agentic-evals
           eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Setup Python
@@ -113,7 +114,9 @@ jobs:
         working-directory: agentic-evals
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GOOGLE_GEMINI_BASE_URL: ${{ secrets.GOOGLE_GEMINI_BASE_URL }}
+          GEMINI_CLI_TRUST_WORKSPACE: "true"
+          # The latest Gemini CLI rejects Gateway auth before making a request.
+          # Without GOOGLE_GEMINI_BASE_URL it uses the supported Gemini API path.
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
           AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}

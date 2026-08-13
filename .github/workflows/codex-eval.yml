@@ -47,6 +47,7 @@ jobs:
       - name: Setup eval harness
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
+          eval_repo: littleDogWang/agentic-evals
           eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Validate YAML
@@ -69,7 +70,10 @@ jobs:
       - name: Install runtime dependencies
         run: |
           pip install pyyaml
-          npm install -g agent-browser @openai/codex
+          npm install -g --allow-scripts=agent-browser agent-browser @openai/codex
+          agent-browser install
+          agent-browser --version
+          codex --version
 
       - name: Write credentials file
         env:
@@ -104,6 +108,9 @@ jobs:
           Key rules:
           - Use spawn_agent with fork_context: false for each case.
           - Do NOT use codex exec as a substitute for per-case execution.
+          - agent-browser and its Chrome runtime are installed. For browser assertions,
+            invoke the agent-browser CLI through shell commands; do not infer that browser
+            verification is unavailable only because it is not exposed as a native tool.
           - Create isolated workspaces via the helper script:
             bash .agents/skills/skills-evaluation/scripts/create_case_workspace.sh
           - Collect evidence from ~/.codex/sessions/ after each sub-agent completes.
@@ -154,16 +161,13 @@ jobs:
         env:
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
           AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
+          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.TEST_RESPONSES_API_ENDPOINT }}
           MODEL: ${{ github.event.inputs.model || 'gpt-5.4' }}
         run: |
           set -e
 
-          run_codex_once() {
-            local attempt="$1"
-            local log_file="$2"
-            local output_file="$3"
+          configure_codex() {
             mkdir -p "$HOME/.codex"
             base_url="${RESPONSES_API_ENDPOINT%/responses}"
             base_url="${base_url%/}/v1"
@@ -171,6 +175,13 @@ jobs:
           model_provider = "OpenAI"
           model = "${MODEL}"
           disable_response_storage = true
+
+          [features]
+          multi_agent = true
+          multi_agent_v2 = true
+
+          [agents]
+          enabled = true
 
           [model_providers.OpenAI]
           name = "OpenAI"
@@ -183,8 +194,39 @@ jobs:
           {"auth_mode":"apikey","OPENAI_API_KEY":"${OPENAI_API_KEY}"}
           EOF
             fi
+          }
 
-            codex exec --skip-git-repo-check --sandbox danger-full-access \
+          configure_codex
+          codex --version
+          codex features list --enable multi_agent --enable multi_agent_v2 | \
+            grep -E '^multi_agent(_v2)?[[:space:]]+stable[[:space:]]+true$'
+
+          preflight_marker="/tmp/codex-subagent-preflight.marker"
+          preflight_output="/tmp/codex-subagent-preflight.md"
+          preflight_child_marker="/tmp/codex-subagent-preflight-child.marker"
+          : > "$preflight_marker"
+          : > "$preflight_output"
+          : > "$preflight_child_marker"
+          cat > /tmp/codex-subagent-preflight.txt << 'HEREDOC'
+          Use spawn_agent with fork_context: false to start one fresh child agent.
+          Ask the child to overwrite /tmp/codex-subagent-preflight-child.marker with exactly: SUBAGENT_CHILD_EXECUTED
+          Then ask the child to reply exactly: SUBAGENT_PREFLIGHT_OK
+          Wait for the child to finish, then reply exactly: SUBAGENT_PREFLIGHT_OK
+          HEREDOC
+          codex exec --enable multi_agent --enable multi_agent_v2 \
+            --skip-git-repo-check --sandbox danger-full-access \
+            --output-last-message "$preflight_output" < /tmp/codex-subagent-preflight.txt
+          grep -qx 'SUBAGENT_PREFLIGHT_OK' "$preflight_output"
+          grep -qx 'SUBAGENT_CHILD_EXECUTED' "$preflight_child_marker"
+          find "$HOME/.codex/sessions" -type f -name '*.jsonl' -newer "$preflight_marker" \
+            -exec grep -l 'subagent' {} + | grep -q .
+
+          run_codex_once() {
+            local attempt="$1"
+            local log_file="$2"
+            local output_file="$3"
+            codex exec --enable multi_agent --enable multi_agent_v2 \
+              --skip-git-repo-check --sandbox danger-full-access \
               --output-last-message "${output_file}" < /tmp/eval-prompt.txt \
               > "${log_file}" 2>&1
           }
