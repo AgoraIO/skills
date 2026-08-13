@@ -28,11 +28,19 @@ agora project list --refresh-cache
 ### Create
 
 ```bash
-agora project create <name> [--region global|cn] [--template voice-agent] [--feature rtc|rtm|convoai]
+agora project create <name> [--template voice-agent] [--feature rtc|rtm|convoai]
 agora project create <name> --dry-run
 agora project create <name> --idempotency-key <key>
 agora project create <name> --rtm-data-center EU
 ```
+
+Project creation uses the active login region. Resolve the region using the
+login flow in [install-auth.md](install-auth.md); do not ask the user to choose
+a region. When repository or session state indicates a non-default region, run
+`agora login --region <region>` before `agora project create`.
+
+CLI `0.2.1` accepted `--region` directly on `project create`, but later releases
+removed that flag. Do not pass `--region` to `project create`.
 
 For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow. Omitted `--feature` defaults to `rtc`, `rtm`, and `convoai`, and `convoai` implies `rtm`.
 
