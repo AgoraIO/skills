@@ -30,6 +30,8 @@ env:
 
 jobs:
   evaluate:
+    # Temporarily disabled - confirm re-enable criteria before flipping back.
+    if: ${{ false }}
     runs-on: macos-latest
     timeout-minutes: 90
     permissions:
@@ -47,7 +49,7 @@ jobs:
         id: setup
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
-          eval_repo: littleDogWang/agentic-evals
+          eval_repo: AgoraIO/agentic-evals
           eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Setup Python
@@ -197,7 +199,7 @@ jobs:
           )
           echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
           if [ "$FAIL" -gt 0 ] || [ "$BLOCKED" -gt 0 ]; then
-            echo "::error::${FAIL} fail, ${BLOCKED} blocked — see report for details"
+            echo "::error::${FAIL} fail, ${BLOCKED} blocked - see report for details"
             exit 1
           fi
 

@@ -49,7 +49,7 @@ jobs:
         id: setup
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
-          eval_repo: littleDogWang/agentic-evals
+          eval_repo: AgoraIO/agentic-evals
           eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Validate YAML
@@ -91,12 +91,12 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup
           source ~/.bashrc || source ~/.zshrc || true
           export PATH="$HOME/.local/bin:$PATH"
-          hermes version
+          hermes --version
 
       - name: Configure Hermes
         env:
-          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
-          RESPONSES_API_ENDPOINT: ${{ secrets.TEST_RESPONSES_API_ENDPOINT }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
           HERMES_MODEL: ${{ github.event.inputs.hermes_model || '' }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
@@ -137,20 +137,39 @@ jobs:
 
       - name: Hermes auth smoke test
         env:
-          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           set -e
-          if hermes run --max-turns 1 "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
-            echo "Hermes smoke test passed via hermes run."
-          elif hermes chat --yolo --quiet -q "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
-            echo "Hermes smoke test passed via hermes chat."
-          else
-            echo "::error::Hermes auth smoke test failed. Confirm RESPONSES_API_ENDPOINT and OPENAI_API_KEY are valid."
-            cat /tmp/hermes-smoke.log
-            exit 1
-          fi
-          if grep -q "INVALID_API_KEY" /tmp/hermes-smoke.log; then
-            echo "::error::Hermes returned INVALID_API_KEY during smoke test."
+          smoke_passed=0
+          for attempt in 1 2 3; do
+            if hermes run --max-turns 1 "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
+              echo "Hermes smoke test passed via hermes run."
+              smoke_passed=1
+              break
+            elif hermes chat --yolo --quiet -q "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
+              echo "Hermes smoke test passed via hermes chat."
+              smoke_passed=1
+              break
+            fi
+
+            if grep -q "INVALID_API_KEY" /tmp/hermes-smoke.log; then
+              echo "::error::Hermes returned INVALID_API_KEY during smoke test."
+              cat /tmp/hermes-smoke.log
+              exit 1
+            fi
+            if ! grep -q "HTTP 503" /tmp/hermes-smoke.log; then
+              echo "::error::Hermes auth smoke test failed. Confirm RESPONSES_API_ENDPOINT and OPENAI_API_KEY are valid."
+              cat /tmp/hermes-smoke.log
+              exit 1
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "::warning::Hermes provider returned HTTP 503; retrying smoke test (${attempt}/3)."
+              sleep 15
+            fi
+          done
+
+          if [ "$smoke_passed" -ne 1 ]; then
+            echo "::error::Hermes provider remained unavailable after 3 smoke-test attempts."
             cat /tmp/hermes-smoke.log
             exit 1
           fi
@@ -208,8 +227,8 @@ jobs:
       - name: Run two-phase evaluation
         working-directory: agentic-evals
         env:
-          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
-          RESPONSES_API_ENDPOINT: ${{ secrets.TEST_RESPONSES_API_ENDPOINT }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
           AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
@@ -274,7 +293,7 @@ jobs:
         run: |
           RESULTS_DIR="${RUN_DIR}/case-results"
           [ -d "$RESULTS_DIR" ] || { echo "::warning::No case-results"; exit 0; }
-          read -r PASS FAIL BLOCKED < <(python3 - "$RESULTS_DIR" <<'PY'
+          COUNTS=$(python3 -c '
           import json
           import sys
           from pathlib import Path
@@ -287,11 +306,11 @@ jobs:
                   status = "blocked"
               counts[status if status in counts else "blocked"] += 1
           print(counts["pass"], counts["fail"], counts["blocked"])
-          PY
-          )
+          ' "$RESULTS_DIR")
+          read -r PASS FAIL BLOCKED <<< "$COUNTS"
           echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
           if [ "$FAIL" -gt 0 ] || [ "$BLOCKED" -gt 0 ]; then
-            echo "::error::${FAIL} fail, ${BLOCKED} blocked — see report for details"
+            echo "::error::${FAIL} fail, ${BLOCKED} blocked - see report for details"
             exit 1
           fi
 

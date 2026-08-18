@@ -51,7 +51,7 @@ jobs:
         id: setup
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
-          eval_repo: littleDogWang/agentic-evals
+          eval_repo: AgoraIO/agentic-evals
           eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Setup Python
@@ -62,15 +62,15 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pyyaml
-          npm install -g acpx@latest agent-browser @openai/codex
+          npm install -g acpx@0.13.0 agent-browser @openai/codex
           npm install -g openclaw@latest
           openclaw --version
           acpx --version
 
       - name: Configure OpenClaw
         env:
-          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
-          RESPONSES_API_ENDPOINT: ${{ secrets.TEST_RESPONSES_API_ENDPOINT }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
         run: |
           mkdir -p ~/.openclaw/agents/main/sessions
           GATEWAY_TOKEN=$(openssl rand -hex 24)
@@ -191,8 +191,8 @@ jobs:
       - name: Run two-phase evaluation
         working-directory: agentic-evals
         env:
-          OPENAI_API_KEY: ${{ secrets.TEST_OPENAI_API_KEY }}
-          RESPONSES_API_ENDPOINT: ${{ secrets.TEST_RESPONSES_API_ENDPOINT }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESPONSES_API_ENDPOINT: ${{ secrets.RESPONSES_API_ENDPOINT }}
           AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
           AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
@@ -271,7 +271,7 @@ jobs:
           )
           echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
           if [ "$FAIL" -gt 0 ] || [ "$BLOCKED" -gt 0 ]; then
-            echo "::error::${FAIL} fail, ${BLOCKED} blocked — see report for details"
+            echo "::error::${FAIL} fail, ${BLOCKED} blocked - see report for details"
             exit 1
           fi
 
