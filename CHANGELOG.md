@@ -10,7 +10,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - `skills/agora/references/cli/*`: moved the canonical installer to `https://dl.agora.io/cli/install.sh`, removed npm `agoraio-cli` as an install path (published `0.1.6` is below the floor; upstream disabled npm publishing), raised Minimum CLI to `0.2.1`, made config-schema guidance version-agnostic, and split version labelling into per-file `Last verified` plus uniform `Minimum CLI`
 - `skills/agora/references/cli/install-auth.md`: added a region detect-don't-ask rule — `agora login` without `--region` resets the active region to `global` and discards project context, so agents resolve region from `.agora/project.json` or session state instead of prompting
-- `CONTEXT.md`: new glossary defining `Last verified`, `Minimum CLI`, `readiness gate`, `install path`, `Level 2 fetch`, and `detect-don't-ask`
 - `tests/eval-cases.md`: rewrote CLI-01, CLI-02, CLI-03, CLI-26; added CLI-31 (npm refusal) and CLI-32 (region non-interrogation)
 
 ## [1.8.1] - 2026-06-26
