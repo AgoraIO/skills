@@ -1,12 +1,12 @@
 # Agora CLI Automation and Machine-Readable Use
 
-<!-- applies-from: v0.2.1 -->
+<!-- applies-from: v0.2.8 -->
 
 Use this file when the user needs script-safe CLI usage, machine-readable output, environment overrides, or agent-oriented command discovery.
 
-Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
+Last verified against Agora CLI `0.2.8`. Basic onboarding minimum `0.2.2`; full current contract `0.2.8`.
 
-> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
+> The basic onboarding flow was tested on each CLI version from `0.2.2` through `0.2.8`; use `agora introspect --json` for the live command tree.
 
 > **Agents:** start with [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any mutating command.
 
@@ -48,7 +48,7 @@ Do not tell agents to parse pretty output unless the user explicitly wants human
 
 ## Output Modes
 
-Verified in `0.2.1`:
+Verified in `0.2.8`:
 
 - default output mode: `pretty`
 - one-shot override: `--json`
@@ -96,7 +96,7 @@ MCP clients may pass `_meta.progressToken` to receive `notifications/progress` f
 
 ## Persisted Defaults
 
-The example config for `0.2.1` includes these persisted defaults:
+The example config for `0.2.8` includes these persisted defaults:
 
 - `output`
 - `apiBaseUrl`

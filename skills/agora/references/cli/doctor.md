@@ -1,12 +1,12 @@
 # Agora CLI Doctor
 
-<!-- applies-from: v0.2.1 -->
+<!-- applies-from: v0.2.8 -->
 
 Use this file when the user needs either local CLI install diagnostics (`agora doctor`) or project readiness diagnostics (`agora project doctor`).
 
-Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
+Last verified against Agora CLI `0.2.8`. Basic onboarding minimum `0.2.2`; full current contract `0.2.8`.
 
-> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
+> The core doctor and project-readiness flows were checked on CLI `0.2.2` and `0.2.8`; use `agora introspect --json` for the live command tree.
 
 > **Agents:** run [CLI readiness](README.md#cli-readiness-agents) before doctor-driven recovery loops.
 
@@ -28,7 +28,7 @@ agora doctor --json
 agora doctor --quiet
 ```
 
-Verified `0.2.1` install-doctor checks include:
+Verified `0.2.8` install-doctor checks include:
 
 - binary path and PATH resolution
 - installed version
@@ -37,7 +37,7 @@ Verified `0.2.1` install-doctor checks include:
 - auth/session state
 - known MCP host detection
 
-Verified `0.2.1` install-doctor exit codes:
+Verified `0.2.8` install-doctor exit codes:
 
 - `0`: healthy
 - `1`: blocking install issues
@@ -47,7 +47,7 @@ Verified `0.2.1` install-doctor exit codes:
 Common recovery paths:
 
 - PATH issue: run the shell-specific command printed by `agora doctor`, or use `which -a agora` to find a shadowing old binary. Do not uninstall automatically; ask before removing a stale binary — see [README.md](README.md#cli-readiness-agents)
-- CLI below Minimum CLI `0.2.1` or config schema newer than the running binary: follow the curl-first upgrade path in [install-auth.md](install-auth.md#version-gate-and-upgrade)
+- CLI below `0.2.2` for basic onboarding, or below `0.2.8` for full-contract features, or config schema newer than the running binary: follow the curl-first upgrade path in [install-auth.md](install-auth.md#version-gate-and-upgrade)
 - network or DNS issue: fix connectivity or proxy settings before retrying auth
 - auth issue: run `agora login`
 
@@ -74,14 +74,14 @@ agora project doctor --deep
 
 ## Interpreting Results
 
-Verified result states in `0.2.1`:
+Verified result states in `0.2.8`:
 
 - `healthy`: project is ready from the CLI's current checks
 - `warning`: partially ready, but not fully clean
 - `not_ready`: blocking issues were found
 - `auth_error`: not logged in or project context cannot be resolved
 
-Exit behavior verified in `0.2.1`:
+Exit behavior verified in `0.2.8`:
 
 - healthy doctor run exits `0`
 - blocking readiness issues exit `1`

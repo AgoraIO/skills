@@ -2,9 +2,9 @@
 
 Use this module when the user is asking how to use the installed `agora` command-line tool.
 
-<!-- applies-from: v0.2.1 -->
+<!-- applies-from: v0.2.8 -->
 
-Last verified against Agora CLI `0.2.7`. Minimum CLI `0.2.1`. Label older behavior as deprecated or removed when it no longer matches the installed CLI.
+Last verified against Agora CLI `0.2.8`. Basic onboarding minimum is `0.2.2`; the full current reference baseline is `0.2.8`. Older releases below `0.2.2` have stale quickstart repository mappings. Label older behavior as deprecated or removed when it no longer matches the installed CLI.
 
 The canonical CLI repository is <https://github.com/AgoraIO/cli>. Use that repository's `README.md`, `docs/commands.md`, `docs/automation.md`, `docs/error-codes.md`, `docs/telemetry.md`, `CHANGELOG.md`, and releases for Level 2 CLI lookup when these bundled references are not enough.
 
@@ -35,7 +35,7 @@ The Agora Docs MCP server (`agora-docs-mcp`) and the Agora CLI solve different p
 | Install, login, config directory, `whoami`, `auth status`, `login --no-browser` | [install-auth.md](install-auth.md) |
 | `agora init`, `quickstart create`, `quickstart env write`, `.agora/project.json`, repo binding | [quickstarts.md](quickstarts.md) |
 | `project env`, `project env write`, `.env`, `.env.local`, shell exports, `--with-secrets` | [env.md](env.md) |
-| `project create`, `project list`, `project use`, `project show`, `project feature ...` | [projects.md](projects.md) |
+| `project create`, `project list`, `project use`, `project show`, `project feature ...`, `project webhook ...` | [projects.md](projects.md) |
 | `doctor`, `project doctor`, readiness, blocking issues, next remediation command | [doctor.md](doctor.md) |
 | Scripted usage, machine-readable output, `introspect`, `env-help`, `skills`, `mcp serve`, error envelopes, telemetry, upgrade, `AGORA_HOME` | [automation.md](automation.md) |
 
@@ -48,8 +48,9 @@ The Agora Docs MCP server (`agora-docs-mcp`) and the Agora CLI solve different p
 | Windows PowerShell installer | `irm https://dl.agora.io/cli/install.ps1 \| iex` |
 | Installed command | `agora` |
 | Deprecated package | `agora-cli-preview` |
-| Last verified | `0.2.7` |
-| Minimum CLI | `0.2.1` |
+| Last verified | `0.2.8` |
+| Basic onboarding minimum | `0.2.2` |
+| Full current contract | `0.2.8` |
 | Default output mode | `pretty` |
 | Agent-safe output mode | `--json` |
 | Agent-safe command tree | `agora introspect --json` |
@@ -60,15 +61,30 @@ The Agora Docs MCP server (`agora-docs-mcp`) and the Agora CLI solve different p
 | Environment override catalog | `agora env-help --json` |
 | Built-in recipe catalog | `agora skills list --json` |
 
+## Compatibility Matrix
+
+| CLI version | Support status | Verified behavior |
+|---|---|---|
+| `0.2.2` | Minimum supported | Basic Python quickstart clone, project binding, env configuration, core command surface, and JSON automation |
+| `0.2.3`–`0.2.7` | Supported for basic onboarding | The same quickstart clone and env configuration flow was tested for each version |
+| `0.2.8` | Current full reference baseline | Basic onboarding plus the current install doctor, Python/Go env layout, region-aware command surface, config schema v4, and project webhook surface |
+
+Version-gated capabilities:
+
+- `project webhook` requires CLI `>=0.2.6`.
+- The current Python/Go quickstart env layout requires CLI `0.2.8`.
+- Region-aware login and config schema v4 behavior require CLI `0.2.8`.
+- The `0.2.2`–`0.2.7` support claim covers basic onboarding only; interactive login and remote webhook writes were not executed.
+
 ## Current Command Surface
 
-Verified in CLI `0.2.1`:
+Verified in CLI `0.2.8`:
 
 - top level: `auth`, `completion`, `config`, `doctor`, `env-help`, `help`, `init`, `introspect`, `login`, `logout`, `mcp`, `open`, `project`, `quickstart`, `skills`, `telemetry`, `upgrade`, `version`, `whoami`
 - auth group: `auth login`, `auth logout`, `auth status`
 - config group: `config path`, `config get`, `config update`
 - mcp group: `mcp serve`
-- project group: `project create`, `project list`, `project use`, `project show`, `project env`, `project feature`, `project doctor`
+- project group: `project create`, `project list`, `project use`, `project show`, `project env`, `project feature`, `project doctor`, `project webhook`
 - env group: `project env write`
 - feature group: `project feature list`, `project feature status`, `project feature enable`
 - quickstart group: `quickstart list`, `quickstart create`, `quickstart env`, `quickstart env write`
@@ -76,7 +92,7 @@ Verified in CLI `0.2.1`:
 - telemetry group: `telemetry status`, `telemetry enable`, `telemetry disable`
 - upgrade aliases: `agora update`, `agora self-update`
 
-This list was compiled at CLI `0.2.1` and is not exhaustive of later releases: `0.2.6` added a `project webhook` command group that is not enumerated here. `agora introspect --json` is authoritative for the live command tree — treat it as the source of truth before telling a user a command doesn't exist.
+This list was compiled at CLI `0.2.8`. `agora introspect --json` is authoritative for the live command tree — treat it as the source of truth before telling a user a command doesn't exist.
 
 For agents, `agora introspect --json` is the preferred way to discover the current command tree programmatically. `agora --help --all` is the human-readable equivalent.
 
@@ -97,7 +113,8 @@ Run `agora doctor --json` after the read-only probe. It is available in every su
 
 ### 2. Version gate
 
-- **Minimum CLI:** `0.2.1`.
+- **Basic onboarding minimum:** `0.2.2`.
+- **Full current contract:** `0.2.8`.
 - **Below minimum** or command not found → stop and upgrade.
 
 **Upgrade order** (ask for user approval before running installers):
@@ -106,7 +123,7 @@ Run `agora doctor --json` after the read-only probe. It is available in every su
    **Preferred (Windows PowerShell):** `irm https://dl.agora.io/cli/install.ps1 | iex`
    - `--add-to-path` was removed in 0.2.0 — do not use it. `--force` / `-Force` do exist, but they install alongside a managed install and create PATH shadowing; do not use them to bypass a refusal.
 2. **npm-managed installs:** if `which -a agora` (or `where.exe agora`) resolves the binary under `npm prefix -g`, the standalone installer refuses with exit `7` and suggests `npm update -g agoraio-cli` — do not follow that suggestion, it resolves to the stale `0.1.6`, below Minimum CLI. Do not pass `--force`/`-Force` to override the refusal either. See [install-auth.md](install-auth.md#npm-managed-installs) for the platform-specific migration commands.
-3. **Confirm:** `agora version` shows `>=0.2.1`, then run `agora doctor --json` before continuing.
+3. **Confirm:** `agora version` shows `>=0.2.2`; require `>=0.2.8` for full-contract features and run `agora doctor --json` when using that baseline.
 
 ### 3. PATH shadowing
 

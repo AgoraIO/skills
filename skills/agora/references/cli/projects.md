@@ -1,12 +1,12 @@
 # Agora CLI Projects
 
-<!-- applies-from: v0.2.1 -->
+<!-- applies-from: v0.2.8 -->
 
 Use this file when the user needs to create, select, inspect, or feature-enable Agora projects from the CLI.
 
-Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
+Last verified against Agora CLI `0.2.8`. Basic onboarding minimum `0.2.2`; full current contract `0.2.8`.
 
-> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
+> Core project commands were checked on CLI `0.2.2` and `0.2.8`; use `agora introspect --json` for the live command tree.
 
 > **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any command here.
 

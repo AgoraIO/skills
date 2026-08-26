@@ -50,13 +50,13 @@ Use template-specific env files/keys for the selected official template:
   - `AGORA_APP_ID` -> `NEXT_PUBLIC_AGORA_APP_ID`
   - `AGORA_APP_CERTIFICATE` -> `NEXT_AGORA_APP_CERTIFICATE`
 - Python quickstart (`agent-quickstart-python`):
-  - write `server/.env`
-  - `AGORA_APP_ID` -> `APP_ID`
-  - `AGORA_APP_CERTIFICATE` -> `APP_CERTIFICATE`
+  - write `server/.env.local` for the current layout; preserve `server/.env` when a legacy layout is detected
+  - keep `AGORA_APP_ID` as `AGORA_APP_ID`
+  - keep `AGORA_APP_CERTIFICATE` as `AGORA_APP_CERTIFICATE`
 - Go quickstart (`agent-quickstart-go`):
-  - write `server-go/.env`
-  - `AGORA_APP_ID` -> `APP_ID`
-  - `AGORA_APP_CERTIFICATE` -> `APP_CERTIFICATE`
+  - write `server/.env.local` for the current layout; preserve `server-go/.env` when a legacy layout is detected
+  - keep `AGORA_APP_ID` as `AGORA_APP_ID`
+  - keep `AGORA_APP_CERTIFICATE` as `AGORA_APP_CERTIFICATE`
 
 The quickstart is the source of truth for code shape. The agent does not need to prove Agora's official quickstart works in the abstract before reading or adapting it. It does need runtime proof before claiming the user's environment, Agora project, and customized flow work end to end.
 
@@ -331,9 +331,9 @@ If no stack preference is provided, default to:
    1.1 Python baseline: Bun (package manager & script runner) + Python 3.8+
    1.2 Node/TS baseline: Node.js 22+ + pnpm 8+ preferred; fallback to npm when pnpm is unavailable and the sample supports npm
 2. CLI preflight
-   2.1 Complete [CLI readiness](../cli/README.md#cli-readiness-agents) — block if below Minimum CLI `0.2.1` or PATH resolves an old binary
+   2.1 Complete [CLI readiness](../cli/README.md#cli-readiness-agents) — block basic onboarding if below `0.2.2` or PATH resolves an old binary; require `0.2.8` for the current full-contract env layout
    2.2 Log in: `agora login`
-   2.3 Verify CLI version with `agora version` (Minimum CLI `0.2.1`)
+   2.3 Verify CLI version with `agora version` (basic onboarding minimum `0.2.2`; full current contract `0.2.8`)
    2.4 Prefer `agora init <name> --template <template> --json` where `<template>` matches the selected baseline (`python` or `nextjs`)
    2.5 For an existing official quickstart, use `agora quickstart env write <repo> --project <project>` — not `project env write`
    2.6 If decomposing the flow, prefer the current selected project only if it is directly usable for first-success
@@ -348,9 +348,9 @@ If no stack preference is provided, default to:
    - Python baseline: `bun install` then `bun run dev`
    - Node/TS baseline: run `pnpm install` then `pnpm dev` when pnpm is available; otherwise run the documented `npm install --package-lock=false` then `npm run dev` fallback when the sample supports npm. Never substitute `npx pnpm`, `pnpm exec`, or a direct framework command.
    3.3 Ensure the expected env file is present:
-   - Python baseline: `server/.env` with `APP_ID` + `APP_CERTIFICATE`
+   - Python baseline: `server/.env.local` with `AGORA_APP_ID` + `AGORA_APP_CERTIFICATE` (preserve legacy layouts when detected)
    - Node/TS baseline: `.env.local` with `NEXT_PUBLIC_AGORA_APP_ID` + `NEXT_AGORA_APP_CERTIFICATE`
-   - Go baseline: `server-go/.env` with `APP_ID` + `APP_CERTIFICATE`
+   - Go baseline: `server/.env.local` with `AGORA_APP_ID` + `AGORA_APP_CERTIFICATE` (preserve legacy layouts when detected)
      (`agora quickstart env write` is the default seeding path)
      3.4 Do not rename the sample's env variables during first success
 4. Success gate

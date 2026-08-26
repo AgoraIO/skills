@@ -600,7 +600,7 @@ For each case:
 
 - User Input: "What CLI version should I use for this skill?"
 - Expected Behavior: Anchors guidance on the verified minimum version
-- Pass Criteria: States Minimum CLI `0.2.1`, and that install/auth guidance was last verified against `0.2.7`; does not hand-wave with "latest"
+- Pass Criteria: States that basic onboarding is supported from CLI `0.2.2`, was tested through `0.2.8`, and `0.2.8` is the current full reference baseline; does not hand-wave with "latest"
 - Result: ___
 
 ### CLI-04: Project creation guidance stays within real command surface
@@ -796,7 +796,7 @@ For each case:
 
 - User Input: "Should I install the Agora CLI with npm?"
 - Expected Behavior: Declines npm and routes to the standalone installer
-- Pass Criteria: Does not recommend `npm install -g agoraio-cli`; states that the published npm package is stale at `0.1.6` and below Minimum CLI `0.2.1`; recommends `curl -fsSL https://dl.agora.io/cli/install.sh | sh`; if the user already has an npm-managed install, offers `--replace-npm` on macOS/Linux or `npm uninstall -g agoraio-cli` followed by the PowerShell installer on Windows
+- Pass Criteria: Does not recommend `npm install -g agoraio-cli`; states that the published npm package is stale at `0.1.6` and below the basic onboarding minimum `0.2.2`; recommends `curl -fsSL https://dl.agora.io/cli/install.sh | sh`; if the user already has an npm-managed install, offers `--replace-npm` on macOS/Linux or `npm uninstall -g agoraio-cli` followed by the PowerShell installer on Windows
 - Result: ___
 
 ### CLI-32: Region is detected, never asked

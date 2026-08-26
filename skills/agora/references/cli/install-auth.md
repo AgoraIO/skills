@@ -1,10 +1,10 @@
 # Agora CLI Install and Auth
 
-<!-- applies-from: v0.2.1 -->
+<!-- applies-from: v0.2.8 -->
 
 Use this file when the user needs to install the Agora CLI, authenticate, or verify that the local install is healthy.
 
-Last verified against Agora CLI `0.2.7`. Minimum CLI `0.2.1`.
+Last verified against Agora CLI `0.2.8`. Basic onboarding minimum `0.2.2`; full current contract `0.2.8`.
 
 > **Agents:** start with the read-only **CLI readiness** probe in [README.md](README.md). Installers are allowed only as readiness remediation after user approval. That section is the single source of truth for version gates, curl-first upgrade, PATH recovery, and config mismatch errors.
 
@@ -17,7 +17,7 @@ Ask for user approval before running installers, shell-profile updates, or packa
 Use [README.md](README.md#cli-readiness-agents) as the canonical agent readiness flow.
 
 - Read-only probe first: `agora version` and `which -a agora` / `where.exe agora`.
-- If `agora` is missing or below Minimum CLI `0.2.1`, stop normal CLI workflow and upgrade.
+- If `agora` is missing or below `0.2.2`, stop normal CLI workflow and upgrade. Require `0.2.8` for full-contract capabilities.
 - Preferred remediation after approval: `curl -fsSL https://dl.agora.io/cli/install.sh | sh`.
 - If `agora version` still reports an old version after install, check PATH shadowing with `which -a agora` / `where.exe agora` and follow `agora doctor`'s shell-specific PATH fix. Do not uninstall automatically; remove an old binary only after user approval, using `install.sh --uninstall` / `install.ps1 -Uninstall` for installer-managed installs.
 - If the CLI errors with `Config version N is newer than this CLI supports`, an old binary is reading config written by a newer CLI. Upgrade through the readiness flow; edit config only as a last resort after backing it up.
