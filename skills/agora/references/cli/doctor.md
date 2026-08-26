@@ -4,7 +4,9 @@
 
 Use this file when the user needs either local CLI install diagnostics (`agora doctor`) or project readiness diagnostics (`agora project doctor`).
 
-Verified against Agora CLI `0.2.1`.
+Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
+
+> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
 
 > **Agents:** run [CLI readiness](README.md#cli-readiness-agents) before doctor-driven recovery loops.
 
@@ -18,7 +20,7 @@ Use `agora doctor` first when the failure looks local to the workstation or shel
 
 ## Install Doctor
 
-Top-level `agora doctor` is available in `0.2.0+`. For `0.1.7–0.1.x`, use the read-only version and PATH checks in [CLI readiness](README.md#cli-readiness-agents), then prefer upgrading to the verified `0.2.1` baseline before deeper diagnostics.
+Top-level `agora doctor` is available in every supported release.
 
 ```bash
 agora doctor
@@ -45,7 +47,7 @@ Verified `0.2.1` install-doctor exit codes:
 Common recovery paths:
 
 - PATH issue: run the shell-specific command printed by `agora doctor`, or use `which -a agora` to find a shadowing old binary. Do not uninstall automatically; ask before removing a stale binary — see [README.md](README.md#cli-readiness-agents)
-- CLI below `0.1.7` or config schema newer than the running binary: follow the curl-first upgrade path in [install-auth.md](install-auth.md#version-gate-and-upgrade)
+- CLI below Minimum CLI `0.2.1` or config schema newer than the running binary: follow the curl-first upgrade path in [install-auth.md](install-auth.md#version-gate-and-upgrade)
 - network or DNS issue: fix connectivity or proxy settings before retrying auth
 - auth issue: run `agora login`
 

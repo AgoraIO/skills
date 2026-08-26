@@ -83,13 +83,13 @@ The bundled CLI skill files live under `skills/agora/references/cli/` and should
 
 When updating CLI guidance:
 
-1. Install or update the CLI from the canonical installer, or use the npm wrapper once it maps to the same Go binary:
+1. Install or update the CLI from the canonical installer:
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh
+   curl -fsSL https://dl.agora.io/cli/install.sh | sh
    agora version
    which -a agora
    ```
-2. Pin the verified release in the CLI reference files, for example `Verified against Agora CLI 0.2.1`.
+2. Record the release in the CLI reference files as `Last verified against Agora CLI <version>`, and update `Minimum CLI` only when deliberately raising the floor. Do not stamp a file as last-verified against a release whose behavior you did not actually check — leaving a file at an older version is how the next maintainer finds what still needs auditing.
 3. Diff the command surface against upstream sources:
    - `agora --help --all`
    - `agora introspect --json`
@@ -98,9 +98,10 @@ When updating CLI guidance:
    - `docs/error-codes.md`
    - `docs/telemetry.md`
    - `CHANGELOG.md` and GitHub Releases
-4. Keep install guidance aligned across `cli/install-auth.md`, `skills/agora/SKILL.md`, `README.md`, and eval cases.
-5. Update `tests/eval-cases.md` for new stable commands, changed flags, JSON contracts, or commands that are now valid and should no longer be rejected.
-6. Preserve the no-hallucination rule: if a command is not in the verified CLI surface or upstream docs, route to the closest real command instead of inventing one.
+4. Verify claims against `agora introspect --json` and upstream source at the release tag — **not** against upstream `CHANGELOG.md`. That changelog has been wrong repeatedly: it filed region support under `[Unreleased]` in a tag that ships it, attributed a config-schema bump to the wrong release, and documented `--rtm-data-center` under a release that a later audit still missed.
+5. Keep install guidance aligned across `cli/install-auth.md`, `skills/agora/SKILL.md`, `README.md`, and eval cases.
+6. Update `tests/eval-cases.md` for new stable commands, changed flags, JSON contracts, or commands that are now valid and should no longer be rejected.
+7. Preserve the no-hallucination rule: if a command is not in the verified CLI surface or upstream docs, route to the closest real command instead of inventing one.
 
 ## Required Frontmatter
 

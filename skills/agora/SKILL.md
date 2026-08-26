@@ -8,7 +8,7 @@ description: >-
   integrating Agora into an app.
 metadata:
   author: agora
-  version: '1.8.1'
+  version: '1.8.2'
 ---
 
 <!-- applies-from: v0.2.1 -->
@@ -80,7 +80,7 @@ Ask at most one focused clarification when the route is still unclear.
 
 2. **ConvoAI quickstart source gate.** For ConvoAI requests without a proven working baseline: start at **[references/conversational-ai/README.md](references/conversational-ai/README.md)** and use the official quickstart as the source of truth before generating or adapting code. Runtime proof validates the user's environment and project, not whether Agora's official quickstart works.
 
-3. **CLI readiness gate.** Before any mutating Agora CLI command (`init`, `quickstart`, `project`, or `login`), run the read-only probe in **[references/cli/README.md](references/cli/README.md)**. Block normal CLI workflow when `agora version` is below `0.1.7`, when PATH still resolves an older binary, or when config schema is newer than the running CLI. Installers or global npm installs are allowed only as readiness remediation after user approval. Use the documented curl-first upgrade path; do not invent installer flags such as `--add-to-path` or `--force`.
+3. **CLI readiness gate.** Before any mutating Agora CLI command (`init`, `quickstart`, `project`, or `login`), run the read-only probe in **[references/cli/README.md](references/cli/README.md)**. Block normal CLI workflow when `agora version` is below Minimum CLI `0.2.1`, when PATH still resolves an older binary, or when config schema is newer than the running CLI. Installers are allowed only as readiness remediation after user approval. Use the documented curl-first upgrade path. `--add-to-path` was removed in `0.2.0` — do not use it. `--force` / `-Force` are real installer flags, but they install alongside a managed install and create PATH shadowing — do not use them to bypass a refusal.
 
 ### ConvoAI Enforcement
 

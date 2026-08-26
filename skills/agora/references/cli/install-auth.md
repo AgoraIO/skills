@@ -4,47 +4,67 @@
 
 Use this file when the user needs to install the Agora CLI, authenticate, or verify that the local install is healthy.
 
-Verified against Agora CLI `0.2.1`.
+Last verified against Agora CLI `0.2.7`. Minimum CLI `0.2.1`.
 
-> **Agents:** start with the read-only **CLI readiness** probe in [README.md](README.md). Installers and global npm installs are allowed only as readiness remediation after user approval. That section is the single source of truth for version gates, curl-first upgrade, PATH recovery, and config mismatch errors.
+> **Agents:** start with the read-only **CLI readiness** probe in [README.md](README.md). Installers are allowed only as readiness remediation after user approval. That section is the single source of truth for version gates, curl-first upgrade, PATH recovery, and config mismatch errors.
 
 ## Install
 
-Ask for user approval before running installers, global package installs, shell-profile updates, or package removal commands.
+Ask for user approval before running installers, shell-profile updates, or package removal commands.
 
 ## Version Gate and Upgrade
 
 Use [README.md](README.md#cli-readiness-agents) as the canonical agent readiness flow.
 
 - Read-only probe first: `agora version` and `which -a agora` / `where.exe agora`.
-- If `agora` is missing or below `0.1.7`, stop normal CLI workflow and upgrade. Do not call `agora upgrade` on `0.1.6`; it does not exist there.
-- Preferred remediation after approval: `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh`.
-- Alternate remediation after approval: `npm install -g agoraio-cli` when Node.js 18+ is available.
-- If a direct-installer upgrade from `0.1.7`–`0.2.0` fails crossing `0.2.1`, re-run the curl installer once because release archive names changed.
-- If `agora version` still reports an old version after install, check PATH shadowing with `which -a agora` / `where.exe agora` and follow `agora doctor`'s shell-specific PATH fix when available. Do not uninstall automatically; remove an old binary only after user approval, using `install.sh --uninstall` / `install.ps1 -Uninstall` for installer-managed installs when applicable.
-- If the CLI errors with `Config version N is newer than this CLI supports`, an old binary is usually reading config from a newer CLI. Upgrade through the readiness flow; edit config only as a last resort after backing it up.
+- If `agora` is missing or below Minimum CLI `0.2.1`, stop normal CLI workflow and upgrade.
+- Preferred remediation after approval: `curl -fsSL https://dl.agora.io/cli/install.sh | sh`.
+- If `agora version` still reports an old version after install, check PATH shadowing with `which -a agora` / `where.exe agora` and follow `agora doctor`'s shell-specific PATH fix. Do not uninstall automatically; remove an old binary only after user approval, using `install.sh --uninstall` / `install.ps1 -Uninstall` for installer-managed installs.
+- If the CLI errors with `Config version N is newer than this CLI supports`, an old binary is reading config written by a newer CLI. Upgrade through the readiness flow; edit config only as a last resort after backing it up.
 
 Preferred macOS / Linux / POSIX shell installer:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh
+curl -fsSL https://dl.agora.io/cli/install.sh | sh
 ```
 
 Windows PowerShell installer:
 
 ```powershell
-irm https://raw.githubusercontent.com/AgoraIO/cli/main/install.ps1 | iex
+irm https://dl.agora.io/cli/install.ps1 | iex
 ```
 
-npm install path:
+### npm-managed installs
+
+<!-- npm agoraio-cli is deliberately omitted as an install path. Latest published is
+     0.1.6 (below Minimum CLI) and publishing is disabled upstream (commit aad8582).
+     Upstream docs/install.md still lists npm as "Available" — do not restore it from
+     there. Restore only if npm publishing resumes AND the published version clears
+     the floor. -->
+
+npm `agoraio-cli` is **not** a current install path. Never recommend it for install or upgrade.
+
+Surface the migration below **only when detection shows an npm-managed install** — the readiness gate already runs `which -a agora`; if the resolved binary sits under `npm prefix -g`, it is npm-managed. If npm is not installed on the machine, the install cannot be npm-managed — skip this check. Otherwise this section does not apply and should not be mentioned.
+
+macOS / Linux:
 
 ```bash
-npm install -g agoraio-cli
+curl -fsSL https://dl.agora.io/cli/install.sh | sh -s -- --replace-npm
 ```
 
-The npm package is expected to be a thin install wrapper for the same Go-based `agora` binary. It requires Node.js 18+ when used. Do not describe npm as a permanent separate CLI implementation.
+Windows PowerShell (there is no `-ReplaceNpm` flag):
 
-In `0.2.1`, the shell installers add the binary directory to `PATH` and wire shell completion by default. Use `--no-path`, `--no-completion`, or `--skip-shell` only when the user explicitly wants to opt out.
+```powershell
+npm uninstall -g agoraio-cli
+irm https://dl.agora.io/cli/install.ps1 | iex
+```
+
+Two traps to avoid:
+
+- `install.ps1` refuses to overwrite an npm-managed install and exits `7`, printing `npm update -g agoraio-cli` as the remedy. Do **not** follow it — that resolves to `0.1.6`, below Minimum CLI.
+- Do **not** pass `-Force` to bypass the exit-`7` refusal. It creates a side-by-side install and the PATH shadowing the readiness gate then has to untangle.
+
+The shell installers add the binary directory to `PATH` and wire shell completion by default. Use `--no-path`, `--no-completion`, or `--skip-shell` only when the user explicitly wants to opt out.
 
 The installed command is:
 
@@ -58,12 +78,12 @@ If the user still has the deprecated preview package:
 
 ```bash
 npm uninstall -g agora-cli-preview
-npm install -g agoraio-cli
+curl -fsSL https://dl.agora.io/cli/install.sh | sh
 ```
 
-For pinned versions, uninstall, custom install directories, Windows details, npm details, or source builds, use the upstream install docs in <https://github.com/AgoraIO/cli>.
+For pinned versions, uninstall, custom install directories, Windows details, or source builds, use the upstream install docs in <https://github.com/AgoraIO/cli>.
 
-> ⚠️ Removed in v0.2.0: `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh -s -- --add-to-path`. Use `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh` instead.
+> ⚠️ Removed in v0.2.0: the `--add-to-path` installer flag. Use `curl -fsSL https://dl.agora.io/cli/install.sh | sh` instead; PATH wiring is on by default.
 
 ## Login Flow
 
@@ -89,7 +109,17 @@ agora auth logout
 
 If browser auto-open fails, use `agora login --no-browser` so the CLI prints a URL and the user can open it manually.
 
-For agents, use `agora auth status --json`. In `0.2.1`, unauthenticated status is still a recoverable auth state; the JSON error envelope uses exit code `3` with `AUTH_UNAUTHENTICATED`.
+### Region — determine, do not ask
+
+`agora login` without `--region` sets the active region to `global` and discards the previous project context. Resolve the region from state:
+
+1. If `.agora/project.json` records a **non-empty** `region`, pass it: `agora login --region <region>`. An empty `region` value means "no opinion" — do not pass `--region ""`; the flag only accepts `global` or `cn` and rejects an empty string.
+2. Otherwise, if a prior session recorded `data.region` via `agora auth status --json`, preserve it by passing that value the same way: `agora login --region <region>`
+3. Otherwise run bare `agora login` — `global` is correct for the large majority
+
+Never prompt the user to choose a region. If the CLI returns `PROJECT_REGION_MISMATCH`, its error names both regions and the exact command to run — follow that.
+
+For agents, use `agora auth status --json`. Unauthenticated status is still a recoverable auth state; the JSON error envelope uses exit code `3` with `AUTH_UNAUTHENTICATED`.
 
 ## Verification and Failure Modes
 
@@ -100,7 +130,7 @@ agora doctor
 agora doctor --json
 ```
 
-Observed `0.2.1` exit codes:
+Observed exit codes:
 
 - `0`: healthy install
 - `1`: blocking install issues
@@ -112,11 +142,10 @@ Common failures:
 - If `agora doctor` reports PATH issues, follow the command it prints for the current shell.
 - If `agora doctor` reports DNS or network failures, fix network or proxy settings before retrying `agora login`.
 - If `agora login` is run in JSON, CI, or non-TTY mode without an existing session, `-y` / `--yes` does not start a new browser flow; the command fails fast with `AUTH_UNAUTHENTICATED`.
-- If upgrade from a direct installer fails when crossing 0.2.1, re-run the curl installer once — see [README.md](README.md) CLI readiness.
 
 ## OAuth Loopback Rule
 
-The verified `0.2.0` loopback login flow advertises a redirect URI shaped like:
+The loopback login flow advertises a redirect URI shaped like:
 
 ```text
 http://localhost:<port>/oauth/callback
@@ -150,3 +179,5 @@ The CLI stores config, session, logs, and current-project context under the Agor
 - Do not document `--add-to-path`; it was removed in `0.2.0`.
 - Do not claim the preview package is still the recommended install target.
 - Use `agora` for an installed CLI. Use `./agora` only when running a local binary built from the CLI repository.
+- Do not present npm `agoraio-cli` as an install or upgrade channel.
+- Do not ask the user which region they want; resolve it from state.

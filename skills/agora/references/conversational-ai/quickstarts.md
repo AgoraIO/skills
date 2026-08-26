@@ -312,9 +312,9 @@ If no stack preference is provided, default to:
    1.1 Python baseline: Bun (package manager & script runner) + Python 3.8+
    1.2 Node/TS baseline: Node.js 22+ + pnpm 8+ preferred; fallback to npm when pnpm is unavailable and the sample supports npm
 2. CLI preflight
-   2.1 Complete [CLI readiness](../cli/README.md#cli-readiness-agents) — block if below `0.1.7` or PATH resolves an old binary
+   2.1 Complete [CLI readiness](../cli/README.md#cli-readiness-agents) — block if below Minimum CLI `0.2.1` or PATH resolves an old binary
    2.2 Log in: `agora login`
-   2.3 Verify CLI version with `agora version` (minimum `0.2.1`, floor `0.1.7`)
+   2.3 Verify CLI version with `agora version` (Minimum CLI `0.2.1`)
    2.4 Prefer `agora init <name> --template <template> --json` where `<template>` matches the selected baseline (`python` or `nextjs`)
    2.5 For an existing official quickstart, use `agora quickstart env write <repo> --project <project>` — not `project env write`
    2.6 If decomposing the flow, prefer the current selected project only if it is directly usable for first-success
@@ -485,7 +485,7 @@ Before starting the CLI readiness flow, complete [CLI readiness](../cli/README.m
 | pnpm or npm (Node/TS baseline) | `pnpm --version`, then `npm --version` if needed | pnpm 8+ preferred; npm fallback allowed | Use npm if pnpm is unavailable and the sample supports it                        |
 | Bun (Python baseline)          | `bun --version`                                  | 1.0+                                    | `npm install -g bun`                                                             |
 | Python (Python baseline)       | `python3 --version`                              | 3.8+                                    | Direct the user to https://python.org                                            |
-| Agora CLI (all baselines)      | `agora version`                                  | Verified `0.2.1`; block if below `0.1.7` | Follow [CLI readiness](../cli/README.md#cli-readiness-agents): curl install first, npm alternate |
+| Agora CLI (all baselines)      | `agora version`                                  | Minimum CLI `0.2.1`                     | Follow [CLI readiness](../cli/README.md#cli-readiness-agents): curl installer from `dl.agora.io` |
 
 Execution rules:
 
@@ -494,7 +494,7 @@ Execution rules:
 - For Node.js and Python, if they are not installed, tell the user what to install and wait — do not attempt to install system-level runtimes.
 - For Python baseline, install Bun only when covered by the approved setup scope.
 - For Node/TS baseline, use pnpm if available; otherwise use npm if the sample supports it. Do not install pnpm just because it is preferred.
-- For Agora CLI below minimum, follow [CLI readiness](../cli/README.md#cli-readiness-agents) — curl installer first, `npm install -g agoraio-cli` as alternate, then re-verify `agora version` and `which -a agora`. Do not use `--add-to-path` or invented `--force` flags.
+- For Agora CLI below Minimum CLI, follow [CLI readiness](../cli/README.md#cli-readiness-agents) — run the `dl.agora.io` curl installer, then re-verify `agora version` and `which -a agora`. Do not use `--add-to-path` or invented `--force` flags. Do not install or upgrade via npm.
 - If Agora CLI is installed but outdated, use `agora upgrade --check --json` for channel-specific guidance or re-run the curl installer.
 - Only proceed to project readiness after all required checks for the selected baseline pass.
 
