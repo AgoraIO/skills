@@ -256,7 +256,7 @@ export default function VideoCall() {
 }
 ```
 
-For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).
+For test setup and mocking patterns, see [references/testing-guidance/README.md](../testing-guidance/README.md).
 
 ## Official Documentation
 

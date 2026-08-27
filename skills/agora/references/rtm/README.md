@@ -77,4 +77,4 @@ All three platform files below document **RTM v2**. Do not apply v1 patterns (`A
 - **[ios.md](ios.md)** — `AgoraRtmClientKit` (Swift): init, login, subscribe, publish, delegate
 - **[android.md](android.md)** — `RtmClient` (Kotlin): init, login, subscribe, publish, event listener
 
-For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).
+For test setup and mocking patterns, see [references/testing-guidance/README.md](../testing-guidance/README.md).

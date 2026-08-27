@@ -221,7 +221,7 @@ extension SignalingViewController: AgoraRtmClientDelegate {
 - The RTM constructor can throw — always wrap in `do/catch`.
 - Always call `login()` and wait for the callback before subscribing or publishing.
 
-For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).
+For test setup and mocking patterns, see [references/testing-guidance/README.md](../testing-guidance/README.md).
 
 ## Official Documentation
 

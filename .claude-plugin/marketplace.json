@@ -1,17 +1,25 @@
 {
   "name": "agora-skills",
+  "description": "Skills for building real-time communication applications with Agora SDKs",
   "owner": {
-    "name": "Agora"
-  },
-  "metadata": {
-    "description": "Skills for building real-time communication applications with Agora SDKs"
+    "name": "Agora",
+    "email": "devrel@agora.io",
+    "url": "https://github.com/AgoraIO"
   },
   "plugins": [
     {
       "name": "agora",
+      "displayName": "Agora",
       "source": "./",
       "description": "Real-time communication with Agora SDKs — RTC, RTM, Conversational AI, and token generation",
-      "version": "1.8.1"
+      "category": "developer-tools",
+      "tags": [
+        "voice-agents",
+        "real-time-communication",
+        "conversational-ai",
+        "rtc",
+        "rtm"
+      ]
     }
   ]
 }

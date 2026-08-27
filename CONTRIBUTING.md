@@ -25,7 +25,7 @@ Server Gateway (`references/server-gateway/`), Testing Guidance (`references/tes
    - Update the **Product Relationships** diagram if the new product changes dependencies
    - Add relevant rows to **Common Product Combinations**
    - Update **Routing** and **Ambiguity Rules** if the new product introduces new cues or disambiguation logic
-7. Bump the version in all three version files (see [Version Bumping](#version-bumping))
+7. Bump the version authorities (see [Version Bumping](#version-bumping))
 
 ## Adding a New Platform
 
@@ -39,8 +39,8 @@ context windows are finite, and oversized files crowd out the user's actual
 project context. If a Layer 4 topic file approaches 500 lines, split it into
 multiple topic files and link from the product README.
 
-Current largest files as reference: `rtc/web.md` (498 lines), `rtm/web.md`
-(375 lines). These are at or near the limit; do not expand them further.
+Use `wc -l` when changing a large topic file. Files at or near the limit should
+be split instead of expanded further.
 
 ## The Freeze-Forever Test
 
@@ -84,11 +84,13 @@ The bundled CLI skill files live under `skills/agora/references/cli/` and should
 When updating CLI guidance:
 
 1. Install or update the CLI from the canonical installer, or use the npm wrapper once it maps to the same Go binary:
+
    ```bash
    curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh
    agora version
    which -a agora
    ```
+
 2. Pin the verified release in the CLI reference files, for example `Verified against Agora CLI 0.2.1`.
 3. Diff the command surface against upstream sources:
    - `agora --help --all`
@@ -106,18 +108,21 @@ When updating CLI guidance:
 
 Every `SKILL.md` must include:
 
-    ---
-    name: kebab-case-name          # max 64 chars, unique across repo
-    description: >-
-      Trigger phrases and description that help agents recognize when to use
-      this skill. Include concrete product names and action verbs.
-    license: MIT
-    metadata:
-      author: agora
-      version: "X.Y.Z"
-    ---
+```yaml
+---
+name: kebab-case-name          # max 64 chars, unique across repo
+description: >-
+  Trigger phrases and description that help agents recognize when to use
+  this skill. Include concrete product names and action verbs.
+license: MIT
+metadata:
+  author: agora
+  version: "X.Y.Z"
+---
+```
 
 Rules:
+
 - Do NOT use `triggers` as a top-level frontmatter field — fold trigger phrases
   into `description`. (Consistent with agentskills.io standard.)
 - Use relative links for all local references.
@@ -138,15 +143,30 @@ Rules:
 - [ ] No duplicate skill names
 - [ ] No absolute local paths (`/Users/...` or any machine-specific path)
 - [ ] No hardcoded credentials, API keys, or App Certificates
+- [ ] No Layer 4 topic file exceeds 500 lines
 - [ ] At least one eval case added or updated in `tests/eval-cases.md`
   (required for new product or platform additions)
 - [ ] If adding a code generation skill: testing guidance updated in
-  `references/testing-guidance/SKILL.md`
+  `references/testing-guidance/README.md`
 - [ ] `scripts/validate-skills.sh` passes locally
 
 ## Local Validation
 
-    bash scripts/validate-skills.sh
+```bash
+bash scripts/validate-skills.sh
+skills-ref validate skills/agora
+claude plugin validate . --strict
+claude plugin validate ./.claude-plugin/plugin.json
+claude plugin validate ./skills --strict
+```
+
+CI installs `skills-ref` from the pinned official Agent Skills repository
+revision. For local use, install that same revision in a Python 3.11+ virtual
+environment before running the command above.
+
+Direct manifest validation may report that the repository-root `CLAUDE.md` is
+not loaded as plugin context. That warning is expected: contributor instructions
+stay at the repository root, while runtime instructions live under `skills/`.
 
 ## Running Evals
 
@@ -164,20 +184,25 @@ skill edits — don't ship a fix without verifying the case now passes.
 
 ## Version Bumping
 
-Versions must stay in sync across three files. Bump all three together:
+Versions must stay in sync across these three files. Bump all three together:
 
 | File | Field |
 |------|-------|
 | `skills/agora/SKILL.md` | `metadata.version` in frontmatter |
 | `.claude-plugin/plugin.json` | `"version"` |
-| `.claude-plugin/marketplace.json` | `plugins[0].version` |
+| `agora/.cursor-plugin/plugin.json` | `"version"` |
+
+Do not add a duplicate version to `.claude-plugin/marketplace.json`. Claude's
+plugin manifest is the version authority for the marketplace entry.
 
 Version rules:
+
 - **Patch** (`x.y.Z`): gotcha fixes, broken link repairs, content corrections
 - **Minor** (`x.Y.0`): new product or platform added, new eval cases, new topic files
 - **Major** (`X.0.0`): breaking restructure of skill entry points or routing logic
 
-Document the change in `CHANGELOG.md` under a new `[x.y.z]` heading.
+Document the change in `CHANGELOG.md`; move it from `Unreleased` to a dated
+`[x.y.z]` heading when publishing the release.
 
 ## Plugin & Marketplace Registration
 
@@ -188,7 +213,7 @@ This skill is published to:
 
 Users install via two slash commands inside Claude Code:
 
-```
+```text
 /plugin marketplace add AgoraIO/skills
 /plugin install agora@agora-skills
 ```
@@ -196,14 +221,14 @@ Users install via two slash commands inside Claude Code:
 (`agora-skills` is the marketplace `name` in `marketplace.json`; `agora` is the plugin `name`.)
 
 To update a registration after a version bump:
-1. Submit a PR with the bumped version in both JSON files
+
+1. Submit a PR with the three version authorities updated together
 2. Once merged, users get the update automatically when Claude Code refreshes (`/plugin marketplace update`)
 3. For agentskills.io manual updates, follow the [agentskills.io submission guide](https://agentskills.io)
 
-The Agora Docs MCP (`agora-docs-mcp`) config is bundled in
-`.claude-plugin/mcp-config.json` and referenced from `plugin.json` via
-`"mcpServers": "./mcp-config.json"`. It is for documentation traversal only,
-not for Agora backend/account/project operations.
+The Agora Docs MCP (`agora-docs-mcp`) config is bundled at the plugin root in
+`.mcp.json`, Claude Code's standard discovery location. It is for documentation
+traversal only, not for Agora backend/account/project operations.
 
 ## Verifying URLs
 

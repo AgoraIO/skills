@@ -30,6 +30,7 @@ directly when the URI is known.
 ## Installation
 
 **Claude Code:**
+
 ```bash
 claude mcp add agora-docs-mcp --transport http https://mcp.agora.io
 ```

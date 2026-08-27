@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Claude plugin packaging now uses the root `.mcp.json` default location so the bundled `agora-docs-mcp` server is discovered at runtime.
+- Cursor and Claude MCP wrappers now use the same `agora-docs-mcp` key and HTTP transport declaration.
+
+### Changed
+
+- Claude plugin, Agora skill, and Cursor wrapper versions aligned at `1.8.2`.
+- Claude plugin metadata now includes the existing DevRel contact and project homepage.
+- Volatile provider model IDs and framework runtime matrices now route to the cloned official sample or current provider docs instead of freezing fast-changing values inline.
+- Testing guidance is now an internal routed reference (`README.md`) rather than a nested `SKILL.md` that different hosts could discover inconsistently.
+- CI now enforces Claude schemas, clean-install skill/MCP discovery, Markdown lint, and the 500-line Layer 4 topic ceiling.
+- The public skill now declares its MIT license explicitly. A separate CI step installs the official Agent Skills reference validator at pinned commit `69ef37e9424c0a7ea9dd2293b559e43ec8176379` and validates `skills/agora`.
+- RTC Web client/join alternatives again retain their semantic comments, and the detailed screen-sharing pattern now lives in its own routed topic instead of leaving `web.md` at the size ceiling.
+- Claude Code is pinned in CI, and clean-install packaging assertions now use `plugin list --json` instead of human-readable spacing.
+
 ## [1.8.1] - 2026-06-26
 
 ### Fixed

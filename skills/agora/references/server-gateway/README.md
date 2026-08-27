@@ -30,6 +30,7 @@ Video SDK clients (Web, iOS, Android, etc.)
 ```
 
 Typical flow:
+
 1. Initialize `IAgoraService` with audio/video support enabled
 2. Create `IRtcConnection` and join channel
 3. Create media senders via `IMediaNodeFactory`, wrap in local tracks, publish

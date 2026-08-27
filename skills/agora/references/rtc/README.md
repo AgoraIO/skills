@@ -60,17 +60,9 @@ client.setRemoteVideoStreamType(uid, 1); // 0=high, 1=low
 
 ## Screen Sharing (Web)
 
-```javascript
-const screenTrack = await AgoraRTC.createScreenVideoTrack(
-  {
-    optimizationMode: 'detail', // or "motion" for video content
-    encoderConfig: { width: 1280, height: 720, frameRate: 15 },
-  },
-  'auto',
-); // "auto" returns [videoTrack, audioTrack] if audio available
-```
-
-Screen share typically uses a separate client instance to avoid replacing the camera track.
+Use a separate client instance so screen publishing does not replace the camera
+track. Read [screen-sharing.md](screen-sharing.md) for identity, token, system
+audio, `track-ended`, and cleanup handling.
 
 ## Cross-Platform Interop Notes
 
@@ -87,6 +79,8 @@ When Web, iOS, and Android clients share the same channel:
 Read the file matching the user's platform:
 
 - **[web.md](web.md)** — `agora-rtc-sdk-ng` (JS/TS): client creation, tracks, events, complete examples
+- **[screen-sharing.md](screen-sharing.md)** — Web dual-client screen sharing, system audio, identity, and cleanup
+- **[large-scale-subscriptions.md](large-scale-subscriptions.md)** — Web multi-channel viewing and dynamic subscription policy
 - **[react.md](react.md)** — `agora-rtc-react` hooks and components
 - **[nextjs.md](nextjs.md)** — Next.js / SSR dynamic import patterns (App Router + Pages Router)
 - **[ios.md](ios.md)** — `AgoraRtcEngineKit` (Swift): engine setup, delegation, permissions
@@ -97,7 +91,7 @@ Read the file matching the user's platform:
 
 For additional platforms and advanced features: <https://docs-md.agora.io/en/video-calling/get-started/get-started-sdk.md> — voice-only: <https://docs-md.agora.io/en/voice-calling/get-started/get-started-sdk.md>
 
-For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).
+For test setup and mocking patterns, see [references/testing-guidance/README.md](../testing-guidance/README.md).
 
 ## When to Fetch More
 

@@ -4,7 +4,7 @@ This repository contains AI agent skills for building with [Agora](https://www.a
 
 ## Repository Structure
 
-```
+```text
 scripts/
 └── validate-skills.sh              # Static validation
 skills/
@@ -55,12 +55,22 @@ Ask: **will this still be correct in 6 months without any updates?** If yes, put
 
 ```bash
 bash scripts/validate-skills.sh
+skills-ref validate skills/agora
+claude plugin validate . --strict
+claude plugin validate ./.claude-plugin/plugin.json
+claude plugin validate ./skills --strict
 ```
 
 Validation covers:
 
 - frontmatter checks for all frontmatter-bearing markdown files under `skills/agora/`
+- the official Agent Skills schema and naming rules through `skills-ref`
 - duplicate skill names
 - broken relative links
+- Layer 4 topic files over 500 lines
 - absolute local path leakage (`/Users/...`)
 - blocklisted internal terms
+
+Claude validation additionally covers the marketplace schema, plugin manifest,
+and public skill frontmatter. Direct manifest validation may emit the expected
+non-blocking warning that the repository-root `CLAUDE.md` is not plugin context.

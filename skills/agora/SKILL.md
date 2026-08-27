@@ -6,9 +6,10 @@ description: >-
   token or auth flows, or use the `agora` CLI for login, quickstarts, env
   setup, diagnostics, introspection, skills, or MCP serving, especially when
   integrating Agora into an app.
+license: MIT
 metadata:
   author: agora
-  version: '1.8.1'
+  version: '1.8.2'
 ---
 
 <!-- applies-from: v0.2.1 -->
@@ -57,7 +58,7 @@ For cross-product coordination as a primary question, use **[references/integrat
 - AI voice assistant → ConvoAI first; RTC client is expected, RTM is optional
 - AI voice assistant + chat history → ConvoAI first, then RTM and [references/integration-patterns.md](references/integration-patterns.md)
 - RTC recording → Cloud Recording first, then RTC if client details matter
-- test generation or review for Agora integration code → [references/testing-guidance/SKILL.md](references/testing-guidance/SKILL.md) after the product route is clear
+- test generation or review for Agora integration code → [references/testing-guidance/README.md](references/testing-guidance/README.md) after the product route is clear
 
 ## Ambiguity Handling
 

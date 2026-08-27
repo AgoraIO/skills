@@ -5,7 +5,6 @@
 - [Overview](#overview)
 - [Installation](#installation)
 - [RTM v2 (Web)](#rtm-v2-web)
-- [RTM v1 (Legacy Web)](#rtm-v1-legacy-web)
 - [Common Use Cases with RTC](#common-use-cases-with-rtc)
 - [Stream Channels (Topics)](#stream-channels-topics)
 
@@ -156,7 +155,6 @@ async function cleanupRTM() {
   await rtmClient.logout()
 }
 ```
-
 
 ## Common Use Cases with RTC
 

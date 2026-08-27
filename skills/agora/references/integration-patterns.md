@@ -85,7 +85,7 @@ Before wiring ConvoAI into an existing multi-product app, read [conversational-a
 
 ### How the Products Connect
 
-```
+```text
 Client                          Server
 ──────────────────────────────────────────────────────
 RTC Engine/Client ──── media ────► Agora RTC

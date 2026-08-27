@@ -267,7 +267,7 @@ class SignalingActivity : AppCompatActivity() {
 - Login must complete before any subscribe/publish operations.
 - Call `release()` only after logout completes to avoid resource leaks.
 
-For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).
+For test setup and mocking patterns, see [references/testing-guidance/README.md](../testing-guidance/README.md).
 
 ## Official Documentation
 

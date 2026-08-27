@@ -83,5 +83,7 @@ export default function Page() {
 
 ## Node.js Version Requirements
 
-- Next.js 14 / 15: requires Node.js >= 18
-- Next.js 16+: requires Node.js >= 20.9.0 (used in agent-samples clients)
+Use the Node.js version declared by the target application's package metadata or
+the official sample's `.nvmrc`. Framework runtime requirements change over time,
+so do not carry a static Next.js-to-Node.js matrix from this reference into a
+project.

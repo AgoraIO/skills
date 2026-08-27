@@ -32,9 +32,9 @@ function App() {
 ```
 
 > For live streaming (host/audience), use `mode: "live"` instead.
-
+>
 > **Codec interop**: `'vp8'` and `'vp9'` scale better in multi-user calls. `'h264'` does not scale well beyond small groups. If codecs differ between Web and native clients, Agora's server transcodes transparently (works but adds latency). See [cross-platform-coordination.md](cross-platform-coordination.md) for full interop notes.
-
+>
 > **UID constraints**: If you pass `uid` into `useJoin`, numeric UIDs must be `0` to `2^32 - 1`; string UIDs must be ASCII and at most `255` characters. Keep UID type consistent per channel.
 
 ## Video Call Component

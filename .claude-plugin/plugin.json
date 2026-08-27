@@ -1,13 +1,15 @@
 {
   "name": "agora",
+  "displayName": "Agora",
   "description": "Real-time communication with Agora SDKs — RTC, RTM, Conversational AI, and token generation",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "author": {
-    "name": "Agora"
+    "name": "Agora",
+    "email": "devrel@agora.io"
   },
+  "homepage": "https://github.com/AgoraIO/skills",
   "repository": "https://github.com/AgoraIO/skills",
   "license": "MIT",
-  "mcpServers": "./mcp-config.json",
   "keywords": [
     "agora",
     "rtc",

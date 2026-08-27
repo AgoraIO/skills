@@ -272,7 +272,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
 }
 ```
 
-For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).
+For test setup and mocking patterns, see [references/testing-guidance/README.md](../testing-guidance/README.md).
 
 ## Official Documentation
 
