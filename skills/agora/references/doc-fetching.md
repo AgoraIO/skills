@@ -16,7 +16,7 @@ If the Agora Docs MCP tool (`agora-docs-mcp`) is available in the current tool/r
 1. Fetch the Agora docs sitemap:
 
    ```http
-   GET https://docs.agora.io/en/llms.txt
+   GET https://docs.agora.io/llms.txt
    ```
 
 2. Scan the response for a URL matching the product and topic.
@@ -35,13 +35,13 @@ known markdown entry points directly:
 | RTM (iOS) | <https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart?platform=ios.md> |
 | RTM (Android) | <https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart?platform=android.md> |
 | ConvoAI | <https://docs-md.agora.io/en/conversational-ai/get-started/quickstart.md> |
-| ConvoAI (TypeScript SDK) | <https://docs-md.agora.io/en/conversational-ai/develop/integrate-sdk.md> |
-| ConvoAI (Python SDK) | <https://docs-md.agora.io/en/conversational-ai/develop/integrate-sdk?platform=python.md> |
+| ConvoAI (TypeScript SDK) | <https://docs.agora.io/en/ai/get-started/quickstart.md> |
+| ConvoAI (Python SDK) | <https://docs.agora.io/en/ai/get-started/quickstart.md> |
 | Cloud Recording | <https://docs-md.agora.io/en/cloud-recording/get-started/getstarted.md> |
-| Server Gateway (C++) | <https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk.md> |
-| Server Gateway (Java) | <https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=java.md> |
-| Server Gateway (Python) | <https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=python.md> |
-| Server Gateway (Go) | <https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=go.md> |
+| Server Gateway (C++) | <https://docs.agora.io/en/realtime-media/rtc-server-sdk/quickstart/linux-cpp.md> |
+| Server Gateway (Java) | <https://docs.agora.io/en/realtime-media/rtc-server-sdk/quickstart/linux-java.md> |
+| Server Gateway (Python) | <https://docs.agora.io/en/realtime-media/rtc-server-sdk/quickstart/python.md> |
+| Server Gateway (Go) | <https://docs.agora.io/en/realtime-media/rtc-server-sdk/quickstart/go.md> |
 | Tokens | <https://docs-md.agora.io/en/video-calling/token-authentication/deploy-token-server.md> |
 
 ## Agora Docs MCP Server (optional)

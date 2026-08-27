@@ -246,6 +246,6 @@ service = nullptr;
 
 ## Official Documentation
 
-- **[Send and Receive Media Streams](https://docs.agora.io/en/server-gateway/develop/send-receive-media-streams?platform=linux-cpp)**
-- **[Video Mixing](https://docs.agora.io/en/server-gateway/develop/video-mixing?platform=linux-cpp)**
+- **[Send and Receive Media Streams](https://docs.agora.io/en/realtime-media/rtc-server-sdk/build/build-core-media-features/send-receive-media-streams)**
+- **[Video Mixing](https://docs.agora.io/en/realtime-media/rtc-server-sdk/build/build-core-media-features/video-mixing)**
 - **[API Reference](https://api-ref.agora.io/en/server-gateway-sdk/linux-cpp/4.x/index.html)**

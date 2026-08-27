@@ -23,8 +23,8 @@ Tokens authenticate users before joining channels. Generated server-side from Ap
 
 ## Token Generation Guides
 
-- **[Deploy a Token Server](https://docs.agora.io/en/video-calling/token-authentication/deploy-token-server)** — Express/Flask/Go server examples
-- **[Use Tokens](https://docs.agora.io/en/video-calling/token-authentication/authentication-workflow)** — When and how tokens are used
+- **[Deploy a Token Server](https://docs.agora.io/en/realtime-media/rtc/build/authenticate-users/deploy-token-server)** — Express/Flask/Go server examples
+- **[Use Tokens](https://docs.agora.io/en/realtime-media/rtc/build/authenticate-users/authentication-workflow)** — When and how tokens are used
 
 ## Token Libraries
 
@@ -51,7 +51,7 @@ All implementations are in [AgoraIO/Tools — DynamicKey/AgoraDynamicKey](https:
 - **RTM Token** — access for Real-Time Messaging
 - **Combined RTC + RTM Token** — bundles RTC + RTM privileges in one token via `buildTokenWithRtm`; also satisfies the `agora token=` auth header for ConvoAI REST API calls (see [conversational-ai/README.md](../conversational-ai/README.md#authentication))
 
-> **[AccessToken2 Guide](https://docs.agora.io/en/video-calling/token-authentication/deploy-token-server)** — AccessToken2 with multi-service privileges
+> **[AccessToken2 Guide](https://docs.agora.io/en/realtime-media/rtc/build/authenticate-users/deploy-token-server)** — AccessToken2 with multi-service privileges
 
 ## buildTokenWithRtm (Node.js)
 

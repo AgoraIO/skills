@@ -342,5 +342,5 @@ When using RTM REST APIs, implement exponential back-off on rate limit responses
 
 For APIs or features not covered above:
 
-- API Reference: <https://docs.agora.io/en/signaling/reference/api?platform=web>
-- Guides: <https://docs.agora.io/en/signaling/overview/product-overview>
+- API Reference: <https://docs.agora.io/en/api-reference/api-ref/signaling/web.md>
+- Guides: <https://docs.agora.io/en/realtime-media/rtm>

@@ -11,7 +11,7 @@
 - [Cleanup](#cleanup)
 - [Complete Example](#complete-example)
 
-API Reference: <https://api-ref.agora.io/en/signaling/android/2.x/API/rtm_api_overview.html>
+API Reference: <https://docs.agora.io/en/api-reference/api-ref/signaling/android.md>
 
 ## Installation
 
@@ -274,4 +274,4 @@ For test setup and mocking patterns, see [references/testing-guidance/README.md]
 For APIs or features not covered above:
 
 - Quick-start guide: <https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart.md?platform=android>
-- API Reference: <https://api-ref.agora.io/en/signaling/android/2.x/API/rtm_api_overview.html>
+- API Reference: <https://docs.agora.io/en/api-reference/api-ref/signaling/android.md>

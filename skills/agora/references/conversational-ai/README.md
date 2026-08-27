@@ -115,7 +115,7 @@ vendor availability, beta status, and vendor-specific configs should come from l
 
 For content that still needs live docs after the local check, use Level 2:
 
-1. Fetch `https://docs.agora.io/en/llms.txt`
+1. Fetch `https://docs.agora.io/llms.txt`
 2. Scan for a URL matching your topic (e.g., `conversational-ai`, `quick-start`, `rest-api`)
 3. Fetch that URL
 

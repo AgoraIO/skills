@@ -89,7 +89,7 @@ Read the file matching the user's platform:
 - **[flutter.md](flutter.md)** — `agora_rtc_engine` (Dart): engine init, events, AgoraVideoView, complete example
 - **[cross-platform-coordination.md](cross-platform-coordination.md)** — UID strategy, codec interop, screen sharing across platforms, audio routing, common cross-platform bugs
 
-For additional platforms and advanced features: <https://docs-md.agora.io/en/video-calling/get-started/get-started-sdk.md> — voice-only: <https://docs-md.agora.io/en/voice-calling/get-started/get-started-sdk.md>
+For additional platforms and advanced features: <https://docs.agora.io/en/realtime-media/rtc/get-started-sdk> — voice-only: <https://docs.agora.io/en/realtime-media/voice>
 
 For test setup and mocking patterns, see [references/testing-guidance/README.md](../testing-guidance/README.md).
 

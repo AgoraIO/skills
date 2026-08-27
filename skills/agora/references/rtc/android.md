@@ -341,4 +341,4 @@ class VideoCallActivity : AppCompatActivity() {
 For APIs or features not covered above:
 
 - API Reference: <https://api-ref.agora.io/en/video-sdk/android/4.x/API/rtc_api_overview.html>
-- Guides: <https://docs.agora.io/en/video-calling/overview/product-overview>
+- Guides: <https://docs.agora.io/en/realtime-media/rtc>

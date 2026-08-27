@@ -182,5 +182,5 @@ Prefer hooks and components over direct `client.*` calls in React. Drop down to 
 
 ## Official Documentation
 
-- React Quickstart: <https://docs.agora.io/en/video-calling/get-started/get-started-sdk?platform=react-js>
+- React Quickstart: <https://docs.agora.io/en/realtime-media/rtc/get-started-sdk>
 - API Reference: <https://api-ref.agora.io/en/video-sdk/reactjs/2.x/>

@@ -78,4 +78,4 @@ network conditions. Do not copy a cached capacity number from this skill.
 ## Official Documentation
 
 - [Web SDK API reference](https://api-ref.agora.io/en/video-sdk/web/4.x/index.html)
-- [Agora video calling guides](https://docs.agora.io/en/video-calling/overview/product-overview)
+- [Agora video calling guides](https://docs.agora.io/en/realtime-media/rtc)

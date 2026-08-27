@@ -40,7 +40,7 @@ an HTTP MCP server in your tool's MCP settings. See your tool's documentation fo
 the exact configuration format.
 
 For the latest setup instructions and any changes to the endpoint, see:
-<https://docs.agora.io/en/mcp>
+<https://docs.agora.io/en/ai/get-started/mcp-integrate.md>
 
 ## Usage Note
 
