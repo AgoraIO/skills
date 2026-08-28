@@ -29,7 +29,7 @@ known markdown entry points directly:
 
 | Product / Language | Markdown URL |
 |---|---|
-| RTC (Web/general) | <https://docs-md.agora.io/en/video-calling/get-started/get-started-sdk.md> |
+| RTC (Web/general) | <https://docs.agora.io/en/realtime-media/rtc/get-started-sdk> |
 | RTC (voice-only) | <https://docs-md.agora.io/en/voice-calling/get-started/get-started-sdk.md> |
 | RTM (Web/general) | <https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart.md> |
 | RTM (iOS) | <https://docs-md.agora.io/en/signaling/get-started/sdk-quickstart?platform=ios.md> |
@@ -42,7 +42,7 @@ known markdown entry points directly:
 | Server Gateway (Java) | <https://docs.agora.io/en/realtime-media/rtc-server-sdk/quickstart/linux-java.md> |
 | Server Gateway (Python) | <https://docs.agora.io/en/realtime-media/rtc-server-sdk/quickstart/python.md> |
 | Server Gateway (Go) | <https://docs.agora.io/en/realtime-media/rtc-server-sdk/quickstart/go.md> |
-| Tokens | <https://docs-md.agora.io/en/video-calling/token-authentication/deploy-token-server.md> |
+| Tokens | <https://docs.agora.io/en/realtime-media/rtc/build/authenticate-users/deploy-token-server> |
 
 ## Agora Docs MCP Server (optional)
 

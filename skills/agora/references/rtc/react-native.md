@@ -262,5 +262,5 @@ For test setup and mocking patterns, see [references/testing-guidance/README.md]
 
 For APIs or features not covered above:
 
-- Quick-start guide: <https://docs-md.agora.io/en/video-calling/get-started/get-started-sdk.md?platform=react-native>
+- Quick-start guide: <https://docs.agora.io/en/realtime-media/rtc/get-started-sdk>
 - API Reference: <https://api-ref.agora.io/en/video-sdk/react-native/4.x/API/rtc_api_overview.html>
