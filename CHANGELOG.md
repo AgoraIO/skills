@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Claude Code is pinned in CI, and clean-install packaging assertions now use `plugin list --json` instead of human-readable spacing.
 - Agora CLI references now use the canonical `dl.agora.io` installer, the verified minimum is `0.2.1`, and region/config guidance is version-agnostic.
 - ConvoAI quickstart readiness now verifies the sample page and uses the documented npm fallback when pnpm lifecycle scripts are blocked.
+- ConvoAI quickstart setup now keeps env writes and startup commands explicit and standalone, avoiding opaque shell wrappers that obscure readiness evidence.
 
 ## [1.8.1] - 2026-06-26
 

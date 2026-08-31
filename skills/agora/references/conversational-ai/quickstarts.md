@@ -214,6 +214,7 @@ After `pnpm install` reports `[ERR_PNPM_IGNORED_BUILDS]`:
 
 - Run the documented `pnpm dev` once. The warning is non-blocking only if that command starts Next.js and a real GET of the local URL returns a non-empty successful response.
 - If `pnpm dev` exits before Next.js starts with the same ignored-builds error, use the sample's npm scripts without changing the quickstart's tracked configuration: `npm install --package-lock=false`, then `npm run dev`.
+- If pnpm is not installed, do not invoke it through `npx` or another wrapper; use the documented npm fallback directly when the sample supports npm.
 - Do not run `pnpm approve-builds`, set pnpm build-approval configuration, add pnpm configuration to `package.json`, or create `pnpm-workspace.yaml` / `pnpm.yaml`.
 
 ## Command Integrity Under Environment Restrictions
@@ -284,6 +285,11 @@ Use the CLI in this order:
 3. Use `agora project env --with-secrets --json` only for manual mapping flows that need raw credential values.
 4. Use `project show --json` only for project metadata inspection.
 
+Keep credential-file writes as a standalone setup action, followed by a separate
+verification action. Do not combine env-file creation, secret expansion, and
+dependency installation into one opaque shell command; this keeps setup
+auditable and makes failures attributable to the correct step.
+
 Do **not** treat a healthy doctor result as a proven ConvoAI baseline.
 
 For command details, route to the CLI references:
@@ -327,7 +333,7 @@ If no stack preference is provided, default to:
    3.1 Clone the selected official quickstart (`agent-quickstart-python`, `agent-quickstart-nextjs`, or `agent-quickstart-go`) directly or through `agora init`
    3.2 Install and start with the selected sample's documented commands:
    - Python baseline: `bun install` then `bun run dev`
-   - Node/TS baseline: run `pnpm install` then `pnpm dev` when pnpm is available; otherwise fall back to `npm install` then `npm run dev` when the sample supports npm
+   - Node/TS baseline: run `pnpm install` then `pnpm dev` when pnpm is available; otherwise run the documented `npm install --package-lock=false` then `npm run dev` fallback when the sample supports npm. Never substitute `npx pnpm`, `pnpm exec`, or a direct framework command.
    3.3 Ensure the expected env file is present:
    - Python baseline: `server/.env` with `APP_ID` + `APP_CERTIFICATE`
    - Node/TS baseline: `.env.local` with `NEXT_PUBLIC_AGORA_APP_ID` + `NEXT_AGORA_APP_CERTIFICATE`
