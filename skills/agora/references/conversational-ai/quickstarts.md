@@ -290,6 +290,13 @@ verification action. Do not combine env-file creation, secret expansion, and
 dependency installation into one opaque shell command; this keeps setup
 auditable and makes failures attributable to the correct step.
 
+When `AGORA_APP_ID` and `AGORA_APP_CERTIFICATE` are already available in the
+environment, that does not bypass the CLI path: after CLI readiness, run
+`agora quickstart env write <repo> --project <project>` as its own command and
+then inspect the generated file in a separate command. Only use a manual mapping
+when the CLI cannot perform the selected template-aware write, and keep each
+file-write and verification action separate.
+
 Do **not** treat a healthy doctor result as a proven ConvoAI baseline.
 
 For command details, route to the CLI references:

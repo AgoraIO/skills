@@ -83,6 +83,12 @@ Ask at most one focused clarification when the route is still unclear.
 
 3. **CLI readiness gate.** Before any mutating Agora CLI command (`init`, `quickstart`, `project`, or `login`), run the read-only probe in **[references/cli/README.md](references/cli/README.md)**. Block normal CLI workflow when `agora version` is below Minimum CLI `0.2.1`, when PATH still resolves an older binary, or when config schema is newer than the running CLI. Installers are allowed only as readiness remediation after user approval. Use the documented curl-first upgrade path. `--add-to-path` was removed in `0.2.0` — do not use it. `--force` / `-Force` are real installer flags, but they install alongside a managed install and create PATH shadowing — do not use them to bypass a refusal.
 
+When a ConvoAI quickstart already has `AGORA_APP_ID` and
+`AGORA_APP_CERTIFICATE` in the environment, those values still go through the
+template-aware `agora quickstart env write` path after CLI readiness. Do not
+silently replace that action with an opaque shell pipeline; write the env file
+and verify it as separate actions.
+
 ### ConvoAI Enforcement
 
 Apply these rules to every ConvoAI request until the official quickstart has been cloned and inspected:
