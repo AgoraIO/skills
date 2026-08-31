@@ -210,11 +210,11 @@ Exit code alone does not determine whether to proceed. Read command output and m
 
 ### Node/TS baseline (`agent-quickstart-nextjs`)
 
-After `pnpm install`:
+After `pnpm install` reports `[ERR_PNPM_IGNORED_BUILDS]`:
 
-- **`[ERR_PNPM_IGNORED_BUILDS]`** is not a blocking error. The sample's dev script uses `next dev --webpack` explicitly — esbuild, sharp, and unrs-resolver build scripts are not required for the dev path. If packages were added and the only non-zero exit is this warning, proceed directly to `pnpm dev`.
-- If `pnpm dev` re-runs an install check and prints the same ignored-builds warning, treat that as non-blocking too — run the README `pnpm dev` again or start the documented dev script from the quickstart directory. Do not stop before a dev server is listening.
-- Do not run `pnpm approve-builds`, `pnpm config set onlyBuiltDependencies`, `pnpm dev --ignore-scripts`, edit `package.json` with pnpm config fields, create `pnpm.yaml`, or change global pnpm build-approval settings to resolve this warning during first-success setup.
+- Run the documented `pnpm dev` once. The warning is non-blocking only if that command starts Next.js and a real GET of the local URL returns a non-empty successful response.
+- If `pnpm dev` exits before Next.js starts with the same ignored-builds error, use the sample's npm scripts without changing the quickstart's tracked configuration: `npm install --package-lock=false`, then `npm run dev`.
+- Do not run `pnpm approve-builds`, set pnpm build-approval configuration, add pnpm configuration to `package.json`, or create `pnpm-workspace.yaml` / `pnpm.yaml`.
 
 ## Command Integrity Under Environment Restrictions
 
@@ -250,10 +250,7 @@ Do **not** reinterpret these failures as sample misconfiguration and do **not** 
 
 ### Install warnings (Node/TS baseline)
 
-When `pnpm install` exits non-zero:
-
-- If the output is caused solely by `[ERR_PNPM_IGNORED_BUILDS]`, classify it as a **warning**, not a failure. Continue to the next documented command (`pnpm dev`). Do not attempt to resolve it before starting the app.
-- Do not treat this warning as sample misconfiguration or as proof that dependencies failed to install.
+When `pnpm install` exits non-zero only for `[ERR_PNPM_IGNORED_BUILDS]`, packages may still be linked but required lifecycle scripts have not run. Start with `pnpm dev` and verify the page with a real GET. If that command exits before Next.js starts for the same reason, use the npm fallback above. Do not describe the sample as ready until the page is actually reachable.
 
 ## First-Success Readiness Layers
 
@@ -304,7 +301,7 @@ After the CLI readiness step is resolved, return to this quickstart and continue
 Select the baseline sample from user preference first, then installed tools:
 
 - If user explicitly wants Python (or has no preference): use `agent-quickstart-python`.
-- If user explicitly wants Node/TypeScript and has the runtime and package manager declared by the current sample: use `agent-quickstart-nextjs`.
+- If user explicitly wants Node/TypeScript and has Node 22+ plus pnpm 8+ (preferred) or npm fallback: use `agent-quickstart-nextjs`.
 - If user asks for Go as the final backend, still complete one official quickstart baseline first, then route to [go-sdk.md](go-sdk.md) for backend implementation.
 
 If no stack preference is provided, default to:
@@ -313,11 +310,11 @@ If no stack preference is provided, default to:
 
 1. Runtime prerequisites
    1.1 Python baseline: Bun (package manager & script runner) + Python 3.8+
-   1.2 Node/TS baseline: use the Node.js and package-manager versions declared by the current sample; use its documented npm fallback only when supported
+   1.2 Node/TS baseline: Node.js 22+ + pnpm 8+ preferred; fallback to npm when pnpm is unavailable and the sample supports npm
 2. CLI preflight
-   2.1 Complete [CLI readiness](../cli/README.md#cli-readiness-agents) — block if below `0.1.7` or PATH resolves an old binary
+   2.1 Complete [CLI readiness](../cli/README.md#cli-readiness-agents) — block if below Minimum CLI `0.2.1` or PATH resolves an old binary
    2.2 Log in: `agora login`
-   2.3 Verify CLI version with `agora version` (minimum `0.2.1`, floor `0.1.7`)
+   2.3 Verify CLI version with `agora version` (Minimum CLI `0.2.1`)
    2.4 Prefer `agora init <name> --template <template> --json` where `<template>` matches the selected baseline (`python` or `nextjs`)
    2.5 For an existing official quickstart, use `agora quickstart env write <repo> --project <project>` — not `project env write`
    2.6 If decomposing the flow, prefer the current selected project only if it is directly usable for first-success

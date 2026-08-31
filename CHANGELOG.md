@@ -21,6 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - The public skill now declares its MIT license explicitly. A separate CI step installs the official Agent Skills reference validator at pinned commit `69ef37e9424c0a7ea9dd2293b559e43ec8176379` and validates `skills/agora`.
 - RTC Web client/join alternatives again retain their semantic comments, and the detailed screen-sharing pattern now lives in its own routed topic instead of leaving `web.md` at the size ceiling.
 - Claude Code is pinned in CI, and clean-install packaging assertions now use `plugin list --json` instead of human-readable spacing.
+- Agora CLI references now use the canonical `dl.agora.io` installer, the verified minimum is `0.2.1`, and region/config guidance is version-agnostic.
+- ConvoAI quickstart readiness now verifies the sample page and uses the documented npm fallback when pnpm lifecycle scripts are blocked.
 
 ## [1.8.1] - 2026-06-26
 

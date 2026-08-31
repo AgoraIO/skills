@@ -31,6 +31,10 @@ runs:
           echo "::error::No eval ref resolved (set eval_ref input or .github/eval-pin.env)"
           exit 1
         fi
+        if [[ "$REF" =~ ^[0-9a-fA-F]{1,39}$ ]]; then
+          echo "::error::eval_ref looks like a shortened commit SHA. Use a full 40-character SHA, branch, or tag."
+          exit 1
+        fi
         echo "ref=${REF}" >> "$GITHUB_OUTPUT"
 
     - name: Clone agentic-evals

@@ -26,7 +26,8 @@ permissions:
 
 jobs:
   sync:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    # Temporarily disabled until the fork sync destination is re-approved.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     env:
       TARGET_REPO: AgoraIO/skills

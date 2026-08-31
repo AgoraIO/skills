@@ -4,7 +4,9 @@
 
 Use this file when the user needs script-safe CLI usage, machine-readable output, environment overrides, or agent-oriented command discovery.
 
-Verified against Agora CLI `0.2.1`.
+Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
+
+> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
 
 > **Agents:** start with [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any mutating command.
 
@@ -120,7 +122,7 @@ Other verified environment overrides are discoverable through `agora env-help --
 
 ## Suggested Agent Pattern
 
-After [CLI readiness](README.md#cli-readiness-agents) passes on a `0.2.0+` CLI:
+After [CLI readiness](README.md#cli-readiness-agents) passes:
 
 ```bash
 agora doctor --json

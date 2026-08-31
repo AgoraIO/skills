@@ -4,7 +4,7 @@ Use this module when the user is asking how to use the installed `agora` command
 
 <!-- applies-from: v0.2.1 -->
 
-Verified against Agora CLI `0.2.1`. Minimum supported CLI is `>=0.1.7`. Label older behavior as deprecated or removed when it no longer matches the installed CLI.
+Last verified against Agora CLI `0.2.7`. Minimum CLI `0.2.1`. Label older behavior as deprecated or removed when it no longer matches the installed CLI.
 
 The canonical CLI repository is <https://github.com/AgoraIO/cli>. Use that repository's `README.md`, `docs/commands.md`, `docs/automation.md`, `docs/error-codes.md`, `docs/telemetry.md`, `CHANGELOG.md`, and releases for Level 2 CLI lookup when these bundled references are not enough.
 
@@ -44,13 +44,12 @@ The Agora Docs MCP server (`agora-docs-mcp`) and the Agora CLI solve different p
 | Item | Value |
 |---|---|
 | Canonical repo | `https://github.com/AgoraIO/cli` |
-| Preferred installer | `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh \| sh` |
-| Windows PowerShell installer | `irm https://raw.githubusercontent.com/AgoraIO/cli/main/install.ps1 \| iex` |
-| npm package | `agoraio-cli` (Node 18+; thin install wrapper for the same Go binary) |
+| Preferred installer | `curl -fsSL https://dl.agora.io/cli/install.sh \| sh` |
+| Windows PowerShell installer | `irm https://dl.agora.io/cli/install.ps1 \| iex` |
 | Installed command | `agora` |
 | Deprecated package | `agora-cli-preview` |
-| Verified against | `0.2.1` |
-| Minimum supported | `0.1.7` |
+| Last verified | `0.2.7` |
+| Minimum CLI | `0.2.1` |
 | Default output mode | `pretty` |
 | Agent-safe output mode | `--json` |
 | Agent-safe command tree | `agora introspect --json` |
@@ -77,13 +76,15 @@ Verified in CLI `0.2.1`:
 - telemetry group: `telemetry status`, `telemetry enable`, `telemetry disable`
 - upgrade aliases: `agora update`, `agora self-update`
 
+This list was compiled at CLI `0.2.1` and is not exhaustive of later releases: `0.2.6` added a `project webhook` command group that is not enumerated here. `agora introspect --json` is authoritative for the live command tree — treat it as the source of truth before telling a user a command doesn't exist.
+
 For agents, `agora introspect --json` is the preferred way to discover the current command tree programmatically. `agora --help --all` is the human-readable equivalent.
 
 If the user asks for a command outside this surface, do not invent it. Route them to the closest real command or say it is not part of the verified CLI. For example, `agora convoai init` and `agora project doctor all` are still not verified commands; use `agora init`, `agora quickstart ...`, or `agora project doctor --feature convoai` instead.
 
 ## CLI Readiness (agents)
 
-Run this checklist **before any mutating CLI command** — including ConvoAI quickstart setup that uses the CLI. Start with the read-only probe. If the CLI is missing, below the minimum, shadowed on PATH, or blocked by a config schema mismatch, installers or global npm are allowed only as readiness remediation after user approval.
+Run this checklist **before any mutating CLI command** — including ConvoAI quickstart setup that uses the CLI. Start with the read-only probe. If the CLI is missing, below the minimum, shadowed on PATH, or blocked by a config schema mismatch, installers are allowed only as readiness remediation after user approval.
 
 ### 1. Read-only probe
 
@@ -92,20 +93,20 @@ agora version
 which -a agora          # macOS / Linux; use where.exe agora on Windows
 ```
 
-Run `agora doctor --json` only after the resolved CLI supports it (`0.2.0+`) or after upgrading. For `0.1.7–0.1.x`, use `agora version` plus PATH inspection, then prefer upgrading to the verified `0.2.1` baseline before deeper diagnostics.
+Run `agora doctor --json` after the read-only probe. It is available in every supported release.
 
 ### 2. Version gate
 
-- **Minimum supported:** `0.1.7` (`agora upgrade`, `introspect`, npm channel, and stable automation errors require this floor).
-- **Below minimum** (for example `0.1.6`) or command not found → stop and upgrade. Do **not** rely on `agora upgrade` on `0.1.6`; that subcommand does not exist there.
+- **Minimum CLI:** `0.2.1`.
+- **Below minimum** or command not found → stop and upgrade.
 
-**Upgrade order** (ask for user approval before installers or global npm):
+**Upgrade order** (ask for user approval before running installers):
 
-1. **Preferred:** `curl -fsSL https://raw.githubusercontent.com/AgoraIO/cli/main/install.sh | sh`
-   - Never use `--add-to-path` (removed in 0.2.0) or invent `--force` flags.
-2. **Alternate:** `npm install -g agoraio-cli` (Node 18+), then repeat step 1 probes.
-3. **If version is 0.1.7–0.2.0 and self-update fails crossing 0.2.1:** re-run the curl installer once (archive prefix rename).
-4. **Confirm:** `agora version` shows `>=0.1.7`, then run `agora doctor --json` when available before continuing.
+1. **Preferred (macOS / Linux):** `curl -fsSL https://dl.agora.io/cli/install.sh | sh`
+   **Preferred (Windows PowerShell):** `irm https://dl.agora.io/cli/install.ps1 | iex`
+   - `--add-to-path` was removed in 0.2.0 — do not use it. `--force` / `-Force` do exist, but they install alongside a managed install and create PATH shadowing; do not use them to bypass a refusal.
+2. **npm-managed installs:** if `which -a agora` (or `where.exe agora`) resolves the binary under `npm prefix -g`, the standalone installer refuses with exit `7` and suggests `npm update -g agoraio-cli` — do not follow that suggestion, it resolves to the stale `0.1.6`, below Minimum CLI. Do not pass `--force`/`-Force` to override the refusal either. See [install-auth.md](install-auth.md#npm-managed-installs) for the platform-specific migration commands.
+3. **Confirm:** `agora version` shows `>=0.2.1`, then run `agora doctor --json` before continuing.
 
 ### 3. PATH shadowing
 
@@ -117,15 +118,15 @@ which -a agora
 
 Run the shell-specific PATH fix printed by `agora doctor`, or reorder PATH so the new install directory wins. Do not continue agent workflows until the probed version matches.
 
-Do not uninstall binaries automatically. If an old `agora` binary still shadows the new install after PATH recovery, ask for user approval before removing it. For installer-managed installs, use the upstream uninstall path (`install.sh --uninstall` / `install.ps1 -Uninstall`); otherwise remove or rename only the specific stale binary the user approves.
+Do not uninstall binaries automatically. If an old `agora` binary still shadows the new install after PATH recovery, ask for user approval before removing it. For installer-managed installs, use the upstream uninstall path (`install.sh --uninstall` / `install.ps1 -Uninstall`). For npm-managed installs, remove with `npm uninstall -g agoraio-cli`, or migrate in place with `--replace-npm` (see [install-auth.md](install-auth.md#npm-managed-installs)) — do not delete an npm-managed binary by hand. Otherwise remove or rename only the specific stale binary the user approves.
 
 ### 4. Config schema mismatch
 
 Error: `Config version N is newer than this CLI supports.`
 
 - Usually an old binary is still on PATH while config was written by a newer CLI.
-- Fix: complete the upgrade playbook above (0.2.0+ supports config v3 and auto-migrates).
-- Last resort on a stuck old binary: back up config (`agora config path`), set `"version": 2`, then upgrade.
+- Fix: complete the upgrade playbook above. Current releases auto-migrate config forward on first load.
+- Last resort on a binary that cannot be upgraded: back up the config file (`agora config path`), then lower its `version` field to a value the running binary accepts.
 
 ### 5. Agent-safe command shapes
 
@@ -159,3 +160,5 @@ Topic files link here instead of duplicating this playbook: [install-auth.md](in
 - Prefer the installer defaults; `--add-to-path` was removed in `0.2.0` because PATH wiring is now on by default.
 - Do not present `agora-cli-preview` as current.
 - Do not call undocumented commands such as `agora convoai init`.
+- Do not present npm `agoraio-cli` as an install or upgrade channel; it is stale below Minimum CLI and publishing is disabled upstream.
+- Do not ask the user to choose a region; resolve it from `.agora/project.json`, then session state, then default to `global`. See [install-auth.md](install-auth.md).

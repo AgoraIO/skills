@@ -48,8 +48,10 @@ jobs:
         run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Setup eval harness
+        id: setup
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
+          eval_repo: AgoraIO/agentic-evals
           eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Setup Python
@@ -60,7 +62,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pyyaml
-          npm install -g acpx@latest agent-browser @openai/codex
+          npm install -g acpx@0.13.0 agent-browser @openai/codex
           npm install -g openclaw@latest
           openclaw --version
           acpx --version
@@ -199,14 +201,14 @@ jobs:
           python3 scripts/run_openclaw_eval.py
 
       - name: Generate report
-        if: always()
+        if: always() && steps.resolve.outputs.run_dir != ''
         working-directory: agentic-evals
         env:
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
         run: python3 scripts/generate_report.py
 
       - name: Upload artifacts
-        if: always()
+        if: always() && steps.resolve.outputs.run_dir != ''
         uses: actions/upload-artifact@v4
         with:
           name: eval-run-openclaw-${{ env.TARGET_ID }}-${{ github.run_id }}
@@ -215,7 +217,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Post report to job summary
-        if: always()
+        if: always() && steps.resolve.outputs.run_dir != ''
         env:
           RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
         run: |
@@ -226,7 +228,7 @@ jobs:
           fi
 
       - name: Post PR comment
-        if: github.event_name == 'pull_request' && always()
+        if: github.event_name == 'pull_request' && always() && steps.resolve.outputs.run_dir != ''
         uses: actions/github-script@v7
         env:
           RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
@@ -246,23 +248,35 @@ jobs:
             });
 
       - name: Report results
-        if: always()
+        if: always() && steps.resolve.outputs.run_dir != ''
         env:
           RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
         run: |
           RESULTS_DIR="${RUN_DIR}/case-results"
           [ -d "$RESULTS_DIR" ] || { echo "::warning::No case-results"; exit 0; }
-          FAIL=$(grep -rl '"status": "fail"' "$RESULTS_DIR" 2>/dev/null | wc -l | tr -d ' ')
-          PASS=$(grep -rl '"status": "pass"' "$RESULTS_DIR" 2>/dev/null | wc -l | tr -d ' ')
-          BLOCKED=$(grep -rl '"status": "blocked"' "$RESULTS_DIR" 2>/dev/null | wc -l | tr -d ' ')
+          read -r PASS FAIL BLOCKED < <(python3 - "$RESULTS_DIR" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          counts = {"pass": 0, "fail": 0, "blocked": 0}
+          for path in Path(sys.argv[1]).glob("*.json"):
+              try:
+                  status = json.loads(path.read_text()).get("status")
+              except (OSError, json.JSONDecodeError):
+                  status = "blocked"
+              counts[status if status in counts else "blocked"] += 1
+          print(counts["pass"], counts["fail"], counts["blocked"])
+          PY
+          )
           echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
           if [ "$FAIL" -gt 0 ] || [ "$BLOCKED" -gt 0 ]; then
-            echo "::error::${FAIL} fail, ${BLOCKED} blocked — see report for details"
+            echo "::error::${FAIL} fail, ${BLOCKED} blocked - see report for details"
             exit 1
           fi
 
       - name: Notify Feishu
-        if: always() && github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request' && steps.resolve.outputs.run_dir != ''
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}

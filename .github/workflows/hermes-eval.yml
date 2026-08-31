@@ -12,7 +12,7 @@ on:
         required: false
         default: "convoai-e2e-first-success"
       hermes_model:
-        description: "Hermes model (e.g. openai/gpt-4o)"
+        description: "Hermes model (e.g. gpt-5.4)"
         required: false
         default: ""
       eval_ref:
@@ -46,8 +46,10 @@ jobs:
           path: skills-repo
 
       - name: Setup eval harness
+        id: setup
         uses: ./skills-repo/.github/actions/setup-eval-harness
         with:
+          eval_repo: AgoraIO/agentic-evals
           eval_ref: ${{ github.event.inputs.eval_ref || '' }}
 
       - name: Validate YAML
@@ -78,14 +80,18 @@ jobs:
       - name: Install runtime dependencies
         run: |
           pip install pyyaml
-          npm install -g agent-browser @openai/codex
+          npm install -g --allow-scripts=agent-browser agent-browser @openai/codex
+          agent-browser install
+          agent-browser --version
+          agent-browser --session hermes-preflight open about:blank
+          agent-browser --session hermes-preflight close
 
       - name: Install Hermes Agent
         run: |
           curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup
           source ~/.bashrc || source ~/.zshrc || true
           export PATH="$HOME/.local/bin:$PATH"
-          hermes version
+          hermes --version
 
       - name: Configure Hermes
         env:
@@ -109,12 +115,17 @@ jobs:
           BASE_URL="${BASE_URL%/}/v1"
 
           # Determine model
-          MODEL="${HERMES_MODEL:-openai/gpt-4o}"
+          MODEL="${HERMES_MODEL:-gpt-5.4}"
 
-          # Configure via hermes config set (proven working approach)
-          hermes config set model.provider custom
-          hermes config set model.base_url "${BASE_URL}"
-          hermes config set model.model "${MODEL}"
+          # Use a named custom provider so Hermes sends the API key to the
+          # non-OpenAI endpoint and uses the Responses API transport.
+          hermes config set providers.test-endpoint.name test-endpoint
+          hermes config set providers.test-endpoint.base_url "${BASE_URL}"
+          hermes config set providers.test-endpoint.key_env OPENAI_API_KEY
+          hermes config set providers.test-endpoint.transport codex_responses
+          hermes config set providers.test-endpoint.default_model "${MODEL}"
+          hermes config set model.provider custom:test-endpoint
+          hermes config set model.default "${MODEL}"
           hermes config set agent.max_turns 90
           hermes config set tools.profile coding
           hermes config set terminal.backend local
@@ -122,24 +133,43 @@ jobs:
           # Write .env for API key
           echo "OPENAI_API_KEY=${OPENAI_API_KEY}" > ~/.hermes/.env
 
-          echo "Hermes configured: provider=custom, base_url=${BASE_URL}, model=${MODEL}"
+          echo "Hermes configured: provider=custom:test-endpoint, base_url=${BASE_URL}, model=${MODEL}"
 
       - name: Hermes auth smoke test
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           set -e
-          if hermes run --max-turns 1 "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
-            echo "Hermes smoke test passed via hermes run."
-          elif hermes chat --yolo --quiet -q "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
-            echo "Hermes smoke test passed via hermes chat."
-          else
-            echo "::error::Hermes auth smoke test failed. Confirm RESPONSES_API_ENDPOINT and OPENAI_API_KEY are valid."
-            cat /tmp/hermes-smoke.log
-            exit 1
-          fi
-          if grep -q "INVALID_API_KEY" /tmp/hermes-smoke.log; then
-            echo "::error::Hermes returned INVALID_API_KEY during smoke test."
+          smoke_passed=0
+          for attempt in 1 2 3; do
+            if hermes run --max-turns 1 "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
+              echo "Hermes smoke test passed via hermes run."
+              smoke_passed=1
+              break
+            elif hermes chat --yolo --quiet -q "Reply OK" >/tmp/hermes-smoke.log 2>&1; then
+              echo "Hermes smoke test passed via hermes chat."
+              smoke_passed=1
+              break
+            fi
+
+            if grep -q "INVALID_API_KEY" /tmp/hermes-smoke.log; then
+              echo "::error::Hermes returned INVALID_API_KEY during smoke test."
+              cat /tmp/hermes-smoke.log
+              exit 1
+            fi
+            if ! grep -q "HTTP 503" /tmp/hermes-smoke.log; then
+              echo "::error::Hermes auth smoke test failed. Confirm RESPONSES_API_ENDPOINT and OPENAI_API_KEY are valid."
+              cat /tmp/hermes-smoke.log
+              exit 1
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "::warning::Hermes provider returned HTTP 503; retrying smoke test (${attempt}/3)."
+              sleep 15
+            fi
+          done
+
+          if [ "$smoke_passed" -ne 1 ]; then
+            echo "::error::Hermes provider remained unavailable after 3 smoke-test attempts."
             cat /tmp/hermes-smoke.log
             exit 1
           fi
@@ -203,20 +233,21 @@ jobs:
           AGORA_APP_CERTIFICATE: ${{ secrets.AGORA_APP_CERTIFICATE }}
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
           HERMES_MODEL: ${{ github.event.inputs.hermes_model || '' }}
+          AGENT_BROWSER_DEBUG: "1"
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           source /tmp/agora-credentials.env
           python3 scripts/run_hermes_eval.py
 
       - name: Generate report
-        if: always()
+        if: always() && steps.resolve.outputs.run_dir != ''
         working-directory: agentic-evals
         env:
           RUN_DIR: ${{ steps.resolve.outputs.run_dir }}
         run: python3 scripts/generate_report.py
 
       - name: Upload run artifacts
-        if: always()
+        if: always() && steps.resolve.outputs.run_dir != ''
         uses: actions/upload-artifact@v4
         with:
           name: eval-run-hermes-${{ env.TARGET_ID }}-${{ github.run_id }}
@@ -225,7 +256,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Post report to job summary
-        if: always()
+        if: always() && steps.resolve.outputs.run_dir != ''
         env:
           RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
         run: |
@@ -236,7 +267,7 @@ jobs:
           fi
 
       - name: Post report as PR comment
-        if: github.event_name == 'pull_request' && always()
+        if: github.event_name == 'pull_request' && always() && steps.resolve.outputs.run_dir != ''
         uses: actions/github-script@v7
         env:
           RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
@@ -256,23 +287,35 @@ jobs:
             });
 
       - name: Report results
-        if: always()
+        if: always() && steps.resolve.outputs.run_dir != ''
         env:
           RUN_DIR: agentic-evals/${{ steps.resolve.outputs.run_dir }}
         run: |
           RESULTS_DIR="${RUN_DIR}/case-results"
           [ -d "$RESULTS_DIR" ] || { echo "::warning::No case-results"; exit 0; }
-          FAIL=$(grep -rl '"status": "fail"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
-          PASS=$(grep -rl '"status": "pass"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
-          BLOCKED=$(grep -rl '"status": "blocked"' "$RESULTS_DIR" 2>/dev/null | wc -l || echo 0)
+          COUNTS=$(python3 -c '
+          import json
+          import sys
+          from pathlib import Path
+
+          counts = {"pass": 0, "fail": 0, "blocked": 0}
+          for path in Path(sys.argv[1]).glob("*.json"):
+              try:
+                  status = json.loads(path.read_text()).get("status")
+              except (OSError, json.JSONDecodeError):
+                  status = "blocked"
+              counts[status if status in counts else "blocked"] += 1
+          print(counts["pass"], counts["fail"], counts["blocked"])
+          ' "$RESULTS_DIR")
+          read -r PASS FAIL BLOCKED <<< "$COUNTS"
           echo "Results: ${PASS} pass, ${FAIL} fail, ${BLOCKED} blocked"
           if [ "$FAIL" -gt 0 ] || [ "$BLOCKED" -gt 0 ]; then
-            echo "::error::${FAIL} fail, ${BLOCKED} blocked — see report for details"
+            echo "::error::${FAIL} fail, ${BLOCKED} blocked - see report for details"
             exit 1
           fi
 
       - name: Notify Feishu
-        if: always() && github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request' && steps.resolve.outputs.run_dir != ''
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
