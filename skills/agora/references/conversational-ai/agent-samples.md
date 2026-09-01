@@ -7,7 +7,7 @@ Backend + frontend clients for Agora Conversational AI.
 
 ## Prerequisites
 
-- **Node.js >= 20.9.0** — required by Next.js 16 (used by both React clients). The repo includes `.nvmrc`. Run `nvm install` (or `nvm use`) in the repo root to auto-select the correct version. If nvm sourcing fails in non-interactive shells, use the full binary path: `$NVM_DIR/versions/node/v<VERSION>/bin/node`.
+- **Node.js** — use the version declared by the repo's `.nvmrc`. Run `nvm install` (or `nvm use`) in the repo root instead of copying a version from this reference.
 - **Python 3.x** — required by simple-backend
 
 ## Local Setup Steps
@@ -34,7 +34,7 @@ Backend + frontend clients for Agora Conversational AI.
 
 ## Profile System
 
-- Default profiles: `VOICE` (Rime TTS + OpenAI), `VIDEO` (ElevenLabs + GPT-4o + HeyGen)
+- Default profile names and provider composition come from the current sample config; inspect it before describing either profile's pipeline.
 - Profile names are case-insensitive
 - Client sends `profile=VOICE` → backend loads all `VOICE_*` env vars
 - `NEXT_PUBLIC_DEFAULT_PROFILE` env var overrides the client's default profile
@@ -52,8 +52,9 @@ Backend + frontend clients for Agora Conversational AI.
 
 ## OpenAI Realtime MLLM
 
-Alternative to Gemini Live for multimodal voice:
-- `MLLM_VENDOR=openai`, `MLLM_MODEL=gpt-4o-realtime-preview`
+For an OpenAI Realtime multimodal path:
+
+- Keep `MLLM_VENDOR=openai`, but read the current `MLLM_MODEL` value from the sample config or live provider docs instead of copying a cached model ID.
 - Built-in TTS (no separate TTS vendor needed), set voice with `MLLM_VOICE=alloy`
 
 > **[AGENT.md — MLLM Configuration](https://github.com/AgoraIO-Conversational-AI/agent-samples/blob/main/AGENT.md#required-mllm-variables-for-gemini-live)**

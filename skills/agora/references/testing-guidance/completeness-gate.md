@@ -5,7 +5,7 @@ When generating an implementation, append the following reminder after the code 
 ```text
 > **Testing:** The above implementation is not complete without tests.
 > Generate unit tests that verify: [list specific behaviors from the implementation].
-> See `references/testing-guidance/SKILL.md` for mocking patterns.
+> See `references/testing-guidance/README.md` for mocking patterns.
 ```
 
 Substitute `[list specific behaviors]` with the concrete behaviors the tests should

@@ -205,11 +205,11 @@ For each case:
 - Expected Behavior: Presents token-based auth as the default; does not default to Basic Auth (Customer ID + Secret) without being asked
 - Pass Criteria: `Authorization: agora token=<token>` pattern appears in the primary example; Basic Auth shown as an alternative only
 
-### C-13: Quickstart vendor defaults come from the Python SDK
+### C-13: Quickstart vendor defaults come from the official sample
 
 - User Input: "I want the fastest way to get ConvoAI working"
-- Expected Behavior: Quickstart anchors on the documented Python SDK first-success combo
-- Pass Criteria: Mentions Deepgram STT with `language=\"en-US\"`, OpenAI LLM with `model=\"gpt-4o-mini\"`, and ElevenLabs TTS with `model_id=\"eleven_flash_v2_5\"` plus `sample_rate=24000`
+- Expected Behavior: Quickstart uses the provider and model values in the cloned official sample's current config.
+- Pass Criteria: Does not substitute cached provider model IDs from the skill; preserves the sample's env names and inspects current sample config before describing the default pipeline.
 
 ### C-14: Sample-aligned env names are preserved
 
@@ -811,6 +811,20 @@ For each case:
 - User Input: "Show me a ConvoAI browser/client setup with RTC + RTM."
 - Expected Behavior: Keeps RTM login identity aligned with the RTM token subject
 - Pass Criteria: Does not mint an RTM token for one identity and log RTM in as another random user ID; if the flow uses the RTC-resolved UID, the RTM identity uses `String(rtcUid)`
+- Result: ___
+
+### C-16: React RTC plus RTM uses the current public SDK surface
+
+- User Input: "Build a React video call with RTM chat and consistent user identities."
+- Expected Behavior: Routes to the React RTC and RTM Web v2 references and coordinates the resolved RTC UID with RTM login
+- Pass Criteria: Uses `agora-rtc-react` and the RTM v2 surface; does not generate RTM v1 APIs; keeps the RTM token subject and login identity aligned with `String(rtcUid)`
+- Result: ___
+
+### C-17: RTC Web alternatives are not copied as duplicate declarations
+
+- User Input: "Create an Agora RTC Web live-streaming client with screen sharing."
+- Expected Behavior: Selects live mode, sets the host/audience role before joining, chooses one UID strategy, and loads the dedicated screen-sharing pattern
+- Pass Criteria: Does not emit both `rtc` and `live` as duplicate `const client` declarations or both join examples as duplicate `const uid` declarations in one code path; screen sharing uses a separate client with its own matching UID and token
 - Result: ___
 
 ---

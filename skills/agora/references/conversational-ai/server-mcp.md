@@ -2,7 +2,7 @@
 
 Multi-user MCP server with persistent memory and full-text search for Agora Conversational AI agents.
 
-**Repo:** <https://github.com/AgoraIO-Conversational-AI/server-mcp-memory>
+**Repo:** <https://github.com/AgoraIO-Conversational-AI/server-mcp>
 
 ## Implementations
 
@@ -23,13 +23,13 @@ All 3 implementations are production-ready with feature parity. Test suite: `tes
 - `compact_memories` — merge related memories
 - `log_message` — append to conversation log
 
-> **[README — Tools](https://github.com/AgoraIO-Conversational-AI/server-mcp-memory#mcp-tools)**
+> **[README — Tools](https://github.com/AgoraIO-Conversational-AI/server-mcp#tools)**
 
 ## Integration with ConvoAI
 
 Configure `MCP_SERVERS` JSON array in agent-samples `.env`. Uses `build_mcp_servers` function.
 
-> **[README — Integration](https://github.com/AgoraIO-Conversational-AI/server-mcp-memory#integration-with-agora-conversational-ai)**
+> **[README — Integration](https://github.com/AgoraIO-Conversational-AI/server-mcp#how-it-works)**
 
 ## Architecture
 
@@ -37,4 +37,4 @@ Configure `MCP_SERVERS` JSON array in agent-samples `.env`. Uses `build_mcp_serv
 - Per-user memory isolation via URL path (`/mcp/{user_id}`)
 - MCP Streamable HTTP protocol
 
-> **[README — Architecture](https://github.com/AgoraIO-Conversational-AI/server-mcp-memory#architecture)**
+> **[README — Architecture](https://github.com/AgoraIO-Conversational-AI/server-mcp#how-it-works)**

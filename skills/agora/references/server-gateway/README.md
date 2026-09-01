@@ -30,6 +30,7 @@ Video SDK clients (Web, iOS, Android, etc.)
 ```
 
 Typical flow:
+
 1. Initialize `IAgoraService` with audio/video support enabled
 2. Create `IRtcConnection` and join channel
 3. Create media senders via `IMediaNodeFactory`, wrap in local tracks, publish
@@ -73,8 +74,8 @@ Hardware minimum: 8-core CPU 1.8 GHz, 2 GB RAM (4 GB recommended).
 
 Always use Level 2 fetch for Java, Go, and Python quick-starts, SDK download links, and any platform-specific method signatures. Direct fallback URLs:
 
-- **Java** — <https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=java.md>
-- **Go** — <https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=go.md>
-- **Python** — <https://docs-md.agora.io/en/server-gateway/get-started/integrate-sdk?platform=python.md>
+- **Java** — <https://docs.agora.io/en/realtime-media/rtc-server-sdk/quickstart/linux-java.md>
+- **Go** — <https://docs.agora.io/en/realtime-media/rtc-server-sdk/quickstart/go.md>
+- **Python** — <https://docs.agora.io/en/realtime-media/rtc-server-sdk/quickstart/python.md>
 - **Product Overview** — <https://docs-md.agora.io/en/server-gateway/overview/product-overview.md>
-- **SDK Downloads** — <https://docs.agora.io/en/sdks>
+- **SDK Downloads** — <https://docs.agora.io/en/api-reference/sdks>

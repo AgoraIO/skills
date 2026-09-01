@@ -6,6 +6,7 @@ description: >-
   token or auth flows, or use the `agora` CLI for login, quickstarts, env
   setup, diagnostics, introspection, skills, or MCP serving, especially when
   integrating Agora into an app.
+license: MIT
 metadata:
   author: agora
   version: '1.8.2'
@@ -57,7 +58,7 @@ For cross-product coordination as a primary question, use **[references/integrat
 - AI voice assistant → ConvoAI first; RTC client is expected, RTM is optional
 - AI voice assistant + chat history → ConvoAI first, then RTM and [references/integration-patterns.md](references/integration-patterns.md)
 - RTC recording → Cloud Recording first, then RTC if client details matter
-- test generation or review for Agora integration code → [references/testing-guidance/SKILL.md](references/testing-guidance/SKILL.md) after the product route is clear
+- test generation or review for Agora integration code → [references/testing-guidance/README.md](references/testing-guidance/README.md) after the product route is clear
 
 ## Ambiguity Handling
 
@@ -81,6 +82,12 @@ Ask at most one focused clarification when the route is still unclear.
 2. **ConvoAI quickstart source gate.** For ConvoAI requests without a proven working baseline: start at **[references/conversational-ai/README.md](references/conversational-ai/README.md)** and use the official quickstart as the source of truth before generating or adapting code. Runtime proof validates the user's environment and project, not whether Agora's official quickstart works.
 
 3. **CLI readiness gate.** Before any mutating Agora CLI command (`init`, `quickstart`, `project`, or `login`), run the read-only probe in **[references/cli/README.md](references/cli/README.md)**. Block normal CLI workflow when `agora version` is below Minimum CLI `0.2.1`, when PATH still resolves an older binary, or when config schema is newer than the running CLI. Installers are allowed only as readiness remediation after user approval. Use the documented curl-first upgrade path. `--add-to-path` was removed in `0.2.0` — do not use it. `--force` / `-Force` are real installer flags, but they install alongside a managed install and create PATH shadowing — do not use them to bypass a refusal.
+
+When a ConvoAI quickstart already has `AGORA_APP_ID` and
+`AGORA_APP_CERTIFICATE` in the environment, those values still go through the
+template-aware `agora quickstart env write` path after CLI readiness. Do not
+silently replace that action with an opaque shell pipeline; write the env file
+and verify it as separate actions.
 
 ### ConvoAI Enforcement
 

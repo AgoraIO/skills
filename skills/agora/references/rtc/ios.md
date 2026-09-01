@@ -12,7 +12,7 @@
 - [Token Renewal](#token-renewal)
 - [Complete Example: Video Call](#complete-example-video-call)
 
-API Reference: <https://api-ref.agora.io/en/video-sdk/ios/4.x/API/rtc_api_overview_ng.html>
+API Reference: <https://api-ref.agora.io/en/video-sdk/ios/4.x/documentation/agorartckit>
 
 ## Installation
 
@@ -302,5 +302,5 @@ extension VideoCallViewController: AgoraRtcEngineDelegate {
 
 For APIs or features not covered above:
 
-- API Reference: <https://api-ref.agora.io/en/video-sdk/ios/4.x/API/rtc_api_overview_ng.html>
-- Guides: <https://docs.agora.io/en/video-calling/overview/product-overview>
+- API Reference: <https://api-ref.agora.io/en/video-sdk/ios/4.x/documentation/agorartckit>
+- Guides: <https://docs.agora.io/en/realtime-media/rtc>

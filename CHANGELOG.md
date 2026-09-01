@@ -6,11 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Claude plugin packaging now uses the root `.mcp.json` default location so the bundled `agora-docs-mcp` server is discovered at runtime.
+- Cursor and Claude MCP wrappers now use the same `agora-docs-mcp` key and HTTP transport declaration.
+
 ### Changed
 
-- `skills/agora/references/cli/*`: moved the canonical installer to `https://dl.agora.io/cli/install.sh`, removed npm `agoraio-cli` as an install path (published `0.1.6` is below the floor; upstream disabled npm publishing), raised Minimum CLI to `0.2.1`, made config-schema guidance version-agnostic, and split version labelling into per-file `Last verified` plus uniform `Minimum CLI`
-- `skills/agora/references/cli/install-auth.md`: added a region detect-don't-ask rule — `agora login` without `--region` resets the active region to `global` and discards project context, so agents resolve region from `.agora/project.json` or session state instead of prompting
-- `tests/eval-cases.md`: rewrote CLI-01, CLI-02, CLI-03, CLI-26; added CLI-31 (npm refusal) and CLI-32 (region non-interrogation)
+- Claude plugin, Agora skill, and Cursor wrapper versions aligned at `1.8.2`.
+- Claude plugin metadata now includes the existing DevRel contact and project homepage.
+- Volatile provider model IDs and framework runtime matrices now route to the cloned official sample or current provider docs instead of freezing fast-changing values inline.
+- Testing guidance is now an internal routed reference (`README.md`) rather than a nested `SKILL.md` that different hosts could discover inconsistently.
+- CI now enforces Claude schemas, clean-install skill/MCP discovery, Markdown lint, and the 500-line Layer 4 topic ceiling.
+- The public skill now declares its MIT license explicitly. A separate CI step installs the official Agent Skills reference validator at pinned commit `69ef37e9424c0a7ea9dd2293b559e43ec8176379` and validates `skills/agora`.
+- RTC Web client/join alternatives again retain their semantic comments, and the detailed screen-sharing pattern now lives in its own routed topic instead of leaving `web.md` at the size ceiling.
+- Claude Code is pinned in CI, and clean-install packaging assertions now use `plugin list --json` instead of human-readable spacing.
+- Agora CLI references now use the canonical `dl.agora.io` installer, the verified minimum is `0.2.1`, and region/config guidance is version-agnostic.
+- ConvoAI quickstart readiness now verifies the sample page and uses the documented npm fallback when pnpm lifecycle scripts are blocked.
+- ConvoAI quickstart setup now keeps env writes and startup commands explicit and standalone, avoiding opaque shell wrappers that obscure readiness evidence.
 
 ## [1.8.1] - 2026-06-26
 

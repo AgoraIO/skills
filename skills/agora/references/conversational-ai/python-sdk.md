@@ -16,7 +16,7 @@ metadata:
 Python SDK for managing Agora Conversational AI agents from a server-side application. Wraps the ConvoAI REST API.
 
 **Package:** `agora-agents`
-**Repo:** <https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-python>
+**Repo:** <https://github.com/AgoraIO/agora-agents-python>
 
 ## Installation
 

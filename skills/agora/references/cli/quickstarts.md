@@ -62,6 +62,17 @@ agora quickstart env write my-python-demo --project my-project
 agora quickstart env write /abs/path/to/my-python-demo --json
 ```
 
+For CI or source-only work without an Agora login session, omit `--project`:
+
+```bash
+agora quickstart create my-nextjs-demo --template nextjs
+```
+
+This clones the official template without resolving a remote project or writing
+credentials. Configure and verify the template's env file separately when CI
+credentials are available. `--project` is required when the command should bind
+the repo and seed its env through Agora.
+
 `quickstart create` shells out to `git clone`. Clone subprocesses disable git credential helpers so agent and CI runs do not hang on macOS keychain prompts.
 
 Typed clone failures:
@@ -113,7 +124,7 @@ Use [env.md](env.md) for generic `agora project env` and `agora project env writ
 - Prefer `agora init <name> --template <template> --json` for one-shot onboarding.
 - Always pass `--template` in agent, CI, and `--json` runs.
 - Prefer `agora quickstart env write ... --json` when seeding or re-syncing official quickstart repos.
-- Do not substitute manual `git clone` until `init` / `quickstart create` fails with a documented error code and recovery is exhausted.
+- Do not substitute manual `git clone` until `init` / `quickstart create` fails with a documented error code and recovery is exhausted. `quickstart create` without `--project` is the supported unauthenticated clone path.
 - Use `agora project doctor --json` after binding to check control-plane readiness, but do not treat it as proof that the sample can run end to end.
 - Use `agora doctor --json` when the failure looks local to the CLI install rather than to the project.
 - Use `agora` in user-facing commands for an installed CLI. Use `./agora` only when running a local binary built from the CLI repository.

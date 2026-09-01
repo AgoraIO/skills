@@ -272,11 +272,11 @@ class _VideoCallPageState extends State<VideoCallPage> {
 }
 ```
 
-For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).
+For test setup and mocking patterns, see [references/testing-guidance/README.md](../testing-guidance/README.md).
 
 ## Official Documentation
 
 For APIs or features not covered above:
 
-- Quick-start guide: <https://docs-md.agora.io/en/video-calling/get-started/get-started-sdk.md?platform=flutter>
+- Quick-start guide: <https://docs.agora.io/en/realtime-media/rtc/get-started-sdk>
 - API Reference: <https://api-ref.agora.io/en/video-sdk/flutter/6.x/API/rtc_api_overview.html>

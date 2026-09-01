@@ -77,7 +77,7 @@ Both SDKs require separate tokens in production. Generate them independently on 
 
 See [server/tokens.md](server/tokens.md) for token generation details.
 
-For Level 2 fetch: fetch `https://docs.agora.io/en/llms.txt`, find the token management guide for your platform, then fetch it.
+For Level 2 fetch: fetch `https://docs.agora.io/llms.txt`, find the token management guide for your platform, then fetch it.
 
 ## RTC + RTM + ConvoAI
 
@@ -85,7 +85,7 @@ Before wiring ConvoAI into an existing multi-product app, read [conversational-a
 
 ### How the Products Connect
 
-```
+```text
 Client                          Server
 ──────────────────────────────────────────────────────
 RTC Engine/Client ──── media ────► Agora RTC
@@ -144,7 +144,7 @@ The ConvoAI agent joins the RTM channel with the **same name** as the RTC channe
 
 The agent publishes JSON messages to the RTM channel. Parse `event.message.data` (Android) or `event.message.stringData` (iOS) as JSON. The `customType` field indicates the event type (transcript, interruption, state change, etc.).
 
-For the full event schema and `customType` values, use Level 2 fetch: fetch `https://docs.agora.io/en/llms.txt`, locate the Conversational AI event reference, then fetch it.
+For the full event schema and `customType` values, use Level 2 fetch: fetch `https://docs.agora.io/llms.txt`, locate the Conversational AI event reference, then fetch it.
 
 ### Token Matrix for ConvoAI
 

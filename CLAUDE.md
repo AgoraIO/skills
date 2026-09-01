@@ -6,7 +6,7 @@ This repo contains AI agent skills for Agora (agora.io) platform integration —
 
 The skill content lives under a nested path: `skills/agora/`. When adding or editing files, always place them here — not at repo root or in a flat `skills/` directory.
 
-```
+```text
 skills/
 └── agora/                     ← skill root (all edits go here)
     ├── SKILL.md               ← entry point; do not restructure this file
@@ -68,6 +68,11 @@ Before suggesting any PR, run:
 
 ```bash
 bash scripts/validate-skills.sh
+skills-ref validate skills/agora
+claude plugin validate . --strict
+claude plugin validate ./.claude-plugin/plugin.json
+claude plugin validate ./skills --strict
 ```
 
-Zero errors required. Fix any reported issues before opening the PR.
+Zero errors required. Direct manifest validation may emit the expected warning
+that this contributor-only `CLAUDE.md` is not loaded as plugin context.

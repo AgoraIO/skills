@@ -118,7 +118,7 @@ Go uses functional options (`With*` functions) instead of chained methods or obj
 // TypeScript equivalent: new Agent({ name: "..." }).withLlm(new OpenAI({ ... }))
 agent := agentkit.NewAgent(
     agentkit.WithName("my_agent"),
-    agentkit.WithLlm(agentkit.OpenAI{APIKey: "OPENAI_KEY", Model: "gpt-4o"}),
+    agentkit.WithLlm(agentkit.OpenAI{APIKey: "OPENAI_KEY", Model: "<current-model-id>"}),
     agentkit.WithTts(agentkit.ElevenLabs{APIKey: "ELEVENLABS_KEY", VoiceID: "..."}),
 )
 ```

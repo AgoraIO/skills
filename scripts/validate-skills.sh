@@ -27,6 +27,10 @@ skill_names = []
 for path in md_files:
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines()
+    if "references" in path.parts and path.name != "README.md" and len(lines) > 500:
+        errors.append(
+            f"{path}: Layer 4 topic exceeds 500 lines ({len(lines)})"
+        )
     if len(lines) < 3 or lines[0].strip() != "---":
         continue
     frontmatter_files.append(path)
@@ -42,6 +46,7 @@ for path in md_files:
     fm = "\n".join(lines[1:end])
     name_match = re.search(r"^name:\s*(.+?)\s*$", fm, re.MULTILINE)
     desc_match = re.search(r"^description:\s*", fm, re.MULTILINE)
+    license_match = re.search(r"^license:\s*(.+?)\s*$", fm, re.MULTILINE)
     author_match = re.search(r"^metadata:\s*(?:\n[ \t]+.+)*\n[ \t]+author:\s*(.+?)\s*$", fm, re.MULTILINE)
     version_match = re.search(r"^metadata:\s*(?:\n[ \t]+.+)*\n[ \t]+version:\s*(.+?)\s*$", fm, re.MULTILINE)
 
@@ -51,6 +56,8 @@ for path in md_files:
         skill_names.append((name_match.group(1).strip().strip('"').strip("'"), path))
     if not desc_match:
         errors.append(f"{path}: frontmatter missing 'description'")
+    if path.name == "SKILL.md" and not license_match:
+        errors.append(f"{path}: skill frontmatter missing 'license'")
     if not author_match:
         errors.append(f"{path}: frontmatter missing 'metadata.author'")
     if not version_match:

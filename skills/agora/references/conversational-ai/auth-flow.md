@@ -18,7 +18,7 @@ metadata:
 # ConvoAI Auth Flow — End to End
 
 > **Architecture first:** For the full system diagram, start/stop sequence, and component roles, read [architecture.md](architecture.md).
-
+>
 > **SDK users:** If you are using the TypeScript, Python, or Go SDK, you do not need to implement this flow manually. Pass `appId + appCertificate` to the SDK client and it generates the ConvoAI token per request automatically. See [server-sdks.md](server-sdks.md). This file is for backends calling the REST API directly.
 
 Three separate tokens exist in a ConvoAI integration. Developers routinely confuse them because they all use the same App ID + App Certificate as inputs.
@@ -35,7 +35,7 @@ The **ConvoAI server token** is a combined RTC + RTM token generated with `RtcTo
 
 ## Sequence Diagram
 
-```
+```text
 Your Server          ConvoAI Platform          Browser Client
      |                      |                        |
      |-- POST /join -------->|                        |

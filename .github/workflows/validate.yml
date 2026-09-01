@@ -15,6 +15,55 @@ jobs:
       - name: Run skill validation
         run: bash scripts/validate-skills.sh
 
+      - name: Set up Python for Agent Skills validation
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Validate the official Agent Skills specification
+        run: |
+          python -m pip install "skills-ref @ git+https://github.com/agentskills/agentskills.git@69ef37e9424c0a7ea9dd2293b559e43ec8176379#subdirectory=skills-ref"
+          skills-ref validate skills/agora
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code@2.1.238
+
+      - name: Validate Claude marketplace and plugin manifests
+        run: |
+          claude plugin validate . --strict
+          claude plugin validate ./.claude-plugin/plugin.json
+          claude plugin validate ./skills --strict
+
+      - name: Verify bundled MCP discovery
+        run: |
+          audit_config_dir="$(mktemp -d)"
+          export CLAUDE_CONFIG_DIR="$audit_config_dir"
+          marketplace_dir="$PWD"
+          marketplace_parent="$(dirname "$marketplace_dir")"
+          marketplace_name="$(basename "$marketplace_dir")"
+          cd "$marketplace_parent"
+          claude plugin marketplace add "./$marketplace_name"
+          claude plugin install agora@agora-skills
+          plugin_list="$(claude plugin list --json)"
+          PLUGIN_LIST_JSON="$plugin_list" node - <<'NODE'
+          const fs = require("node:fs")
+          const path = require("node:path")
+
+          const plugins = JSON.parse(process.env.PLUGIN_LIST_JSON)
+          const plugin = plugins.find(({ id }) => id === "agora@agora-skills")
+          if (!plugin || !plugin.enabled) throw new Error("Agora plugin is not enabled")
+
+          const manifestPath = path.join(plugin.installPath, ".claude-plugin", "plugin.json")
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"))
+          if (plugin.version !== manifest.version) throw new Error("Installed version does not match plugin manifest")
+
+          const skillPath = path.join(plugin.installPath, "skills", "agora", "SKILL.md")
+          if (!fs.existsSync(skillPath)) throw new Error("Agora skill was not packaged")
+          if (!plugin.mcpServers?.["agora-docs-mcp"]) throw new Error("Agora Docs MCP server was not discovered")
+
+          console.log(`Verified ${plugin.id}@${plugin.version}: agora skill + agora-docs-mcp`)
+          NODE
+
       - name: Markdown lint
         uses: DavidAnson/markdownlint-cli2-action@v18
         with:

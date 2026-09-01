@@ -14,8 +14,9 @@
 - [Network Quality](#network-quality)
 - [Device Enumeration](#device-enumeration)
 - [Complete Example: Video Call](#complete-example-video-call)
-- [Multi-Channel Pattern](#multi-channel-pattern)
-- [Advanced: Dynamic Subscription Management](#advanced-dynamic-subscription-management)
+- [Large-Scale Subscription Management](#large-scale-subscription-management)
+- [Track Muting](#track-muting)
+- [Screen Sharing](#screen-sharing)
 
 ## Installation
 
@@ -27,11 +28,21 @@ Package: `agora-rtc-sdk-ng` (v4.x). Do NOT use deprecated `agora-rtc-sdk` (v3.x)
 
 ## Client Creation
 
+Choose one mode for a client instance.
+
+Communication mode (all peers equal):
+
 ```typescript
-import AgoraRTC, { IAgoraRTCClient } from "agora-rtc-sdk-ng"
+import AgoraRTC from "agora-rtc-sdk-ng"
 
 // Communication mode (all peers equal)
 const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" })
+```
+
+Live broadcasting mode (host/audience roles):
+
+```typescript
+import AgoraRTC from "agora-rtc-sdk-ng"
 
 // Live broadcasting mode (host/audience roles)
 const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" })
@@ -41,16 +52,29 @@ Codec options: `"vp8"`, `"vp9"`, `"h264"`, `"h265"`, `"av1"`. Use `"vp8"` for br
 
 ## Joining a Channel
 
+Choose one UID strategy for communication mode.
+
+Auto-assigned UID:
+
 ```typescript
 // Join with auto-assigned UID
 const uid = await client.join(APP_ID, "channel-name", TOKEN, null)
+```
 
+Specific UID:
+
+```typescript
 // Join with specific UID
 const uid = await client.join(APP_ID, "channel-name", TOKEN, 12345)
+```
 
+For live broadcasting, choose one role and set it before joining:
+
+```typescript
 // For live broadcasting, set role before joining
-await client.setClientRole("host")     // Can publish + subscribe
-await client.setClientRole("audience") // Can only subscribe
+const role = isHost ? "host" : "audience"
+await client.setClientRole(role)
+const uid = await client.join(APP_ID, "channel-name", TOKEN, null)
 ```
 
 - `TOKEN`: Pass `null` for testing without tokens enabled. In production, always use a server-generated token.
@@ -299,7 +323,11 @@ AgoraRTC.onCameraChanged = (info) => {
 ## Complete Example: Video Call
 
 ```typescript
-import AgoraRTC from "agora-rtc-sdk-ng"
+import AgoraRTC, {
+  IAgoraRTCClient,
+  ICameraVideoTrack,
+  IMicrophoneAudioTrack,
+} from "agora-rtc-sdk-ng"
 
 const APP_ID = "your-app-id"
 let client: IAgoraRTCClient
@@ -353,74 +381,11 @@ async function leave() {
 }
 ```
 
-## Multi-Channel Pattern
+## Large-Scale Subscription Management
 
-For large-scale viewing (64+ users), use multiple client instances joining different channels:
-
-```typescript
-const clients: IAgoraRTCClient[] = []
-const NUM_CHANNELS = 4
-
-for (let i = 0; i < NUM_CHANNELS; i++) {
-  const client = AgoraRTC.createClient({ mode: "live", codec: "vp9" })
-  clients.push(client)
-}
-
-// Join each client to a different channel
-for (let i = 0; i < NUM_CHANNELS; i++) {
-  await clients[i].setClientRole("audience")
-  await clients[i].join(APP_ID, `${baseChannel}${i}`, null, null)
-
-  clients[i].on("user-published", async (user, mediaType) => {
-    // Manage subscriptions across channels
-  })
-}
-```
-
-Key: Single channel supports up to 17 video publishers (recommended) or 128 hosts. Multi-channel multiplies this.
-
-## Advanced: Dynamic Subscription Management
-
-For apps with many publishers, don't subscribe to all immediately. Use a priority queue:
-
-```typescript
-const videoPublishers = new Map()    // uid -> client
-const videoSubscriptions = new Map() // uid -> subscription info
-
-client.on("user-published", (user, mediaType) => {
-  if (mediaType === "video") {
-    // Don't subscribe yet — add to available publishers
-    videoPublishers.set(user.uid, client)
-  }
-})
-
-// Periodically manage subscriptions based on capacity
-function manageSubscriptions(maxSubs: number) {
-  const prioritized = [...videoPublishers.keys()].slice(0, maxSubs)
-
-  // Subscribe to top-priority users not yet subscribed
-  for (const uid of prioritized) {
-    if (!videoSubscriptions.has(uid)) {
-      const user = client.remoteUsers.find(u => u.uid === uid)
-      if (user) {
-        client.subscribe(user, "video").then(() => {
-          user.videoTrack?.play(`player-${uid}`)
-          videoSubscriptions.set(uid, { startTime: Date.now() })
-        })
-      }
-    }
-  }
-
-  // Unsubscribe from users no longer in priority list
-  for (const uid of videoSubscriptions.keys()) {
-    if (!prioritized.includes(uid)) {
-      const user = client.remoteUsers.find(u => u.uid === uid)
-      if (user) client.unsubscribe(user, "video")
-      videoSubscriptions.delete(uid)
-    }
-  }
-}
-```
+For multi-channel viewing and priority-based dynamic subscription patterns,
+read [large-scale-subscriptions.md](large-scale-subscriptions.md). Fetch current
+Agora documentation before stating channel or publisher capacity limits.
 
 ## Track Muting
 
@@ -438,69 +403,15 @@ await localVideoTrack.setEnabled(true)  // camera on
 
 `setEnabled(false)` differs from `setMuted(true)`: `setEnabled` stops the device, while `setMuted` sends silence/black frames but keeps the device active.
 
-## Screen Sharing: Dual-Client Pattern
+## Screen Sharing
 
-Screen sharing requires a **separate client instance** to avoid replacing the camera track. The screen share client joins the same channel with a different UID.
-
-```typescript
-// 1. Create a second client for screen sharing
-const screenClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" })
-
-// 2. Derive a screen-share UID (convention: camera UID + 100000)
-const screenUid = cameraUid + 100000
-
-// 3. Create screen track — returns single track or [video, audio] tuple
-const screenTrackOrTracks = await AgoraRTC.createScreenVideoTrack({
-  encoderConfig: { width: 1920, height: 1080, frameRate: 15 },
-  optimizationMode: "detail", // "detail" for text/slides, "motion" for video
-}, "auto") // "auto" = include system audio if available
-
-// Handle the return type (single track or tuple)
-const screenVideoTrack = Array.isArray(screenTrackOrTracks)
-  ? screenTrackOrTracks[0]
-  : screenTrackOrTracks
-const screenAudioTrack = Array.isArray(screenTrackOrTracks)
-  ? screenTrackOrTracks[1]
-  : null
-
-// 4. Join the same channel with a different UID and token
-await screenClient.join(APP_ID, channelName, screenToken, screenUid)
-
-// 5. Publish screen track(s)
-const tracksToPublish = screenAudioTrack
-  ? [screenVideoTrack, screenAudioTrack]
-  : [screenVideoTrack]
-await screenClient.publish(tracksToPublish)
-
-// 6. CRITICAL: Listen for "track-ended" — fires when user clicks browser's "Stop sharing"
-screenVideoTrack.on("track-ended", async () => {
-  // Clean up screen share
-  for (const track of tracksToPublish) {
-    track.stop()
-    track.close()
-  }
-  await screenClient.leave()
-})
-
-// 7. Cleanup function
-async function stopScreenShare() {
-  for (const track of tracksToPublish) {
-    track.stop()
-    track.close()
-  }
-  await screenClient.leave()
-}
-```
-
-**Tips:**
-
-- Use RTM to notify other participants of screen share start/stop (include the screen UID so viewers can identify it)
-- Remote participants see the screen share as a new user joining — use the UID convention to distinguish camera from screen share
-- Generate a separate token for the screen share UID
+For the dual-client screen-sharing pattern, including system audio, separate
+identity/token handling, `track-ended`, and cleanup, read
+[screen-sharing.md](screen-sharing.md).
 
 ## Official Documentation
 
 For APIs or features not covered above:
 
 - API Reference: <https://api-ref.agora.io/en/video-sdk/web/4.x/index.html>
-- Guides: <https://docs.agora.io/en/video-calling/overview/product-overview>
+- Guides: <https://docs.agora.io/en/realtime-media/rtc>

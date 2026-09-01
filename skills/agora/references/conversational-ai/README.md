@@ -3,9 +3,9 @@
 REST API-driven voice AI agents. Create agents that join RTC channels and converse with users via speech. Front-end clients connect via RTC+RTM.
 
 > **HARD GATE:** If the user does not have a working ConvoAI baseline, route to [quickstarts.md](quickstarts.md) and use the official quickstart as the source of truth. Do not generate code from memory, scaffold a replacement project, or invent custom architecture. Runtime proof validates the user's environment and Agora project before declaring success.
-
+>
 > **OFFICIAL SOURCE FIRST:** When the user wants to try ConvoAI, build a demo, or prototype a voice AI agent, always clone or inspect the official sample repo first. Use its source files and documented startup commands for the first-success path. Do not replace the flow with a self-built implementation. Do not use web search for Agora integration details — use only the skill reference files.
-
+>
 > **POLICY CHECK:** Generating `package.json`, backend routes, UI/client code, SDK implementation files, or `/join` payloads from memory before inspecting the official quickstart source is a policy violation. In user-visible replies, explain this in plain language: "I need to pull this from the official quickstart first, then adapt it to your app."
 
 ## Routing: Classify the Request
@@ -80,7 +80,7 @@ Important:
 Direct REST API use is fully supported for languages without an SDK. The [auth-flow.md](auth-flow.md) file covers the end-to-end auth and token flow for REST API implementors. If the user has an SDK available, start with that instead — the SDK eliminates the need to manually build tokens for the ConvoAI server.
 The live OpenAPI spec is the authoritative source for request/response schemas:
 
-```
+```http
 GET https://docs-md.agora.io/api/conversational-ai-api-v2.x.yaml
 ```
 
@@ -115,7 +115,7 @@ vendor availability, beta status, and vendor-specific configs should come from l
 
 For content that still needs live docs after the local check, use Level 2:
 
-1. Fetch `https://docs.agora.io/en/llms.txt`
+1. Fetch `https://docs.agora.io/llms.txt`
 2. Scan for a URL matching your topic (e.g., `conversational-ai`, `quick-start`, `rest-api`)
 3. Fetch that URL
 
@@ -207,7 +207,7 @@ Things the official docs don't emphasize that cause frequent mistakes:
 - **Error response format** — non-200 responses return `{ "detail": "...", "reason": "..." }`.
 - **MLLM `location` not `region`** — use `params.location: "us-central1"`, not `region`. The field name is `location` at every level (join payload and backend env vars).
 
-For test setup and mocking patterns, see [references/testing-guidance/SKILL.md](../testing-guidance/SKILL.md).
+For test setup and mocking patterns, see [references/testing-guidance/README.md](../testing-guidance/README.md).
 
 ## REST API Endpoints
 
@@ -262,6 +262,7 @@ Full request/response details for all endpoints — **always fetch these; do not
 ## Production: Platform Webhooks
 
 The ConvoAI platform can POST event notifications to your server endpoint when agent state changes. These are distinct from:
+
 - The SDK's in-process `session.on()` events (fire in your Node.js/Python/Go process)
 - The client toolkit's `AGENT_STATE_CHANGED` event (fires in the browser via RTM)
 
@@ -269,7 +270,7 @@ Webhooks are the correct pattern for **production stateless deployments** where 
 
 Webhook payload schemas and registration are REST API surface — do not rely on inline content here. Fetch from the Agora docs:
 
-```
+```http
 GET https://docs-md.agora.io/en/conversational-ai/rest-api/agent/join.md
 ```
 

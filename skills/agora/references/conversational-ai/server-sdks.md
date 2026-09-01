@@ -54,7 +54,7 @@ await session.stop();
 await client.stopAgent(sessionId);
 ```
 
-Token auth is handled automatically when `appCertificate` is provided. For vendor-specific STT/LLM/TTS import paths and MLLM (OpenAI Realtime, Gemini Live) config, see the [SDK README](https://github.com/AgoraIO-Conversational-AI/agent-server-sdk-ts).
+Token auth is handled automatically when `appCertificate` is provided. For vendor-specific STT/LLM/TTS import paths and MLLM (OpenAI Realtime, Gemini Live) config, see the [SDK README](https://github.com/AgoraIO/agora-agents-ts).
 
 ## Auth Modes
 

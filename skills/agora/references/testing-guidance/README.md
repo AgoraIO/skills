@@ -1,20 +1,7 @@
----
-name: agora-testing-guidance
-description: |
-  Mocking patterns and testing requirements for Agora SDK integration code.
-  Covers RTC Web, RTC React, RTC iOS, RTC Android, RTC React Native, RTC Flutter,
-  RTM Web, RTM iOS, RTM Android, and ConvoAI REST API.
-  Use when generating tests for any Agora integration, or when reminding the user
-  to add tests to an implementation.
-license: MIT
-metadata:
-  author: agora
-  version: '1.0.0'
----
-
 # Agora Testing Guidance
 
-Mocking patterns and completeness requirements for Agora SDK integration code.
+Mocking patterns and completeness requirements loaded by the main Agora skill
+when generating or reviewing integration tests.
 
 ## When to Generate Tests
 
