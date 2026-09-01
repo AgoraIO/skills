@@ -285,6 +285,12 @@ Use the CLI in this order:
 3. Use `agora project env --with-secrets --json` only for manual mapping flows that need raw credential values.
 4. Use `project show --json` only for project metadata inspection.
 
+For CI or source-only setup without an Agora login session, use
+`agora quickstart create <name> --template <template>` without `--project`.
+That clones the official template and intentionally skips remote project
+resolution and CLI env seeding. Configure the template's expected env file in a
+separate action using CI-provided credentials, then verify it separately.
+
 Keep credential-file writes as a standalone setup action, followed by a separate
 verification action. Do not combine env-file creation, secret expansion, and
 dependency installation into one opaque shell command; this keeps setup
