@@ -771,11 +771,11 @@ For each case:
 - Pass Criteria: Uses `which -a agora` or `where.exe agora`; references `agora doctor` PATH recovery or reordering PATH; does not uninstall automatically; uses `install.sh --uninstall` / `install.ps1 -Uninstall` or stale-binary removal only after user approval; does not continue ConvoAI/CLI workflows until version confirms the new binary
 - Result: ___
 
-### CLI-28: Python quickstart env writer
+### CLI-28: Python quickstart env writer preserves current and legacy layouts
 
 - User Input: "Seed credentials for agent-quickstart-python with the CLI"
-- Expected Behavior: Uses template-aware env write
-- Pass Criteria: Uses `agora quickstart env write` so `server/.env` gets `APP_ID` / `APP_CERTIFICATE`; does not use `agora project env write` alone (which writes generic `AGORA_APP_ID`)
+- Expected Behavior: Uses the template-aware env writer and respects the quickstart's detected layout
+- Pass Criteria: Uses `agora quickstart env write`; for a fresh CLI `0.2.8` Python quickstart, expects `server/.env.local` with `AGORA_APP_ID` / `AGORA_APP_CERTIFICATE`; when an existing legacy layout is detected, preserves `server/.env` with `APP_ID` / `APP_CERTIFICATE`; does not use `agora project env write` alone or rewrite a detected legacy layout to the current layout
 - Result: ___
 
 ### CLI-29: Config version newer than CLI
