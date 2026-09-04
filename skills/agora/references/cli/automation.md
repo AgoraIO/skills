@@ -4,9 +4,7 @@
 
 Use this file when the user needs script-safe CLI usage, machine-readable output, environment overrides, or agent-oriented command discovery.
 
-Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
-
-> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
+Last verified against Agora CLI `0.2.9`. Minimum CLI `0.2.1`.
 
 > **Agents:** start with [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any mutating command.
 
@@ -38,6 +36,13 @@ For curated workflow discovery, prefer:
 agora skills list --json
 ```
 
+For official recipe discovery, prefer:
+
+```bash
+agora recipes list --type all --json
+agora recipes show <slug> --json
+```
+
 For project environment values, prefer:
 
 ```bash
@@ -48,7 +53,7 @@ Do not tell agents to parse pretty output unless the user explicitly wants human
 
 ## Output Modes
 
-Verified in `0.2.1`:
+Verified in `0.2.9`:
 
 - default output mode: `pretty`
 - one-shot override: `--json`
@@ -57,7 +62,8 @@ Verified in `0.2.1`:
 - global `--quiet` suppresses success output; rely on exit code
 - global `--debug` echoes structured logs to stderr without changing JSON envelopes
 - global `--yes` / `-y` accepts defaults for confirmation prompts without starting new interactive OAuth flows in JSON, CI, or non-TTY contexts
-- in non-interactive runs, `agora init` requires `--template` or fails with `QUICKSTART_TEMPLATE_REQUIRED`
+- in non-interactive runs, `agora init` requires exactly one of `--template` or `--recipe`; omission returns `INIT_SOURCE_REQUIRED` and passing both returns `INIT_SOURCE_CONFLICT`
+- non-interactive `quickstart create` requires a resolved project or explicit `--template-only`; otherwise it returns `QUICKSTART_PROJECT_REQUIRED` before cloning
 
 > ⚠️ Deprecated in v0.2.0: `--verbose` and `AGORA_VERBOSE`. Use `--debug` and `AGORA_DEBUG` instead.
 
@@ -78,6 +84,8 @@ agora introspect --json
 agora --help --all --json
 agora env-help --json
 agora skills list --json
+agora recipes list --type ai --json
+agora recipes show tool-calling --json
 agora mcp serve
 agora project env --json
 agora auth status --json
@@ -86,11 +94,11 @@ source <(agora project env --format shell)
 
 ## Init JSON Fields
 
-Successful `agora init --json` responses include `projectSelectionReason` (`explicit_project`, `new_project`, `most_recent`, etc.) for deterministic agent branching.
+Successful `agora init --json` responses include `sourceType` (`quickstart` or `recipe`), `sourceId`, and `projectSelectionReason` (`explicit_project`, `new_project`, `most_recent`, etc.) for deterministic agent branching. Recipe-backed results additionally include `recipe`, `recipeUrl`, `recipeRawUrl`, `primaryPrompt`, and `cloneUrl`.
 
 ## Progress and MCP
 
-Long-running commands emit NDJSON `progress` events on stdout before the terminal envelope. Stages include `clone:start`, `clone:complete`, and `clone:override` when `AGORA_QUICKSTART_<TEMPLATE>_REPO_URL` overrides the clone URL.
+Long-running commands emit NDJSON `progress` events on stdout before the terminal envelope. Stages include `clone:start`, `clone:complete`, and `clone:override` when `AGORA_QUICKSTART_<TEMPLATE>_REPO_URL` overrides the clone URL. Recipe initialization resolves official API metadata before project creation, then emits the same clone stages.
 
 MCP clients may pass `_meta.progressToken` to receive `notifications/progress` for long-running tools.
 
@@ -138,6 +146,16 @@ Full demo setup:
 ```bash
 agora init my-python-demo --template python --new-project --json
 ```
+
+Official recipe setup:
+
+```bash
+agora recipes list --type ai --json
+agora recipes show tool-calling --json
+agora init my-tool-agent --recipe tool-calling --project <project-id-or-name> --json
+```
+
+The recipes API returns only official entries. If a listed recipe lacks `cli.env`, initialization returns `RECIPE_INIT_UNSUPPORTED`; do not infer an env layout.
 
 Official quickstart repo (template-aware env keys):
 
