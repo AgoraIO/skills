@@ -3,13 +3,13 @@ name: agora
 description: >-
   Activate when the user wants to build voice AI agents, video or voice calls,
   live streaming, screen sharing, in-app messaging and presence, recording,
-  token or auth flows, or use the `agora` CLI for login, quickstarts, env
-  setup, diagnostics, introspection, skills, or MCP serving, especially when
-  integrating Agora into an app.
+  token or auth flows, or use the `agora` CLI for login, official recipes,
+  quickstarts, env setup, diagnostics, introspection, skills, or MCP serving,
+  especially when integrating Agora into an app.
 license: MIT
 metadata:
   author: agora
-  version: '1.8.2'
+  version: '1.8.3'
 ---
 
 <!-- applies-from: v0.2.1 -->
@@ -39,7 +39,7 @@ Top-level workflow for selecting the right Agora path and loading only the refer
   Route to **[references/conversational-ai/README.md](references/conversational-ai/README.md)**.
 - **ConvoAI + existing app**: user already has a codebase and wants ConvoAI added
   Route to **[references/conversational-ai/README.md](references/conversational-ai/README.md)** first, then **[references/conversational-ai/integration-from-quickstart.md](references/conversational-ai/integration-from-quickstart.md)** after the official quickstart has been cloned and inspected.
-- **Agora CLI**: `agora` install, login, project selection, `init`, `quickstart`, env export, quickstart env binding, feature enablement, `doctor`, `project doctor`, env help, introspection, built-in skills, and MCP serving
+- **Agora CLI**: `agora` install, login, project selection, `init`, official recipe discovery, `quickstart`, env export, quickstart env binding, feature enablement, `doctor`, `project doctor`, env help, introspection, built-in skills, and MCP serving
   Route to **[references/cli/README.md](references/cli/README.md)**.
 - **Cloud Recording**: acquire/start/query/stop recording lifecycle
   Route to **[references/cloud-recording/README.md](references/cloud-recording/README.md)**.

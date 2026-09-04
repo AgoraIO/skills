@@ -2,7 +2,7 @@
   "name": "agora",
   "displayName": "Agora",
   "description": "Real-time communication with Agora SDKs — RTC, RTM, Conversational AI, and token generation",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "author": {
     "name": "Agora",
     "email": "devrel@agora.io"

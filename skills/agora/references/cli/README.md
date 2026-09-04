@@ -4,7 +4,7 @@ Use this module when the user is asking how to use the installed `agora` command
 
 <!-- applies-from: v0.2.1 -->
 
-Last verified against Agora CLI `0.2.7`. Minimum CLI `0.2.1`. Label older behavior as deprecated or removed when it no longer matches the installed CLI.
+Last verified against Agora CLI `0.2.9`. Minimum CLI `0.2.1`. Label older behavior as deprecated or removed when it no longer matches the installed CLI.
 
 The canonical CLI repository is <https://github.com/AgoraIO/cli>. Use that repository's `README.md`, `docs/commands.md`, `docs/automation.md`, `docs/error-codes.md`, `docs/telemetry.md`, `CHANGELOG.md`, and releases for Level 2 CLI lookup when these bundled references are not enough.
 
@@ -19,6 +19,7 @@ The Agora Docs MCP server (`agora-docs-mcp`) and the Agora CLI solve different p
 - Feature enablement for `rtc`, `rtm`, and `convoai`
 - One-command onboarding with `agora init`
 - Official quickstart cloning, binding, and env writing
+- Read-only discovery of official recipes and recipe-backed initialization
 - Repo-local project binding through `.agora/project.json`
 - Install self-diagnostics through `agora doctor`
 - Environment-variable discovery through `agora env-help`
@@ -33,7 +34,7 @@ The Agora Docs MCP server (`agora-docs-mcp`) and the Agora CLI solve different p
 | User's request | Read this file next |
 |---|---|
 | Install, login, config directory, `whoami`, `auth status`, `login --no-browser` | [install-auth.md](install-auth.md) |
-| `agora init`, `quickstart create`, `quickstart env write`, `.agora/project.json`, repo binding | [quickstarts.md](quickstarts.md) |
+| `agora init`, `recipes list/show`, `quickstart create`, `quickstart env write`, `.agora/project.json`, repo binding | [quickstarts.md](quickstarts.md) |
 | `project env`, `project env write`, `.env`, `.env.local`, shell exports, `--with-secrets` | [env.md](env.md) |
 | `project create`, `project list`, `project use`, `project show`, `project feature ...` | [projects.md](projects.md) |
 | `doctor`, `project doctor`, readiness, blocking issues, next remediation command | [doctor.md](doctor.md) |
@@ -48,35 +49,38 @@ The Agora Docs MCP server (`agora-docs-mcp`) and the Agora CLI solve different p
 | Windows PowerShell installer | `irm https://dl.agora.io/cli/install.ps1 \| iex` |
 | Installed command | `agora` |
 | Deprecated package | `agora-cli-preview` |
-| Last verified | `0.2.7` |
+| Last verified | `0.2.9` |
 | Minimum CLI | `0.2.1` |
 | Default output mode | `pretty` |
 | Agent-safe output mode | `--json` |
 | Agent-safe command tree | `agora introspect --json` |
-| Preferred full onboarding command | `agora init <name> --template <template>` |
+| Preferred full onboarding command | `agora init <name> --template <template>` or `--recipe <slug>` |
 | Preferred project env export command | `agora project env` |
 | Preferred quickstart env command | `agora quickstart env write` |
 | Install self-test | `agora doctor --json` |
 | Environment override catalog | `agora env-help --json` |
-| Built-in recipe catalog | `agora skills list --json` |
+| Official recipe catalog | `agora recipes list --json` |
+| Built-in workflow catalog | `agora skills list --json` |
 
 ## Current Command Surface
 
-Verified in CLI `0.2.1`:
+Verified in CLI `0.2.9`:
 
-- top level: `auth`, `completion`, `config`, `doctor`, `env-help`, `help`, `init`, `introspect`, `login`, `logout`, `mcp`, `open`, `project`, `quickstart`, `skills`, `telemetry`, `upgrade`, `version`, `whoami`
+- top level: `auth`, `completion`, `config`, `doctor`, `env-help`, `help`, `init`, `introspect`, `login`, `logout`, `mcp`, `open`, `project`, `quickstart`, `recipes`, `skills`, `telemetry`, `upgrade`, `version`, `whoami`
 - auth group: `auth login`, `auth logout`, `auth status`
 - config group: `config path`, `config get`, `config update`
 - mcp group: `mcp serve`
 - project group: `project create`, `project list`, `project use`, `project show`, `project env`, `project feature`, `project doctor`
 - env group: `project env write`
 - feature group: `project feature list`, `project feature status`, `project feature enable`
+- webhook group: `project webhook events`, `project webhook list`, `project webhook show`, `project webhook create`, `project webhook update`, `project webhook delete`
 - quickstart group: `quickstart list`, `quickstart create`, `quickstart env`, `quickstart env write`
+- recipes group: `recipes list`, `recipes show`
 - skills group: `skills list`, `skills search`, `skills show`
 - telemetry group: `telemetry status`, `telemetry enable`, `telemetry disable`
 - upgrade aliases: `agora update`, `agora self-update`
 
-This list was compiled at CLI `0.2.1` and is not exhaustive of later releases: `0.2.6` added a `project webhook` command group that is not enumerated here. `agora introspect --json` is authoritative for the live command tree — treat it as the source of truth before telling a user a command doesn't exist.
+`agora introspect --json` is authoritative for the live command tree. Treat it as the source of truth before telling a user a command does not exist.
 
 For agents, `agora introspect --json` is the preferred way to discover the current command tree programmatically. `agora --help --all` is the human-readable equivalent.
 
@@ -134,8 +138,10 @@ After readiness passes:
 
 | Task | Command shape |
 |------|---------------|
-| New demo in agent terminal | `agora init <name> --template python\|nextjs\|go --json` — **`--template` required** in `--json`, `--yes`, CI, or non-TTY runs (`QUICKSTART_TEMPLATE_REQUIRED` otherwise) |
-| Official quickstart env | `agora quickstart env write <repo> --json` — writes template keys (`APP_ID` for Python, not generic `AGORA_APP_ID`) |
+| New demo in agent terminal | `agora init <name> --template python\|nextjs\|go\|android --json` or `agora init <name> --recipe <slug> --json` — pass exactly one source (`INIT_SOURCE_REQUIRED` when omitted; `INIT_SOURCE_CONFLICT` when both are present) |
+| Discover official recipes | `agora recipes list --type all\|ai\|rtc --json`, then `agora recipes show <slug> --json` |
+| Clone-only quickstart | `agora quickstart create <name> --template <id> --template-only --json` |
+| Official quickstart env | `agora quickstart env write <repo> --json` — Python and Go use `AGORA_APP_ID` / `AGORA_APP_CERTIFICATE`; Next.js uses its `NEXT_*` keys |
 | Generic project dotenv | `agora project env write` — only when the repo is **not** an official quickstart expecting template keys |
 | CI upgrade check | `agora upgrade --check --json` — do not mutate the binary in CI unless `AGORA_ALLOW_UPGRADE_IN_CI=1` |
 
@@ -147,6 +153,7 @@ Topic files link here instead of duplicating this playbook: [install-auth.md](in
 - For agents and scripts, prefer `--json` instead of parsing pretty output.
 - Use `agora` in examples for an installed CLI. Use `./agora` only when running a locally built binary from the CLI repository.
 - Use `agora init` for a new end-to-end demo when the user wants the CLI to create or bind a project, clone a quickstart, write env, and print next steps.
+- Use `agora recipes list/show` for read-only discovery. Use `agora init <name> --recipe <slug>` to clone a supported official recipe and write credentials from its API-provided `cli.env` contract.
 - Use `agora quickstart ...` when the user wants to clone or re-bind an official starter repo without necessarily creating a new project.
 - Treat `project env` as the primary way to export project development config.
 - Treat `agora doctor` as the install and local-environment self-test.
@@ -154,7 +161,7 @@ Topic files link here instead of duplicating this playbook: [install-auth.md](in
 - Treat `quickstart env write` as the template-aware env writer for official quickstarts.
 - Do not expose secrets unless the user explicitly asks for `--with-secrets`.
 - Treat `project doctor` as a readiness checker, not a full Conversational AI onboarding flow.
-- In non-interactive runs (`--json`, `--yes`, CI, or non-TTY), always pass `--template` to `agora init`.
+- In non-interactive runs (`--json`, `--yes`, CI, or non-TTY), pass exactly one of `--template` or `--recipe` to `agora init`.
 - In CI/non-TTY, `agora open` defaults to URL-only behavior unless `--browser` is explicitly passed.
 - Prefer `--debug` and `AGORA_DEBUG`; `--verbose` and `AGORA_VERBOSE` were removed in `0.2.0`.
 - Prefer the installer defaults; `--add-to-path` was removed in `0.2.0` because PATH wiring is now on by default.
