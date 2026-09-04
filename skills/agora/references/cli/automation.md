@@ -4,9 +4,7 @@
 
 Use this file when the user needs script-safe CLI usage, machine-readable output, environment overrides, or agent-oriented command discovery.
 
-Last verified against Agora CLI `0.2.8`. Basic onboarding minimum `0.2.2`; full current contract `0.2.8`.
-
-> The basic onboarding flow was tested on each CLI version from `0.2.2` through `0.2.8`; use `agora introspect --json` for the live command tree.
+Last verified against Agora CLI `0.2.8`. Minimum CLI `0.2.2`.
 
 > **Agents:** start with [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any mutating command.
 
@@ -22,9 +20,17 @@ For command discovery, prefer:
 
 ```bash
 agora introspect --json
+agora --help --all --json
 ```
 
 Each `commands[]` record includes `headlessSafe` and `interactivity`. Prefer commands where `headlessSafe` is true; skip flows marked `interactive-browser` or similar in agent terminals.
+
+For installed quickstart templates, runtime commands, required features, and env
+guidance, prefer:
+
+```bash
+agora quickstart list --details --json
+```
 
 For environment-variable discovery, prefer:
 
@@ -96,17 +102,16 @@ MCP clients may pass `_meta.progressToken` to receive `notifications/progress` f
 
 ## Persisted Defaults
 
-The example config for `0.2.8` includes these persisted defaults:
+The persisted `0.2.8` config includes these user-facing defaults:
 
 - `output`
-- `apiBaseUrl`
-- `oauthBaseUrl`
-- `oauthClientId`
-- `oauthScope`
 - `telemetryEnabled`
 - `browserAutoOpen`
 - `logLevel`
 - `debug`
+
+API and OAuth integration values are derived from the active region or explicit
+environment overrides in `0.2.8`; they are not persisted config defaults.
 
 ## Local Isolation
 

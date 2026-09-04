@@ -4,9 +4,7 @@
 
 Use this file when the user wants `agora init`, `agora quickstart ...`, or repo-local project binding for an official quickstart.
 
-Last verified against Agora CLI `0.2.8`. Basic onboarding minimum `0.2.2`; full current contract `0.2.8`.
-
-> Basic quickstart onboarding was tested on each CLI version from `0.2.2` through `0.2.8`; use `agora introspect --json` for the live command tree.
+Last verified against Agora CLI `0.2.8`. Minimum CLI `0.2.2`.
 
 > **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any command here.
 
@@ -103,7 +101,8 @@ Resolution order:
 
 ## Env Writing
 
-`quickstart env write` is template-aware. It writes the variable names and env file path the selected official quickstart expects:
+In verified CLI `0.2.8`, `quickstart env write` is template-aware. It writes the
+variable names and env file path the selected official quickstart expects:
 
 | Template | Target | Variables |
 |---|---|---|

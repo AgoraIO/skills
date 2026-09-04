@@ -46,7 +46,8 @@ The key question: does the user already have a **working ConvoAI baseline**?
 
 For `quickstart` and `integration` mode, the fastest first-mile path is often:
 
-0. run **[CLI readiness](../cli/README.md#cli-readiness-agents)** — version gate, upgrade if below `0.2.2`, require `0.2.8` for the current full-contract env and webhook paths, and confirm PATH before any mutating CLI command
+0. run **[CLI readiness](../cli/README.md#cli-readiness-agents)** — apply the
+   canonical version, PATH, and config checks before any mutating CLI command
 1. use `agora init <name> --template <template> --json` for a new official quickstart, or `agora quickstart env write` to bind an existing official quickstart
 2. use the Agora CLI to verify login, current project, `convoai` feature readiness, and other basic project checks such as App ID/App Certificate presence
 3. run `project doctor` to catch missing setup early

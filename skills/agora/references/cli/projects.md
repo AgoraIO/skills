@@ -4,9 +4,7 @@
 
 Use this file when the user needs to create, select, inspect, or feature-enable Agora projects from the CLI.
 
-Last verified against Agora CLI `0.2.8`. Basic onboarding minimum `0.2.2`; full current contract `0.2.8`.
-
-> Core project commands were checked on CLI `0.2.2` and `0.2.8`; use `agora introspect --json` for the live command tree.
+Last verified against Agora CLI `0.2.8`. Minimum CLI `0.2.2`.
 
 > **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any command here.
 
@@ -39,8 +37,8 @@ login flow in [install-auth.md](install-auth.md); do not ask the user to choose
 a region. When repository or session state indicates a non-default region, run
 `agora login --region <region>` before `agora project create`.
 
-CLI `0.2.1` accepted `--region` directly on `project create`, but later releases
-removed that flag. Do not pass `--region` to `project create`.
+In the verified `0.2.8` surface, `project create` does not accept `--region`.
+Check `agora introspect --json` before making the same claim about another installed version.
 
 For agent guidance, prefer explicit `--feature` flags because they match the later `project feature` workflow. Omitted `--feature` defaults to `rtc`, `rtm`, and `convoai`, and `convoai` implies `rtm`.
 
@@ -105,6 +103,21 @@ Most ConvoAI onboarding preparation starts with:
 ```bash
 agora project feature enable convoai
 ```
+
+## Project Webhooks
+
+Agora CLI `0.2.8` exposes `agora project webhook` operations. Use installed
+introspection for the available subcommands and flags instead of duplicating the
+generated command reference here.
+
+Webhook create, update, and delete operations modify remote project state and
+require explicit authorization for that specific action. Inspect the current
+project, feature, webhook target, URL, events, and delivery region before writing.
+Listing events or webhook configurations is read-only.
+
+Treat webhook signing secrets as sensitive. Do not request or display them unless
+the user explicitly needs secret-bearing output, and do not include secret values
+in logs, reports, or examples.
 
 ## Current-Project Context
 

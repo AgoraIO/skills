@@ -4,9 +4,7 @@
 
 Use this file when the user needs to export project credentials, write dotenv files, or explain the difference between generic project env and quickstart env commands.
 
-Last verified against Agora CLI `0.2.8`. Basic onboarding minimum `0.2.2`; full current contract `0.2.8`.
-
-> The env export and quickstart env-write flows were checked on CLI `0.2.2` and `0.2.8`; use `agora introspect --json` for the live command tree.
+Last verified against Agora CLI `0.2.8`. Minimum CLI `0.2.2`.
 
 > **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) first. For official quickstarts, **`quickstart env write` is mandatory** — see warning below.
 
@@ -49,7 +47,7 @@ Use:
 agora quickstart env write [repo-path]
 ```
 
-when working inside an official quickstart or writing template-specific env names such as `NEXT_PUBLIC_AGORA_APP_ID` or `APP_ID`.
+when working inside an official quickstart or writing template-specific env names.
 
 ## Export Commands
 
@@ -146,7 +144,7 @@ agora quickstart env write my-python-demo --project my-project
 agora quickstart env write /abs/path/to/my-go-demo --json
 ```
 
-Template-specific behavior:
+Verified `0.2.8` behavior:
 
 | Template | Target | Variables |
 |---|---|---|

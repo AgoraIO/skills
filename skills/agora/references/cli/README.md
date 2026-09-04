@@ -4,7 +4,8 @@ Use this module when the user is asking how to use the installed `agora` command
 
 <!-- applies-from: v0.2.8 -->
 
-Last verified against Agora CLI `0.2.8`. Basic onboarding minimum is `0.2.2`; the full current reference baseline is `0.2.8`. Older releases below `0.2.2` have stale quickstart repository mappings. Label older behavior as deprecated or removed when it no longer matches the installed CLI.
+Last verified against Agora CLI `0.2.8`. Minimum CLI `0.2.2`.
+Label older behavior as deprecated or removed when it no longer matches the installed CLI.
 
 The canonical CLI repository is <https://github.com/AgoraIO/cli>. Use that repository's `README.md`, `docs/commands.md`, `docs/automation.md`, `docs/error-codes.md`, `docs/telemetry.md`, `CHANGELOG.md`, and releases for Level 2 CLI lookup when these bundled references are not enough.
 
@@ -49,8 +50,7 @@ The Agora Docs MCP server (`agora-docs-mcp`) and the Agora CLI solve different p
 | Installed command | `agora` |
 | Deprecated package | `agora-cli-preview` |
 | Last verified | `0.2.8` |
-| Basic onboarding minimum | `0.2.2` |
-| Full current contract | `0.2.8` |
+| Minimum CLI | `0.2.2` |
 | Default output mode | `pretty` |
 | Agent-safe output mode | `--json` |
 | Agent-safe command tree | `agora introspect --json` |
@@ -60,21 +60,6 @@ The Agora Docs MCP server (`agora-docs-mcp`) and the Agora CLI solve different p
 | Install self-test | `agora doctor --json` |
 | Environment override catalog | `agora env-help --json` |
 | Built-in recipe catalog | `agora skills list --json` |
-
-## Compatibility Matrix
-
-| CLI version | Support status | Verified behavior |
-|---|---|---|
-| `0.2.2` | Minimum supported | Basic Python quickstart clone, project binding, env configuration, core command surface, and JSON automation |
-| `0.2.3`–`0.2.7` | Supported for basic onboarding | The same quickstart clone and env configuration flow was tested for each version |
-| `0.2.8` | Current full reference baseline | Basic onboarding plus the current install doctor, Python/Go env layout, region-aware command surface, config schema v4, and project webhook surface |
-
-Version-gated capabilities:
-
-- `project webhook` requires CLI `>=0.2.6`.
-- The current Python/Go quickstart env layout requires CLI `0.2.8`.
-- Region-aware login and config schema v4 behavior require CLI `0.2.8`.
-- The `0.2.2`–`0.2.7` support claim covers basic onboarding only; interactive login and remote webhook writes were not executed.
 
 ## Current Command Surface
 
@@ -113,8 +98,7 @@ Run `agora doctor --json` after the read-only probe. It is available in every su
 
 ### 2. Version gate
 
-- **Basic onboarding minimum:** `0.2.2`.
-- **Full current contract:** `0.2.8`.
+- **Minimum CLI:** `0.2.2`.
 - **Below minimum** or command not found → stop and upgrade.
 
 **Upgrade order** (ask for user approval before running installers):
@@ -123,7 +107,7 @@ Run `agora doctor --json` after the read-only probe. It is available in every su
    **Preferred (Windows PowerShell):** `irm https://dl.agora.io/cli/install.ps1 | iex`
    - `--add-to-path` was removed in 0.2.0 — do not use it. `--force` / `-Force` do exist, but they install alongside a managed install and create PATH shadowing; do not use them to bypass a refusal.
 2. **npm-managed installs:** if `which -a agora` (or `where.exe agora`) resolves the binary under `npm prefix -g`, the standalone installer refuses with exit `7` and suggests `npm update -g agoraio-cli` — do not follow that suggestion, it resolves to the stale `0.1.6`, below Minimum CLI. Do not pass `--force`/`-Force` to override the refusal either. See [install-auth.md](install-auth.md#npm-managed-installs) for the platform-specific migration commands.
-3. **Confirm:** `agora version` shows `>=0.2.2`; require `>=0.2.8` for full-contract features and run `agora doctor --json` when using that baseline.
+3. **Confirm:** `agora version` shows `>=0.2.2`, then run `agora doctor --json` before continuing.
 
 ### 3. PATH shadowing
 
@@ -152,7 +136,7 @@ After readiness passes:
 | Task | Command shape |
 |------|---------------|
 | New demo in agent terminal | `agora init <name> --template python\|nextjs\|go --json` — **`--template` required** in `--json`, `--yes`, CI, or non-TTY runs (`QUICKSTART_TEMPLATE_REQUIRED` otherwise) |
-| Official quickstart env | `agora quickstart env write <repo> --json` — writes template keys (`APP_ID` for Python, not generic `AGORA_APP_ID`) |
+| Official quickstart env | `agora quickstart env write <repo> --json` — uses the CLI's template-aware layout; verify the actual file afterward |
 | Generic project dotenv | `agora project env write` — only when the repo is **not** an official quickstart expecting template keys |
 | CI upgrade check | `agora upgrade --check --json` — do not mutate the binary in CI unless `AGORA_ALLOW_UPGRADE_IN_CI=1` |
 
