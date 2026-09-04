@@ -1,12 +1,10 @@
 # Agora CLI Init and Quickstarts
 
-<!-- applies-from: v0.2.1 -->
+<!-- applies-from: v0.2.8 -->
 
 Use this file when the user wants `agora init`, `agora quickstart ...`, or repo-local project binding for an official quickstart.
 
-Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
-
-> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
+Last verified against Agora CLI `0.2.8`. Minimum CLI `0.2.2`.
 
 > **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) in [README.md](README.md) before any command here.
 
@@ -103,16 +101,17 @@ Resolution order:
 
 ## Env Writing
 
-`quickstart env write` is template-aware. It writes the variable names and env file path the selected official quickstart expects:
+In verified CLI `0.2.8`, `quickstart env write` is template-aware. It writes the
+variable names and env file path the selected official quickstart expects:
 
 | Template | Target | Variables |
 |---|---|---|
 | Generic project env | selected dotenv file | `AGORA_APP_ID`, `AGORA_APP_CERTIFICATE` |
 | Next.js quickstart | `.env.local` | `NEXT_PUBLIC_AGORA_APP_ID`, `NEXT_AGORA_APP_CERTIFICATE` |
-| Python quickstart | `server/.env` | `APP_ID`, `APP_CERTIFICATE` |
-| Go quickstart | `server-go/.env` | `APP_ID`, `APP_CERTIFICATE` |
+| Python quickstart | `server/.env.local` | `AGORA_APP_ID`, `AGORA_APP_CERTIFICATE` |
+| Go quickstart | `server/.env.local` | `AGORA_APP_ID`, `AGORA_APP_CERTIFICATE` |
 
-**Agent rule:** for official quickstarts, always use **`agora quickstart env write`**, not `agora project env write`. Using the generic writer leaves Python samples with `AGORA_APP_ID` while the backend reads `APP_ID` — the service starts but credentials are empty.
+**Agent rule:** for official quickstarts, always use **`agora quickstart env write`**, not `agora project env write`. Fresh Python and Go quickstarts use `server/.env.local` with `AGORA_APP_ID` / `AGORA_APP_CERTIFICATE`; preserve legacy layouts when detected.
 
 Existing `.env` and `.env.local` files are preserved. The CLI updates existing credential keys, appends missing credentials, and comments duplicate or stale Agora credential aliases for the selected runtime.
 

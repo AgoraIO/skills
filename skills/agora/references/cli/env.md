@@ -1,12 +1,10 @@
 # Agora CLI Project Environment Export
 
-<!-- applies-from: v0.2.1 -->
+<!-- applies-from: v0.2.8 -->
 
 Use this file when the user needs to export project credentials, write dotenv files, or explain the difference between generic project env and quickstart env commands.
 
-Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
-
-> Reviewed at `0.2.7` for install-path and minimum-version changes only. The command behavior below was last checked at `0.2.1`; use `agora introspect --json` for the live command tree.
+Last verified against Agora CLI `0.2.8`. Minimum CLI `0.2.2`.
 
 > **Agents:** complete [CLI readiness](README.md#cli-readiness-agents) first. For official quickstarts, **`quickstart env write` is mandatory** — see warning below.
 
@@ -14,7 +12,12 @@ Last verified against Agora CLI `0.2.1`. Minimum CLI `0.2.1`.
 
 ## Critical Agent Rule
 
-Using `agora project env write` on an official Python or Go quickstart writes **`AGORA_APP_ID`** to a generic dotenv path. Those samples read **`APP_ID`** from `server/.env` or `server-go/.env`. The backend starts with empty credentials.
+Using `agora project env write` on an official quickstart writes generic
+`AGORA_APP_ID` / `AGORA_APP_CERTIFICATE` values to a generic dotenv path and
+does not choose the template's env file. Fresh v0.2.8 Python and Go
+quickstarts use `server/.env.local` with those `AGORA_*` keys; legacy layouts
+may instead use `server/.env` or `server-go/.env` with `APP_ID` /
+`APP_CERTIFICATE`.
 
 For official quickstarts, always use:
 
@@ -44,7 +47,7 @@ Use:
 agora quickstart env write [repo-path]
 ```
 
-when working inside an official quickstart or writing template-specific env names such as `NEXT_PUBLIC_AGORA_APP_ID` or `APP_ID`.
+when working inside an official quickstart or writing template-specific env names.
 
 ## Export Commands
 
@@ -86,7 +89,7 @@ Option rules:
 
 ## Project Env Variables
 
-The verified `0.2.1` project env export contract focuses on:
+The verified `0.2.8` project env export contract focuses on:
 
 - `AGORA_APP_ID`
 - `AGORA_APP_CERTIFICATE` only when `--with-secrets` is provided
@@ -128,26 +131,26 @@ Ask for explicit approval before running `--overwrite`, and state the target pat
 
 Do not use template files such as `.env.example`, `.env.sample`, or `.env.template` as write targets for real values or secrets.
 
-In `0.2.1`, `project env write` updates or creates repo-local `.agora/project.json` metadata and records detected `projectType` / `envPath` when missing.
+In `0.2.8`, `project env write` updates or creates repo-local `.agora/project.json` metadata and records detected `projectType` / `envPath` when missing.
 
 ## Quickstart Env Writing
 
 Official quickstarts use template-specific env names and file paths. Use [quickstarts.md](quickstarts.md) for the full flow.
 
-Verified `0.2.1` examples:
+Verified `0.2.8` examples:
 
 ```bash
 agora quickstart env write my-python-demo --project my-project
 agora quickstart env write /abs/path/to/my-go-demo --json
 ```
 
-Template-specific behavior:
+Verified `0.2.8` behavior:
 
 | Template | Target | Variables |
 |---|---|---|
 | Next.js quickstart | `.env.local` | `NEXT_PUBLIC_AGORA_APP_ID`, `NEXT_AGORA_APP_CERTIFICATE` |
-| Python quickstart | `server/.env` | `APP_ID`, `APP_CERTIFICATE` |
-| Go quickstart | `server-go/.env` | `APP_ID`, `APP_CERTIFICATE` |
+| Python quickstart | `server/.env.local` | `AGORA_APP_ID`, `AGORA_APP_CERTIFICATE` |
+| Go quickstart | `server/.env.local` | `AGORA_APP_ID`, `AGORA_APP_CERTIFICATE` |
 
 Existing env files are preserved. The CLI updates existing credential keys, appends missing values, and comments duplicate or stale Agora credential aliases for the selected runtime.
 

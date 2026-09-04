@@ -599,8 +599,8 @@ For each case:
 ### CLI-03: Version-aware minimum support
 
 - User Input: "What CLI version should I use for this skill?"
-- Expected Behavior: Anchors guidance on the verified minimum version
-- Pass Criteria: States Minimum CLI `0.2.1`, and that install/auth guidance was last verified against `0.2.7`; does not hand-wave with "latest"
+- Expected Behavior: Distinguishes the last-verified release from the minimum version gate
+- Pass Criteria: States Last verified `0.2.8` and Minimum CLI `0.2.2`; does not claim behavioral parity or per-patch testing across a version range
 - Result: ___
 
 ### CLI-04: Project creation guidance stays within real command surface
@@ -649,7 +649,7 @@ For each case:
 
 - User Input: "Can I run `agora convoai init`?"
 - Expected Behavior: Rejects the invented command and routes to the real command set
-- Pass Criteria: Explicitly says this is not part of the verified CLI surface; redirects to actual `agora init`, `agora quickstart`, `auth`, `config`, `project`, `project feature`, or `project doctor` commands
+- Pass Criteria: Checks `agora introspect --json` before concluding the command is absent; redirects only to commands exposed by the installed CLI and does not invent a replacement
 - Result: ___
 
 ### CLI-11: Root routing bypasses intake for clear CLI requests
@@ -684,7 +684,7 @@ For each case:
 
 - User Input: "What's the difference between `agora project env write` and `agora quickstart env write`?"
 - Expected Behavior: Distinguishes generic project dotenv writing from official quickstart template-aware env writing
-- Pass Criteria: Says `project env write` writes generic `AGORA_APP_ID` / `AGORA_APP_CERTIFICATE`, while `quickstart env write` writes runtime-specific files and variable names such as Next.js `NEXT_PUBLIC_AGORA_APP_ID` / `NEXT_AGORA_APP_CERTIFICATE` or Python `server/.env` with `APP_ID` / `APP_CERTIFICATE`
+- Pass Criteria: Distinguishes generic `project env write` from template-aware `quickstart env write`; uses the verified `0.2.8` Python layout `server/.env.local` with `AGORA_APP_ID` / `AGORA_APP_CERTIFICATE`; preserves an existing legacy layout and verifies the actual writer result
 - Result: ___
 
 ### CLI-16: OAuth loopback redirect mismatch guidance is host-aware
@@ -718,7 +718,7 @@ For each case:
 ### CLI-20: Command tree discovery uses introspect
 
 - User Input: "How can an agent discover the full Agora CLI command tree?"
-- Expected Behavior: Uses the v0.2.1 machine-readable discovery path
+- Expected Behavior: Uses the installed CLI's machine-readable discovery path
 - Pass Criteria: Recommends `agora introspect --json` for agents, mentions filtering on `headlessSafe` for non-interactive runs, and `agora --help --all` / `agora --help --all --json` for help output; does not suggest scraping pretty help as the default
 - Result: ___
 
@@ -771,11 +771,11 @@ For each case:
 - Pass Criteria: Uses `which -a agora` or `where.exe agora`; references `agora doctor` PATH recovery or reordering PATH; does not uninstall automatically; uses `install.sh --uninstall` / `install.ps1 -Uninstall` or stale-binary removal only after user approval; does not continue ConvoAI/CLI workflows until version confirms the new binary
 - Result: ___
 
-### CLI-28: Python quickstart env writer
+### CLI-28: Python quickstart env writer preserves current and legacy layouts
 
 - User Input: "Seed credentials for agent-quickstart-python with the CLI"
-- Expected Behavior: Uses template-aware env write
-- Pass Criteria: Uses `agora quickstart env write` so `server/.env` gets `APP_ID` / `APP_CERTIFICATE`; does not use `agora project env write` alone (which writes generic `AGORA_APP_ID`)
+- Expected Behavior: Uses the template-aware env writer and respects the quickstart's detected layout
+- Pass Criteria: Uses `agora quickstart env write`; for a fresh CLI `0.2.8` Python quickstart, expects `server/.env.local` with `AGORA_APP_ID` / `AGORA_APP_CERTIFICATE`; when an existing legacy layout is detected, preserves `server/.env` with `APP_ID` / `APP_CERTIFICATE`; verifies file and key names without printing values and does not use `agora project env write` alone
 - Result: ___
 
 ### CLI-29: Config version newer than CLI
@@ -796,7 +796,7 @@ For each case:
 
 - User Input: "Should I install the Agora CLI with npm?"
 - Expected Behavior: Declines npm and routes to the standalone installer
-- Pass Criteria: Does not recommend `npm install -g agoraio-cli`; states that the published npm package is stale at `0.1.6` and below Minimum CLI `0.2.1`; recommends `curl -fsSL https://dl.agora.io/cli/install.sh | sh`; if the user already has an npm-managed install, offers `--replace-npm` on macOS/Linux or `npm uninstall -g agoraio-cli` followed by the PowerShell installer on Windows
+- Pass Criteria: Does not recommend `npm install -g agoraio-cli`; states that the published npm package is stale at `0.1.6` and below Minimum CLI `0.2.2`; recommends `curl -fsSL https://dl.agora.io/cli/install.sh | sh`; if the user already has an npm-managed install, offers `--replace-npm` on macOS/Linux or `npm uninstall -g agoraio-cli` followed by the PowerShell installer on Windows
 - Result: ___
 
 ### CLI-32: Region is detected, never asked
