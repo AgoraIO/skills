@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- RTC First Success now has a Quickstart-first workflow with CLI-managed `nextjs + video-call` setup, current-run evidence, and user-confirmed two-page bidirectional audio/video verification.
+
+### Changed
+
+- RTC routing now distinguishes new demo and First Success requests from explicit SDK questions and post-baseline feature work.
+
 ## [1.8.3] - 2026-09-21
 
 ### Fixed

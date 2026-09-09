@@ -2,6 +2,28 @@
 
 Real-time audio and video communication. Users join channels, publish local tracks, and subscribe to remote tracks.
 
+## Route the Request
+
+First decide whether the user needs a working starting point or a focused RTC
+implementation answer.
+
+| Mode | When | Route to |
+|---|---|---|
+| `quickstart` | Create, build, run, try, demo, onboard, integrate from scratch, or reach RTC First Success without a working RTC baseline | [quickstarts.md](quickstarts.md) |
+| `sdk-implementation` | Explicit SDK/API question, focused code change, review, or debugging request | The matching platform or feature reference below |
+| `post-baseline` | The user reports that a real RTC call already worked and now wants another feature | The matching platform or feature reference below |
+
+A working RTC baseline means two independently joined clients in the same room
+received each other's remote audio and video. A cloned repository, configured
+env file, healthy Doctor result, successful build, HTTP response, token response,
+local preview, or single-client join does not establish that baseline.
+
+For a request to verify RTC now, prior success is context only. Use the current
+run and follow [quickstarts.md](quickstarts.md). For a post-baseline feature
+request, a user's explicit statement that the call already worked is sufficient
+for routing, but label it as user-reported rather than current Agent-observed
+evidence.
+
 ## Critical Rules
 
 1. **Register event handlers BEFORE joining** the channel, or you will miss events for users already present.
@@ -78,6 +100,7 @@ When Web, iOS, and Android clients share the same channel:
 
 Read the file matching the user's platform:
 
+- **[quickstarts.md](quickstarts.md)** — official Next.js video-call onboarding and real-device First Success
 - **[web.md](web.md)** — `agora-rtc-sdk-ng` (JS/TS): client creation, tracks, events, complete examples
 - **[screen-sharing.md](screen-sharing.md)** — Web dual-client screen sharing, system audio, identity, and cleanup
 - **[large-scale-subscriptions.md](large-scale-subscriptions.md)** — Web multi-channel viewing and dynamic subscription policy

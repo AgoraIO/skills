@@ -305,11 +305,11 @@ For each case:
 - Pass Criteria: Does not generate code; does not ask a long multi-step interview; asks only for the baseline path or equivalent next gate
 - Result: ___
 
-### I-04: Clear RTC request — no intake
+### I-04: Explicit RTC SDK question — no quickstart intake
 
-- User Input: "RTC Web video call"
-- Expected Behavior: Routes DIRECTLY to `references/rtc/web.md`; does NOT go through intake
-- Pass Criteria: Intake flow is not entered; confirms the routing non-regression for experienced developers
+- User Input: "How should I handle separate audio and video `user-published` events in Agora RTC Web?"
+- Expected Behavior: Routes DIRECTLY to `references/rtc/web.md`; does NOT enter the RTC first-success quickstart
+- Pass Criteria: Answers the explicit SDK implementation question and does not restart onboarding
 - Result: ___
 
 ### I-05: Cloned repo is not a working baseline
@@ -580,7 +580,102 @@ For each case:
 
 ---
 
-## 5. CLI Skill Coverage (CLI-series)
+## 5. RTC First-Success Coverage (RTC-QS-series)
+
+### RTC-QS-01: New RTC demo enters the official quickstart
+
+- User Input: "Build me a working Agora one-to-one video call"
+- Expected Behavior: Routes through `references/rtc/README.md` into `references/rtc/quickstarts.md`
+- Pass Criteria: Uses the official `nextjs + video-call` Quickstart through the Agora CLI; does not scaffold a replacement RTC app or jump directly to SDK code
+- Result: ___
+
+### RTC-QS-02: CLI selector uses the video-call scenario
+
+- User Input: "Use the Agora skill to get me to RTC First Success"
+- Expected Behavior: Runs CLI readiness, then initializes the RTC video-call Quickstart
+- Pass Criteria: Uses `agora init <name> --template nextjs --scenario video-call --json` with an explicitly authorized existing or new project path; consumes the returned `nextSteps` instead of inventing setup commands
+- Result: ___
+
+### RTC-QS-03: Readiness is not runtime success
+
+- User Input: "RTC Doctor passed, the env file exists, and localhost returns 200. Are we done?"
+- Expected Behavior: Keeps the request in the RTC Quickstart workflow
+- Pass Criteria: Says these observations establish readiness only; does not mark `app_running` or `user_experience_verified` complete
+- Result: ___
+
+### RTC-QS-04: Single-client join is not complete RTC First Success
+
+- User Input: "One browser joined the room and shows my local camera"
+- Expected Behavior: Keeps `user_experience_verified` pending and proceeds to the user's two-page experience
+- Pass Criteria: Does not claim complete First Success; asks the user to open the exact room URL in a second page and join independently
+- Result: ___
+
+### RTC-QS-05: Same-device experience remains one gate
+
+- User Input: "Both pages joined the same room on my laptop"
+- Expected Behavior: Keeps `user_experience_verified` pending until the user assesses the complete call
+- Pass Criteria: Asks whether bidirectional remote audio and video worked without exposing separate client-A, client-B, audio, or video gate fields
+- Result: ___
+
+### RTC-QS-06: User confirmation completes the experience gate
+
+- User Input: "I can see and hear the other page in both directions"
+- Expected Behavior: Marks `user_experience_verified` as user-confirmed while retaining Agent-observed project, Quickstart, and app-running gates
+- Pass Criteria: Does not invent or display separate client-A, client-B, audio, or video status fields; completes First Success only when all four current-run gates pass
+- Result: ___
+
+### RTC-QS-07: Previous success is not current-run verification
+
+- User Input: "This Quickstart worked last week. Verify that it works now."
+- Expected Behavior: Treats the old result as context and performs a new current run
+- Pass Criteria: Does not reuse historical success as current runtime evidence; starts the Quickstart and repeats two-page media verification
+- Result: ___
+
+### RTC-QS-08: Explicit post-baseline SDK work skips onboarding
+
+- User Input: "Our RTC Quickstart already completed a two-way audio/video call. Help me add screen sharing."
+- Expected Behavior: Accepts the user-reported working baseline for routing and opens the RTC screen-sharing reference
+- Pass Criteria: Does not re-run first-success onboarding; labels the baseline as user-reported rather than Agent-observed if evidence was not produced in the current task
+- Result: ___
+
+### RTC-QS-09: Remote project creation remains separately authorized
+
+- User Input: "Set up RTC First Success, but I do not have a usable Agora project."
+- Expected Behavior: Completes read-only project discovery first and stops before remote project creation
+- Pass Criteria: Shows the proposed project action and asks for explicit authorization before `--new-project`; does not treat local setup authorization as remote-write authorization
+- Result: ___
+
+### RTC-QS-10: App startup hands browser control to the user
+
+- User Input: "The RTC Quickstart is running. Finish the setup and give me the result."
+- Expected Behavior: Verifies the local URL, gives that exact URL to the user, and stops automated browser interaction
+- Pass Criteria: Does not create a room, enter pre-join, or request camera or microphone permission unless the user explicitly requested automated UI inspection
+- Result: ___
+
+### RTC-QS-11: Host-sensitive start keeps the returned command intact
+
+- User Input: "Run the RTC Quickstart from a sandboxed coding session."
+- Expected Behavior: Keeps dependency setup and static verification sandboxed, then runs the exact CLI-returned start command with minimally scoped host access because the process depends on file watching and real browser media
+- Pass Criteria: Changes the execution environment without rewriting the returned start command
+- Result: ___
+
+### RTC-QS-12: Sandbox watcher failure gets a same-command host retry
+
+- User Input: "The returned Next.js dev command failed in the sandbox with `EMFILE: too many open files, watch`."
+- Expected Behavior: Preserves the sandbox error and reruns the same returned dev command on the host before adapting it
+- Pass Criteria: Does not immediately switch to `next start`, raise file limits, or claim a descriptor leak; uses a single-watcher sandbox/host comparison when diagnosis is needed
+- Result: ___
+
+### RTC-QS-13: Running app is not completed First Success
+
+- User Input: "The Quickstart is installed and localhost returns a non-empty 200 response, but I have not tried the call yet."
+- Expected Behavior: Reports that the Quickstart is prepared and the app is running while user experience verification remains pending
+- Pass Criteria: Does not use RTC First Success or completion language until the user confirms the two-page bidirectional audio and video experience
+- Result: ___
+
+---
+
+## 6. CLI Skill Coverage (CLI-series)
 
 ### CLI-01: Root routing for install and login
 

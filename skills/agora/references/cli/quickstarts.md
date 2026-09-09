@@ -39,6 +39,39 @@ when the user wants to clone or re-bind an official quickstart separately from p
 
 Use low-level `agora project ...` commands when the workflow must be decomposed, resumed, or inspected step by step.
 
+### RTC video-call scenario
+
+For an RTC one-to-one video-call First Success, first verify that live CLI
+discovery exposes the `nextjs + video-call` combination:
+
+```bash
+agora quickstart list --show-all --details --json
+agora introspect --json
+```
+
+The RTC scenario is not implied by the general minimum CLI version in this
+reference. If the live catalog does not return `id: nextjs-video-call`, do not
+run an invented selector or fall back to a self-built RTC app. Use a released or
+explicitly selected local CLI build that contains the scenario.
+
+Initialize against an existing authorized project with:
+
+```bash
+agora init my-rtc-demo --template nextjs --scenario video-call --project <project> --json
+```
+
+Creating a new remote project requires separate authorization before using
+`--new-project`. The selected scenario requires `rtc` and writes the Next.js
+Quickstart env layout. Its repository must contain an `agora.quickstart.json`
+manifest identifying `template: nextjs` and `scenario: video-call`.
+
+After clone, the CLI resolves the Quickstart's declared package manager against
+the current machine. Consume the successful result's `nextSteps` in order and
+as returned. Do not replace them with remembered pnpm, npm, npx, framework,
+port, or wrapper commands. The returned package-manager readiness and successful
+setup establish local preparation only; use the RTC First Success workflow for
+two-client media proof.
+
 ## Commands
 
 ```bash
