@@ -97,8 +97,9 @@ and verify it as separate actions.
 Apply these rules while the RTC First Success workflow is active:
 
 - Use the official `nextjs + video-call` Quickstart selected by the current CLI; do not scaffold a substitute RTC app.
-- Run the environment-specific `nextSteps` returned by the CLI as returned. Do not replace them with remembered package-manager or framework commands.
-- Keep dependency setup and static verification sandboxed. Treat long-running start commands that depend on file watching, browser sessions, or media devices as host-sensitive, and run the exact returned command with the minimum required host access.
+- Run the environment-specific `nextSteps` returned by the CLI in order and as returned. Do not replace them with remembered package-manager or framework commands.
+- Do not insert tests, lint, typecheck, or a production build before the returned start command unless that verification command is itself present in `nextSteps` or the user explicitly requested it. If startup fails, run only diagnostics that are relevant to the observed failure.
+- Keep dependency setup sandboxed. Treat long-running start commands that depend on file watching, browser sessions, or media devices as host-sensitive, and run the exact returned command with the minimum required host access.
 - If a returned start command fails in a sandbox because a host capability is unavailable, preserve the failure and rerun the same command on the host before changing the command or using a production fallback.
 - Track Agent-observed source/app evidence separately from user-confirmed real-device media evidence.
 - After `app_running` passes, hand the exact local URL to the user and stop browser automation unless the user explicitly requested automated UI inspection. Do not create a room, enter pre-join, or request camera or microphone permission on the user's behalf by default.

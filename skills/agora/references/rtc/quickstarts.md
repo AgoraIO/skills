@@ -144,16 +144,24 @@ environment-specific `nextSteps`. Run those commands as returned before
 adapting them. Do not replace them with a remembered pnpm, npm, npx, framework,
 port, or wrapper command.
 
+For the standard RTC Next.js Quickstart, setup flows directly from the returned
+dependency-install step to the returned dev-server start step. Do not add
+`test`, `lint`, `typecheck`, or a production `build` between them unless that
+command appears in `nextSteps` or the user explicitly requested it. A failed
+start may justify narrowly scoped diagnostics for the observed error; it does
+not retroactively authorize a full test suite.
+
 If the returned setup strategy is unavailable, report the CLI diagnostic and
 leave the state blocked. Installing or upgrading a system runtime requires user
 approval. Keep the generated credential file secret and never print its values.
 
 ## Execution Environment Boundary
 
-Keep dependency installation and static verification in the sandbox. Treat a
-long-running start step that depends on file watching, a browser session, or
-media devices as host-sensitive and run the exact CLI-returned command with the
-minimum required host access.
+Keep dependency installation in the sandbox. Treat a long-running start step
+that depends on file watching, a browser session, or media devices as
+host-sensitive and run the exact CLI-returned command with the minimum required
+host access. Run no separate pre-start verification unless permitted by the
+command-integrity rule above.
 
 If the exact start command was first run in a sandbox and fails because a host
 capability is unavailable, preserve that failure and rerun the same command on

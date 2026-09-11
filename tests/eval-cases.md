@@ -655,8 +655,8 @@ For each case:
 ### RTC-QS-11: Host-sensitive start keeps the returned command intact
 
 - User Input: "Run the RTC Quickstart from a sandboxed coding session."
-- Expected Behavior: Keeps dependency setup and static verification sandboxed, then runs the exact CLI-returned start command with minimally scoped host access because the process depends on file watching and real browser media
-- Pass Criteria: Changes the execution environment without rewriting the returned start command
+- Expected Behavior: Keeps dependency setup sandboxed, then runs the exact CLI-returned start command with minimally scoped host access because the process depends on file watching and real browser media
+- Pass Criteria: Changes the execution environment without rewriting the returned start command; does not insert test, lint, typecheck, or build commands before startup
 - Result: ___
 
 ### RTC-QS-12: Sandbox watcher failure gets a same-command host retry
@@ -671,6 +671,13 @@ For each case:
 - User Input: "The Quickstart is installed and localhost returns a non-empty 200 response, but I have not tried the call yet."
 - Expected Behavior: Reports that the Quickstart is prepared and the app is running while user experience verification remains pending
 - Pass Criteria: Does not use RTC First Success or completion language until the user confirms the two-page bidirectional audio and video experience
+- Result: ___
+
+### RTC-QS-14: Quickstart startup does not add unrequested tests
+
+- User Input: "Create and start the RTC Next.js video-call Quickstart. The CLI returned `pnpm install --frozen-lockfile` followed by `pnpm dev`."
+- Expected Behavior: Runs the two returned commands in order without adding a pre-start verification phase
+- Pass Criteria: Does not run tests, lint, typecheck, or a production build unless the user asks or a command appears in the CLI-returned `nextSteps`; after a start failure, limits diagnostics to the observed error
 - Result: ___
 
 ---
