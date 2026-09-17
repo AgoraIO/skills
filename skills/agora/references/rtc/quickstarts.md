@@ -1,10 +1,10 @@
 ---
 name: agora-rtc-first-success
 description: >-
-  Blocking official Quickstart workflow for a new Agora RTC one-to-one video
+  Official Quickstart workflow for a new Agora RTC one-to-one video
   call. Use for build, try, run, onboarding, or First Success requests when no
-  working RTC baseline exists. Requires a current app run and user-confirmed
-  bidirectional remote audio and video from two pages in the same room.
+  working RTC baseline exists. Requires a current app run; claims about call
+  quality or bidirectional media require user-provided evidence.
 license: MIT
 metadata:
   author: agora
@@ -86,15 +86,14 @@ field to `passed` without evidence from its declared source in the current run.
 
 ### User-confirmed evidence
 
-- `user_experience_verified`: the user confirms that two pages on one device
-  joined the same room and completed a successful bidirectional remote audio
-  and video experience.
+- `user_experience_verified`: the user provides evidence of a successful
+  bidirectional remote audio and video call in the same channel.
 
-After `app_running` passes, give the user the exact local URL and stop browser
-automation. Unless the user explicitly requested automated UI inspection, do
-not create a room, enter pre-join, or request camera or microphone permission
-on the user's behalf. Requested browser automation remains setup or UI evidence
-only; record real-device media evidence as `user_confirmed`.
+After `app_running` passes, give the user the exact local URL. Do not enter the
+call or request camera or microphone permission on the user's behalf unless
+explicitly asked. Report that the Quickstart is running. Do not claim a
+successful RTC call based on startup or page availability alone; describe call
+quality or bidirectional media only when the user provides that evidence.
 
 ## What Does Not Prove First Success
 
@@ -112,8 +111,7 @@ None of these, alone or together, prove complete RTC First Success:
 - a successful run from an earlier task
 
 These observations can advance only the matching project, Quickstart, or app
-gate. First Success still requires the user's current-run experience
-confirmation.
+gate. Claims of a successful call still require the user's current-run evidence.
 
 ## Execution State Machine
 
@@ -126,7 +124,7 @@ or declare completion.
 | `project_readiness` | Inspect the selected or current project and verify RTC, App ID, App Certificate, and Doctor results | `project_ready` passes |
 | `quickstart_setup` | Run `agora init <name> --template nextjs --scenario video-call --project <project> --json` or the equivalent decomposed Quickstart flow, then complete the returned dependency setup without starting a replacement command | `quickstart_ready` passes |
 | `app_start` | Run the start step returned by the CLI exactly from the generated directory and keep the process active | `app_running` passes |
-| `user_experience` | Give the user the local URL and ask them to complete and assess the two-page call | The user confirms the full bidirectional audio/video experience and `user_experience_verified` passes |
+| `user_experience` | Hand off the local URL; leave media verification pending without prescribing a test setup | The user provides evidence of a bidirectional call and `user_experience_verified` passes |
 | `complete` | Report RTC First Success with evidence ownership | All four gates are `passed` in the current run |
 
 Use an existing directly usable project when the user selected one or when the
@@ -172,15 +170,9 @@ attributing the error to descriptor exhaustion or a leak.
 
 ## Real-Device Verification
 
-The standard verification uses one physical device and two independent pages.
-Give the user the local URL, ask them to open the exact same room in both pages,
-and let them assess whether bidirectional remote audio and video work. Recommend
-headphones to avoid feedback.
-
-If the browser or hardware cannot provide the camera or microphone to both
-pages, report a partial or blocked result. Audio-only, video-only, one-way
-media, local preview, or a waiting state is not complete video-call First
-Success.
+Give the user the local URL without prescribing how to test the call. If the
+user reports audio-only, video-only, one-way media, local preview, or a waiting
+state, do not claim a successful bidirectional video call.
 
 Ask for only unresolved observations. Do not ask the user to repeat setup facts
 already observed by the Agent.
@@ -190,10 +182,10 @@ already observed by the Agent.
 - Attribute failures to the layer directly observed: CLI, project readiness,
   Quickstart setup, app start, page join, remote audio, or remote video.
 - Preserve passed current-run gates when retrying a later stage, unless the app
-  process, room, project, or generated Quickstart changes.
+  process, channel, project, or generated Quickstart changes.
 - If the app process restarts, re-check `app_running` and repeat the user
   experience verification.
-- If the user changes rooms before completion, repeat the user experience
+- If the user changes channels before completion, repeat the user experience
   verification.
 - If host camera, microphone, browser-session, Keychain, VPN, or GUI state is
   unavailable from a sandbox, classify host state as unknown and request the
@@ -212,7 +204,7 @@ First Success reply, when blocked, or when the user asks for status. When one
 field advances, a short update is enough:
 
 ```text
-rtc_first_success: 2/4 -> 3/4; next: complete the two-page call
+rtc_first_success: 2/4 -> 3/4; next: hand off the local URL
 ```
 
 At completion, state which fields were Agent-observed and which were

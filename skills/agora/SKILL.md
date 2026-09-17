@@ -80,7 +80,7 @@ Ask at most one focused clarification when the route is still unclear.
 
 1. **Skill files are the single source of truth for Agora integration.** Do not use web search, external documentation, blog posts, or training data to answer Agora-related questions. All Agora SDK usage, API calls, architecture decisions, and integration patterns must come from the reference files in this skill. If the needed detail is not in the local references, use the Level 2 doc-fetching procedure in [references/doc-fetching.md](references/doc-fetching.md) — never free-form web search.
 
-2. **RTC quickstart and runtime gate.** For RTC build, run, demo, onboarding, or First Success requests without a working baseline: start at **[references/rtc/README.md](references/rtc/README.md)** and follow **[references/rtc/quickstarts.md](references/rtc/quickstarts.md)**. The Agent must start the official `nextjs + video-call` Quickstart in the current run. Doctor, env, build, HTTP, token, local preview, single-client join, fake media, and historical success do not prove complete First Success. Completion requires the user to confirm that two pages on one device joined the same room and each received the other's remote audio and video. Explicit SDK/API questions and post-baseline feature work still route to the relevant RTC topic file.
+2. **RTC quickstart and runtime gate.** For RTC build, run, demo, onboarding, or First Success requests without a working baseline: start at **[references/rtc/README.md](references/rtc/README.md)** and follow **[references/rtc/quickstarts.md](references/rtc/quickstarts.md)**. The Agent must start the official `nextjs + video-call` Quickstart in the current run. Doctor, env, build, HTTP, token, local preview, single-client join, fake media, and historical success do not prove a successful RTC call. Describe call quality or bidirectional media only when the user provides that evidence. Explicit SDK/API questions and post-baseline feature work still route to the relevant RTC topic file.
 
 3. **ConvoAI quickstart source gate.** For ConvoAI requests without a proven working baseline: start at **[references/conversational-ai/README.md](references/conversational-ai/README.md)** and use the official quickstart as the source of truth before generating or adapting code. Runtime proof validates the user's environment and project, not whether Agora's official quickstart works.
 
@@ -102,9 +102,8 @@ Apply these rules while the RTC First Success workflow is active:
 - Keep dependency setup sandboxed. Treat long-running start commands that depend on file watching, browser sessions, or media devices as host-sensitive, and run the exact returned command with the minimum required host access.
 - If a returned start command fails in a sandbox because a host capability is unavailable, preserve the failure and rerun the same command on the host before changing the command or using a production fallback.
 - Track Agent-observed source/app evidence separately from user-confirmed real-device media evidence.
-- After `app_running` passes, hand the exact local URL to the user and stop browser automation unless the user explicitly requested automated UI inspection. Do not create a room, enter pre-join, or request camera or microphone permission on the user's behalf by default.
-- Keep the workflow blocked until two pages in the same room receive remote audio and video in both directions.
-- While user experience verification is pending, say that the Quickstart is prepared and the app is running; reserve `RTC First Success` and completion language for all passed gates.
+- After `app_running` passes, give the user the exact local URL. Do not enter the call or request camera or microphone permission on the user's behalf unless explicitly asked.
+- Report that the Quickstart is running. Do not claim a successful RTC call based on startup or page availability alone; describe call quality or bidirectional media only when the user provides that evidence.
 - Do not reuse a prior run as proof when the user asks for current verification.
 
 ### ConvoAI Enforcement

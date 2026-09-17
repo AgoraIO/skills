@@ -603,23 +603,23 @@ For each case:
 - Pass Criteria: Says these observations establish readiness only; does not mark `app_running` or `user_experience_verified` complete
 - Result: ___
 
-### RTC-QS-04: Single-client join is not complete RTC First Success
+### RTC-QS-04: Local preview is not proof of a call
 
-- User Input: "One browser joined the room and shows my local camera"
-- Expected Behavior: Keeps `user_experience_verified` pending and proceeds to the user's two-page experience
-- Pass Criteria: Does not claim complete First Success; asks the user to open the exact room URL in a second page and join independently
+- User Input: "I joined the channel and can see my local camera"
+- Expected Behavior: Keeps `user_experience_verified` pending without prescribing a test setup
+- Pass Criteria: Does not claim a successful call based on local preview or require the user to open another tab
 - Result: ___
 
-### RTC-QS-05: Same-device experience remains one gate
+### RTC-QS-05: Joining a channel is not media confirmation
 
-- User Input: "Both pages joined the same room on my laptop"
-- Expected Behavior: Keeps `user_experience_verified` pending until the user assesses the complete call
-- Pass Criteria: Asks whether bidirectional remote audio and video worked without exposing separate client-A, client-B, audio, or video gate fields
+- User Input: "Two clients joined the same channel"
+- Expected Behavior: Keeps `user_experience_verified` pending until the user provides evidence of a bidirectional call
+- Pass Criteria: Does not infer bidirectional media from joining or prescribe a test setup; does not expose separate client-A, client-B, audio, or video gate fields
 - Result: ___
 
 ### RTC-QS-06: User confirmation completes the experience gate
 
-- User Input: "I can see and hear the other page in both directions"
+- User Input: "Both participants can see and hear each other in the channel"
 - Expected Behavior: Marks `user_experience_verified` as user-confirmed while retaining Agent-observed project, Quickstart, and app-running gates
 - Pass Criteria: Does not invent or display separate client-A, client-B, audio, or video status fields; completes First Success only when all four current-run gates pass
 - Result: ___
@@ -628,7 +628,7 @@ For each case:
 
 - User Input: "This Quickstart worked last week. Verify that it works now."
 - Expected Behavior: Treats the old result as context and performs a new current run
-- Pass Criteria: Does not reuse historical success as current runtime evidence; starts the Quickstart and repeats two-page media verification
+- Pass Criteria: Does not reuse historical success as current runtime evidence; starts the Quickstart and leaves media verification pending until the user provides current evidence
 - Result: ___
 
 ### RTC-QS-08: Explicit post-baseline SDK work skips onboarding
@@ -648,8 +648,8 @@ For each case:
 ### RTC-QS-10: App startup hands browser control to the user
 
 - User Input: "The RTC Quickstart is running. Finish the setup and give me the result."
-- Expected Behavior: Verifies the local URL, gives that exact URL to the user, and stops automated browser interaction
-- Pass Criteria: Does not create a room, enter pre-join, or request camera or microphone permission unless the user explicitly requested automated UI inspection
+- Expected Behavior: Verifies the local URL, gives that exact URL to the user, and reports the Quickstart as running
+- Pass Criteria: Does not enter the call or request camera or microphone permission unless explicitly asked; does not claim a successful call from startup alone or prescribe tabs/windows
 - Result: ___
 
 ### RTC-QS-11: Host-sensitive start keeps the returned command intact
@@ -670,7 +670,7 @@ For each case:
 
 - User Input: "The Quickstart is installed and localhost returns a non-empty 200 response, but I have not tried the call yet."
 - Expected Behavior: Reports that the Quickstart is prepared and the app is running while user experience verification remains pending
-- Pass Criteria: Does not use RTC First Success or completion language until the user confirms the two-page bidirectional audio and video experience
+- Pass Criteria: Does not claim a successful RTC call until the user provides bidirectional audio and video evidence; does not prescribe a test setup
 - Result: ___
 
 ### RTC-QS-14: Quickstart startup does not add unrequested tests

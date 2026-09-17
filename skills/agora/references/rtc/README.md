@@ -13,9 +13,9 @@ implementation answer.
 | `sdk-implementation` | Explicit SDK/API question, focused code change, review, or debugging request | The matching platform or feature reference below |
 | `post-baseline` | The user reports that a real RTC call already worked and now wants another feature | The matching platform or feature reference below |
 
-A working RTC baseline means two independently joined clients in the same room
-received each other's remote audio and video. A cloned repository, configured
-env file, healthy Doctor result, successful build, HTTP response, token response,
+A working RTC baseline means the user has confirmed a bidirectional call in the
+same channel. A cloned repository, configured env file, healthy Doctor result,
+successful build, HTTP response, token response,
 local preview, or single-client join does not establish that baseline.
 
 For a request to verify RTC now, prior success is context only. Use the current
