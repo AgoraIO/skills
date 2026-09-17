@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Claude plugin, Agora skill, and Cursor wrapper versions aligned at `1.9.0` for the RTC First Success topic and eval additions.
+
 - RTC routing now distinguishes new demo and First Success requests from explicit SDK questions and post-baseline feature work.
 
 ## [1.8.3] - 2026-09-21

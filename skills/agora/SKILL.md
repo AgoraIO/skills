@@ -9,7 +9,7 @@ description: >-
 license: MIT
 metadata:
   author: agora
-  version: '1.8.3'
+  version: '1.9.0'
 ---
 
 <!-- applies-from: v0.2.1 -->
