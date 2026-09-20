@@ -24,6 +24,9 @@ on:
     paths:
       - "skills/**/*.md"
       - ".github/workflows/**"
+      - ".github/actions/setup-eval-harness/**"
+      - ".github/eval-pin.env"
+      - "scripts/eval-browser-preflight.sh"
 
 env:
   TARGET_ID: agora
@@ -72,7 +75,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "22.23.2"
 
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@latest --activate
@@ -80,18 +83,32 @@ jobs:
       - name: Install runtime dependencies
         run: |
           pip install pyyaml
-          npm install -g --allow-scripts=agent-browser agent-browser @openai/codex
+          npm install -g --allow-scripts=agent-browser agent-browser@0.27.0 @openai/codex
           agent-browser install
-          agent-browser --version
-          agent-browser --session hermes-preflight open about:blank
-          agent-browser --session hermes-preflight close
+          bash skills-repo/scripts/eval-browser-preflight.sh
 
       - name: Install Hermes Agent
+        env:
+          HERMES_REF: 251e5f7c0a067239655f3421812ab7492a206065
         run: |
-          curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup
+          curl -fsSL "https://raw.githubusercontent.com/NousResearch/hermes-agent/${HERMES_REF}/scripts/install.sh" \
+            | bash -s -- --skip-setup --commit "$HERMES_REF" --force-commit
           source ~/.bashrc || source ~/.zshrc || true
           export PATH="$HOME/.local/bin:$PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          test "$(git -C "$HOME/.hermes/hermes-agent" rev-parse HEAD)" = "$HERMES_REF"
           hermes --version
+          cd "$HOME/.hermes/hermes-agent"
+          venv/bin/python - <<'PY'
+          from toolsets import resolve_toolset
+
+          required = {"terminal", "read_file", "write_file", "patch"}
+          available = set(resolve_toolset("hermes-cli"))
+          missing = required - available
+          if missing:
+              raise SystemExit(f"Missing Hermes CLI tools: {sorted(missing)}")
+          print("Hermes CLI file and terminal tools available")
+          PY
 
       - name: Configure Hermes
         env:
@@ -127,7 +144,6 @@ jobs:
           hermes config set model.provider custom:test-endpoint
           hermes config set model.default "${MODEL}"
           hermes config set agent.max_turns 90
-          hermes config set tools.profile coding
           hermes config set terminal.backend local
 
           # Write .env for API key

@@ -20,6 +20,9 @@ on:
     paths:
       - "skills/**/*.md"
       - ".github/workflows/**"
+      - ".github/actions/setup-eval-harness/**"
+      - ".github/eval-pin.env"
+      - "scripts/eval-browser-preflight.sh"
 
 env:
   TARGET_ID: agora
@@ -62,8 +65,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pyyaml
-          npm install -g acpx@0.13.0 agent-browser @openai/codex
-          npm install -g openclaw@latest
+          npm install -g acpx@0.13.0 agent-browser@0.27.0 @openai/codex
+          npm install -g openclaw@2026.9.4
+          agent-browser install --with-deps
+          bash skills-repo/scripts/eval-browser-preflight.sh
           openclaw --version
           acpx --version
 

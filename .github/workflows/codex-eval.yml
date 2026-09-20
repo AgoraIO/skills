@@ -24,6 +24,9 @@ on:
     paths:
       - "skills/**/*.md"
       - ".github/workflows/**"
+      - ".github/actions/setup-eval-harness/**"
+      - ".github/eval-pin.env"
+      - "scripts/eval-browser-preflight.sh"
 
 env:
   TARGET_ID: agora
@@ -67,12 +70,17 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.23.2"
+
       - name: Install runtime dependencies
         run: |
           pip install pyyaml
-          npm install -g --allow-scripts=agent-browser agent-browser @openai/codex
+          npm install -g --allow-scripts=agent-browser agent-browser@0.27.0 @openai/codex
           agent-browser install
-          agent-browser --version
+          bash skills-repo/scripts/eval-browser-preflight.sh
           codex --version
 
       - name: Write credentials file
