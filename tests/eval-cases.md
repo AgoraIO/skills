@@ -584,14 +584,14 @@ For each case:
 
 ### RTC-QS-01: New RTC demo enters the official quickstart
 
-- User Input: "Build me a working Agora one-to-one video call"
+- User Input: "Build me a working Agora Web one-to-one video call"
 - Expected Behavior: Routes through `references/rtc/README.md` into `references/rtc/quickstarts.md`
 - Pass Criteria: Uses the official `nextjs + video-call` Quickstart through the Agora CLI; does not scaffold a replacement RTC app or jump directly to SDK code
 - Result: ___
 
 ### RTC-QS-02: CLI selector uses the video-call scenario
 
-- User Input: "Use the Agora skill to get me to RTC First Success"
+- User Input: "Use the Agora skill to get me to RTC Web video-call First Success"
 - Expected Behavior: Runs CLI readiness, then initializes the RTC video-call Quickstart
 - Pass Criteria: Uses `agora init <name> --template nextjs --scenario video-call --json` with an explicitly authorized existing or new project path; consumes the returned `nextSteps` instead of inventing setup commands
 - Result: ___
@@ -678,6 +678,20 @@ For each case:
 - User Input: "Create and start the RTC Next.js video-call Quickstart. The CLI returned `pnpm install --frozen-lockfile` followed by `pnpm dev`."
 - Expected Behavior: Runs the two returned commands in order without adding a pre-start verification phase
 - Pass Criteria: Does not run tests, lint, typecheck, or a production build unless the user asks or a command appears in the CLI-returned `nextSteps`; after a start failure, limits diagnostics to the observed error
+- Result: ___
+
+### RTC-QS-15: Native platform request keeps its platform
+
+- User Input: "Build an Agora video-call demo for native iOS."
+- Expected Behavior: Routes to the iOS RTC reference
+- Pass Criteria: Respects the explicit native platform; does not require a Next.js video-call baseline
+- Result: ___
+
+### RTC-QS-16: Audio-only request keeps its media scope
+
+- User Input: "Build an Agora Web audio-only call demo."
+- Expected Behavior: Routes to the RTC Web reference for the requested audio-only implementation
+- Pass Criteria: Does not require the video-call First Success workflow or camera setup
 - Result: ___
 
 ---

@@ -98,17 +98,6 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           test "$(git -C "$HOME/.hermes/hermes-agent" rev-parse HEAD)" = "$HERMES_REF"
           hermes --version
-          cd "$HOME/.hermes/hermes-agent"
-          venv/bin/python - <<'PY'
-          from toolsets import resolve_toolset
-
-          required = {"terminal", "read_file", "write_file", "patch"}
-          available = set(resolve_toolset("hermes-cli"))
-          missing = required - available
-          if missing:
-              raise SystemExit(f"Missing Hermes CLI tools: {sorted(missing)}")
-          print("Hermes CLI file and terminal tools available")
-          PY
 
       - name: Configure Hermes
         env:

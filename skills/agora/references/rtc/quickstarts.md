@@ -1,7 +1,7 @@
 ---
 name: agora-rtc-first-success
 description: >-
-  Official Quickstart workflow for a new Agora RTC one-to-one video
+  Official Quickstart workflow for a new Agora RTC Web one-to-one video
   call. Use for build, try, run, onboarding, or First Success requests when no
   working RTC baseline exists. Requires a current app run; claims about call
   quality or bidirectional media require user-provided evidence.
@@ -38,17 +38,18 @@ Quickstart blocks the documented path.
 
 ## Routing Rule
 
-Enter this workflow when the user asks to create, build, run, try, demo,
-onboard, or reach First Success for an RTC call and has not stated that a real
-RTC call already worked.
+Enter this workflow for a Web one-to-one video-call build, demo, or First
+Success request without a working RTC baseline. Non-Web platforms and
+audio-only requests use the matching topic via [README.md](README.md); this
+workflow does not require them to run a Next.js video-call baseline.
 
 Skip this workflow for an explicit SDK/API concept, code review, or focused
 implementation question. If the user reports a prior working RTC baseline and
 asks for a new feature, use that report for routing but do not describe it as a
 current Agent-observed verification.
 
-If the user asks to verify RTC now, historical runs never satisfy the current
-run. Start the Quickstart and collect fresh evidence.
+If the user asks to verify this Web video-call Quickstart now, historical runs
+never satisfy the current run. Start the Quickstart and collect fresh evidence.
 
 ## Evidence Contract
 
