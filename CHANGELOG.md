@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.8.3] - 2026-09-21
+
 ### Fixed
 
 - Claude plugin packaging now uses the root `.mcp.json` default location so the bundled `agora-docs-mcp` server is discovered at runtime.
