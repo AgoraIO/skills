@@ -13,7 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- Claude plugin, Agora skill, and Cursor wrapper versions aligned at `1.8.2`.
+- Claude plugin, Agora skill, and Cursor wrapper versions aligned at `1.8.3`.
+- Agora CLI references aligned with v0.2.9, including official recipe discovery, quickstart guidance, and automation commands.
 - Claude plugin metadata now includes the existing DevRel contact and project homepage.
 - Volatile provider model IDs and framework runtime matrices now route to the cloned official sample or current provider docs instead of freezing fast-changing values inline.
 - Testing guidance is now an internal routed reference (`README.md`) rather than a nested `SKILL.md` that different hosts could discover inconsistently.
