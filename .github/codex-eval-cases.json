@@ -1,0 +1,9 @@
+[
+  "targets/agora/cases/workflow/convoai-e2e-first-success.yaml",
+  "targets/agora/cases/rtc-contract/rtc-web-quickstart-route.yaml",
+  "targets/agora/cases/rtc-contract/rtc-web-sdk-question.yaml",
+  "targets/agora/cases/rtc-contract/rtc-web-post-baseline.yaml",
+  "targets/agora/cases/rtc-contract/rtc-web-audio-only.yaml",
+  "targets/agora/cases/rtc-contract/rtc-web-readiness-evidence.yaml",
+  "targets/agora/cases/rtc-contract/rtc-native-ios-route.yaml"
+]
