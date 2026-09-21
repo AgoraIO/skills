@@ -99,7 +99,8 @@ jobs:
         working-directory: agentic-evals
         env:
           SUITE_IDS: ${{ github.event.inputs.suite_ids || 'workflow' }}
-          CASE_ID: ${{ github.event.inputs.case_id || 'convoai-e2e-first-success' }}
+          CASE_ID: ${{ github.event.inputs.case_id }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           python3 - <<'PY'
           import datetime
@@ -110,14 +111,21 @@ jobs:
           target_id = os.environ["TARGET_ID"]
           suite_ids = os.environ["SUITE_IDS"]
           case_id = os.environ["CASE_ID"]
+          is_pr = os.environ["EVENT_NAME"] == "pull_request"
           target = yaml.safe_load(open(f"targets/{target_id}/target.yaml"))
           selected_suites = target["default_suites"] if suite_ids == "all" else [item.strip() for item in suite_ids.split(",")]
+          # Requires an eval pin containing rtc-contract before this workflow is published.
+          if is_pr:
+              selected_suites = ["workflow", "rtc-contract"]
           cases = []
           for suite_id in selected_suites:
               suite = yaml.safe_load(open(f"targets/{target_id}/cases/{suite_id}/suite.yaml"))
+              selected_case = case_id
+              if is_pr:
+                  selected_case = "convoai-e2e-first-success" if suite_id == "workflow" else ""
               for case_path in suite["cases"]:
                   case = yaml.safe_load(open(case_path))
-                  if case_id and case["case_id"] != case_id:
+                  if selected_case and case["case_id"] != selected_case:
                       continue
                   cases.append({"case_id": case["case_id"], "path": case_path, "user_prompt": case["input"]["user_prompt"]})
           if not cases:

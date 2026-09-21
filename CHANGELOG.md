@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- RTC First Success now has a Quickstart-first workflow with CLI-managed `nextjs + video-call` setup, current-run evidence, and user-confirmed two-page bidirectional audio/video verification.
+- RTC First Success now has a Quickstart-first workflow with CLI-managed `nextjs + video-call` setup, current-run evidence, and user-confirmed bidirectional audio/video call verification.
 
 ### Changed
 

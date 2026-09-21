@@ -669,7 +669,8 @@ For each case:
 ### RTC-QS-13: Running app is not completed First Success
 
 - User Input: "The Quickstart is installed and localhost returns a non-empty 200 response, but I have not tried the call yet."
-- Expected Behavior: Reports that the Quickstart is prepared and the app is running while user experience verification remains pending
+- Preconditions: In this run, the Agent already observed CLI setup, the exact returned start command running, a still-active process, and a successful non-empty GET response. Without these observations, treat the input as user-reported readiness only.
+- Expected Behavior: With the Agent-observed prerequisites, reports that the Quickstart is prepared and the app is running while user experience verification remains pending
 - Pass Criteria: Does not claim a successful RTC call until the user provides bidirectional audio and video evidence; does not prescribe a test setup
 - Result: ___
 
