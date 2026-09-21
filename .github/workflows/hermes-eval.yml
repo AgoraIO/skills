@@ -24,6 +24,9 @@ on:
     paths:
       - "skills/**/*.md"
       - ".github/workflows/**"
+      - ".github/actions/setup-eval-harness/**"
+      - ".github/eval-pin.env"
+      - "scripts/eval-browser-preflight.sh"
 
 env:
   TARGET_ID: agora
@@ -72,7 +75,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Enable pnpm
         run: corepack enable && corepack prepare pnpm@latest --activate
@@ -82,15 +85,14 @@ jobs:
           pip install pyyaml
           npm install -g --allow-scripts=agent-browser agent-browser @openai/codex
           agent-browser install
-          agent-browser --version
-          agent-browser --session hermes-preflight open about:blank
-          agent-browser --session hermes-preflight close
+          bash skills-repo/scripts/eval-browser-preflight.sh
 
       - name: Install Hermes Agent
         run: |
           curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup
           source ~/.bashrc || source ~/.zshrc || true
           export PATH="$HOME/.local/bin:$PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           hermes --version
 
       - name: Configure Hermes
@@ -127,7 +129,6 @@ jobs:
           hermes config set model.provider custom:test-endpoint
           hermes config set model.default "${MODEL}"
           hermes config set agent.max_turns 90
-          hermes config set tools.profile coding
           hermes config set terminal.backend local
 
           # Write .env for API key

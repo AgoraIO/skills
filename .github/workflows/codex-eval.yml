@@ -3,14 +3,10 @@ name: Skills Evaluation (Codex)
 on:
   workflow_dispatch:
     inputs:
-      suite_ids:
-        description: "Comma-separated suite IDs, or 'all' for all suites"
-        required: false
-        default: "workflow"
       case_id:
-        description: "Single case ID (leave empty for full suite)"
+        description: "Single case ID, or 'all' for the standard VA + 6 RTC cases"
         required: false
-        default: "convoai-e2e-first-success"
+        default: "all"
       model:
         description: "Model for Codex"
         required: false
@@ -24,6 +20,10 @@ on:
     paths:
       - "skills/**/*.md"
       - ".github/workflows/**"
+      - ".github/actions/setup-eval-harness/**"
+      - ".github/eval-pin.env"
+      - ".github/codex-eval-cases.json"
+      - "scripts/eval-browser-preflight.sh"
 
 env:
   TARGET_ID: agora
@@ -67,12 +67,17 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
       - name: Install runtime dependencies
         run: |
           pip install pyyaml
           npm install -g --allow-scripts=agent-browser agent-browser @openai/codex
           agent-browser install
-          agent-browser --version
+          bash skills-repo/scripts/eval-browser-preflight.sh
           codex --version
 
       - name: Write credentials file
@@ -90,28 +95,24 @@ jobs:
         id: resolve
         working-directory: agentic-evals
         env:
-          SUITE_IDS: ${{ github.event.inputs.suite_ids || 'workflow' }}
-          CASE_ID: ${{ github.event.inputs.case_id || 'convoai-e2e-first-success' }}
+          CASE_ID: ${{ github.event.inputs.case_id || 'all' }}
         run: |
           python3 - <<'PY'
           import datetime
           import json
           import os
+          from pathlib import Path
           import yaml
 
           target_id = os.environ["TARGET_ID"]
-          suite_ids = os.environ["SUITE_IDS"]
           case_id = os.environ["CASE_ID"]
-          target = yaml.safe_load(open(f"targets/{target_id}/target.yaml"))
-          selected_suites = target["default_suites"] if suite_ids == "all" else [item.strip() for item in suite_ids.split(",")]
+          case_paths = json.loads(Path("../skills-repo/.github/codex-eval-cases.json").read_text())
           cases = []
-          for suite_id in selected_suites:
-              suite = yaml.safe_load(open(f"targets/{target_id}/cases/{suite_id}/suite.yaml"))
-              for case_path in suite["cases"]:
-                  case = yaml.safe_load(open(case_path))
-                  if case_id and case["case_id"] != case_id:
-                      continue
-                  cases.append({"case_id": case["case_id"], "path": case_path, "user_prompt": case["input"]["user_prompt"]})
+          for case_path in case_paths:
+              case = yaml.safe_load(Path(case_path).read_text())
+              if case_id != "all" and case["case_id"] != case_id:
+                  continue
+              cases.append({"case_id": case["case_id"], "path": case_path, "user_prompt": case["input"]["user_prompt"]})
           if not cases:
               raise SystemExit("No cases resolved.")
           started = datetime.datetime.now(datetime.timezone.utc)
@@ -124,7 +125,7 @@ jobs:
               "run_id": run_id,
               "runtime": "codex-cli-direct",
               "target_id": target_id,
-              "suite_ids": selected_suites,
+              "suite_ids": sorted({Path(case["path"]).parent.name for case in cases}),
               "case_ids": [case["case_id"] for case in cases],
               "started_at": started.isoformat(),
               "workspace_mode": "isolated-per-case",

@@ -2,6 +2,34 @@
 
 Real-time audio and video communication. Users join channels, publish local tracks, and subscribe to remote tracks.
 
+## Route the Request
+
+First decide whether the user needs a working starting point or a focused RTC
+implementation answer.
+
+| Mode | When | Route to |
+|---|---|---|
+| `quickstart` | Create, run, or reach First Success for a Web one-to-one video call without a working RTC baseline | [quickstarts.md](quickstarts.md) |
+| `sdk-implementation` | Explicit SDK/API question, focused code change, review, debugging, non-Web platform, or audio-only request | The matching platform or feature reference below |
+| `post-baseline` | The user reports that a real RTC call already worked and now wants another feature | The matching platform or feature reference below |
+
+Respect the requested platform and media type: iOS, Android, React Native,
+Flutter, and audio-only requests use the matching reference below, without a
+mandatory Next.js video-call baseline. If the platform is unclear, inspect the
+existing project first and ask one focused clarification only if still needed.
+
+A working RTC baseline means the user has confirmed a bidirectional call in the
+same channel. A cloned repository, configured env file, healthy Doctor result,
+successful build, HTTP response, token response,
+local preview, or single-client join does not establish that baseline.
+
+For a request to verify RTC now, prior success is context only. Use current-run
+evidence; follow [quickstarts.md](quickstarts.md) when the Web video-call
+workflow applies. For a post-baseline feature request, a user's explicit
+statement that the call already worked is sufficient
+for routing, but label it as user-reported rather than current Agent-observed
+evidence.
+
 ## Critical Rules
 
 1. **Register event handlers BEFORE joining** the channel, or you will miss events for users already present.
@@ -78,6 +106,7 @@ When Web, iOS, and Android clients share the same channel:
 
 Read the file matching the user's platform:
 
+- **[quickstarts.md](quickstarts.md)** — official Next.js video-call onboarding and real-device First Success
 - **[web.md](web.md)** — `agora-rtc-sdk-ng` (JS/TS): client creation, tracks, events, complete examples
 - **[screen-sharing.md](screen-sharing.md)** — Web dual-client screen sharing, system audio, identity, and cleanup
 - **[large-scale-subscriptions.md](large-scale-subscriptions.md)** — Web multi-channel viewing and dynamic subscription policy
