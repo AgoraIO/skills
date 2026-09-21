@@ -8,7 +8,7 @@ on:
         required: false
         default: "workflow"
       case_id:
-        description: "Single case ID (leave empty for full suite)"
+        description: "Single case ID, or 'all' for the full selected suite(s)"
         required: false
         default: "convoai-e2e-first-success"
       model:
@@ -111,6 +111,8 @@ jobs:
           target_id = os.environ["TARGET_ID"]
           suite_ids = os.environ["SUITE_IDS"]
           case_id = os.environ["CASE_ID"]
+          if case_id == "all":
+              case_id = ""
           is_pr = os.environ["EVENT_NAME"] == "pull_request"
           target = yaml.safe_load(open(f"targets/{target_id}/target.yaml"))
           selected_suites = target["default_suites"] if suite_ids == "all" else [item.strip() for item in suite_ids.split(",")]

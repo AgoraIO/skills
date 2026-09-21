@@ -57,10 +57,15 @@ class CodexCaseSelectionTest(unittest.TestCase):
         self.assertTrue(all(case.startswith('rtc-') for case in cases[1:]))
         self.assertIn('rtc-native-ios-route', cases)
 
-    def test_manual_single_case_and_empty_filter(self):
+    def test_manual_single_case_and_all_filter(self):
         self.assertEqual(self.resolve('workflow_dispatch', 'rtc-contract', 'rtc-web-audio-only'), ['rtc-web-audio-only'])
-        self.assertEqual(len(self.resolve('workflow_dispatch', 'rtc-contract')), 6)
+        self.assertEqual(len(self.resolve('workflow_dispatch', 'rtc-contract', 'all')), 6)
         self.assertEqual(self.resolve('workflow_dispatch', 'workflow', 'convoai-e2e-first-success'), ['convoai-e2e-first-success'])
+
+    def test_dispatch_default_case_cannot_select_rtc_suite(self):
+        # Run 35592561560 received the default despite dispatching an empty input.
+        with self.assertRaisesRegex(SystemExit, 'No cases resolved'):
+            self.resolve('workflow_dispatch', 'rtc-contract', 'convoai-e2e-first-success')
 
     def test_manual_ios_case(self):
         self.assertEqual(self.resolve('workflow_dispatch', 'rtc-contract', 'rtc-native-ios-route'), ['rtc-native-ios-route'])
