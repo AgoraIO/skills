@@ -42,8 +42,24 @@ You should not need to manually dig through the Agora Console just to get a firs
 ### Skills CLI
 
 ```bash
-npx skills add github:AgoraIO/skills
+npx skills add AgoraIO/skills
 ```
+
+Run the same command again to update an existing Agora skill installation to the latest version from `main`.
+
+To target the Agora skill path explicitly:
+
+```bash
+npx skills add https://github.com/AgoraIO/skills/tree/main/skills/agora
+```
+
+To verify the installed skill version:
+
+```bash
+grep -A3 "metadata:" ~/.agents/skills/agora/SKILL.md
+```
+
+Use the `metadata.version` value as the skill version. The `<!-- applies-from: v0.2.1 -->` comment marks Agora CLI compatibility, not the Agora skill version.
 
 ### Agora CLI (for local onboarding)
 
@@ -94,7 +110,7 @@ This works with tools like **Cursor, Windsurf, GitHub Copilot, Kiro**, or any en
 ### Claude Code — symlink (user-level)
 
 ```bash
-npx skills add github:AgoraIO/skills
+npx skills add AgoraIO/skills
 # or manually:
 ln -s ~/agora-skills/skills/agora ~/.claude/skills/agora
 ```
