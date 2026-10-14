@@ -178,7 +178,7 @@ Reverse of initialization:
 3. Log out of RTM
 4. Release both engines/clients
 
-For ConvoAI: call `DELETE /leave` (or the SDK equivalent) from your app server before leaving the RTC channel, to give the agent time to exit gracefully.
+For ConvoAI: call `POST /agents/{agentId}/leave` (or the SDK equivalent) from your app server before leaving the RTC channel, to give the agent time to exit gracefully.
 
 ## Reference Files by Product
 

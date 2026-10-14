@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- `references/integration-patterns.md`: the ConvoAI cleanup step now says `POST /agents/{agentId}/leave` instead of `DELETE /leave`, matching the [Stop Agent (Leave)](https://docs-md.agora.io/en/conversational-ai/rest-api/agent/leave.md) REST reference and `references/conversational-ai/README.md`.
+
+### Changed
+
+- Claude plugin, Agora skill, and Cursor wrapper versions aligned at `1.9.1`.
+
 ## [1.9.0] - 2026-09-21
 
 ### Added
