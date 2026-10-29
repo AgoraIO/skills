@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Agora Docs MCP guidance now uses the connected server's tool catalog and input schemas instead of a fixed tool list.
+- MCP lookup now follows the existing Level 2 policy and opens returned page URLs when search results contain excerpts.
+
+### Changed
+
+- Claude plugin, Agora skill, and Cursor wrapper versions aligned at `1.9.1` for this content correction.
+
 ## [1.9.0] - 2026-09-21
 
 ### Added
