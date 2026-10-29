@@ -280,6 +280,14 @@ For each case:
 - Expected Behavior: Refuses the edit in natural language if the quickstart source has not been inspected or no copy map exists, then gives the step that unblocks it
 - Pass Criteria: Does not use "policy violation" or "Track A/B" in user-visible wording; does not edit the user's app before source inspection and copy map
 
+### F-10: Documentation tools change after connection
+
+- Scenario: The connected Agora Docs MCP server advertises a renamed search tool with required context fields and a query array.
+- User Input: "Use Agora MCP to find the Web Conversational AI quickstart."
+- Expected Behavior: Reads the connected tool catalog and the selected tool's input schema before calling it.
+- Pass Criteria: Uses an advertised tool name, supplies all required fields, and matches the declared query type. Opens the returned page URL when the result contains only excerpts. Uses HTTP lookup if MCP returns no useful content.
+- Result: ___
+
 ---
 
 ## 4. Intake Accuracy (I-series)

@@ -2,30 +2,37 @@
 
 <!-- applies-from: v0.2.0 -->
 
-The Agora Docs MCP server (`agora-docs-mcp`) gives AI assistants direct tool-call access to Agora documentation. It is an
-optional enhancement — the skill works without it using the two-tier fetch
-approach in [doc-fetching.md](doc-fetching.md).
-
-Agora Docs MCP is for traversing docs only. It does not operate Agora backends,
-log in to accounts, create projects, write env files, or check project readiness;
-the local `agora` CLI handles those workflows.
-
-**Only use MCP when the user explicitly asks for it.** The default documentation
-lookup is the two-tier fetch approach in [doc-fetching.md](doc-fetching.md) — use
-that regardless of whether MCP is installed.
+The Agora Docs MCP server gives AI assistants access to Agora documentation search.
+The bundled plugin uses `agora-docs-mcp` as the connection name.
+Follow the lookup policy in [doc-fetching.md](doc-fetching.md) for live documentation.
 
 **MCP endpoint:** `https://mcp.agora.io`
 
-## Tools
+The server searches product guides and SDK API references.
+Use filter discovery when an advertised tool supports it.
+Use the local `agora` CLI for login, projects, environment files, and readiness checks.
 
-| Tool | Input | Returns |
-|---|---|---|
-| `get-doc-content` | `{"uri": "docs://..."}` | Full markdown content |
-| `search-docs` | `{"query": "keyword"}` | List of matching doc URIs |
-| `list-docs` | `{"category": "...", "limit": 20}` | All docs in a category |
+## Discover tools before calling them
 
-Use `search-docs` when the topic is known but the URI isn't. Use `get-doc-content`
-directly when the URI is known.
+The connected MCP client exposes tool names, descriptions, and input schemas.
+Use those definitions as the source of truth for each call.
+
+1. Inspect the tools exposed by the connected Agora Docs MCP server.
+2. Select a tool whose description matches the product, platform, and task.
+3. Read its input schema. Supply every required field, including any required context or session fields.
+4. Use the declared types for queries and filters. Read supported filter values from the schema or discovery results.
+5. Read the result. Open returned documentation URLs when excerpts do not contain the complete answer.
+
+For a guide on `docs.agora.io`, append `.md` to read its Markdown content.
+Use the original URL for references hosted on other domains.
+
+If the server rejects a tool name or its arguments, refresh the tool catalog.
+Inspect the current schema before another call.
+If MCP is unavailable or returns no useful content, use the HTTP lookup in [doc-fetching.md](doc-fetching.md).
+
+For a custom MCP client, initialize the connection and request the catalog with `tools/list`.
+Follow `nextCursor` until the catalog is complete.
+For protocol details, see the [MCP tools specification](https://modelcontextprotocol.io/specification/2025-06-18/server/tools).
 
 ## Installation
 
@@ -39,12 +46,10 @@ claude mcp add agora-docs-mcp --transport http https://mcp.agora.io
 an HTTP MCP server in your tool's MCP settings. See your tool's documentation for
 the exact configuration format.
 
-For the latest setup instructions and any changes to the endpoint, see:
-<https://docs.agora.io/en/ai/get-started/mcp-integrate.md>
+For setup instructions, see:
+<https://docs.agora.io/en/introduction/agora-mcp.md>
 
-## Usage Note
+## Usage note
 
-After fetching quick-start docs via MCP, use the content for API structure and field
-names only. Do NOT copy sample code verbatim — quick-start examples typically hardcode
-credentials and omit production requirements. Apply the gotchas and generation rules
-in `references/conversational-ai/README.md` to any generated code.
+Use quickstart documentation to check API structure and field names.
+Apply the credential handling and generation rules in [ConvoAI integration guidance](conversational-ai/README.md) before generating ConvoAI code.

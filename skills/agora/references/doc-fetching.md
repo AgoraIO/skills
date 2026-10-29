@@ -11,7 +11,9 @@ rules. If the answer is here, stop — no fetch needed.
 When bundled references don't cover the detail needed (full request/response schemas,
 vendor-specific configs, language-specific quick-start code):
 
-If the Agora Docs MCP tool (`agora-docs-mcp`) is available in the current tool/runtime, prefer it for Level 2 documentation lookup. Otherwise use the HTTP fetch flow below. If MCP returns no useful result, fall back to HTTP fetch.
+If Agora Docs MCP is available in the current runtime, prefer it for Level 2 lookup.
+Follow [mcp-tools.md](mcp-tools.md) to discover the available tools and read their input schemas before calling them.
+Otherwise, use the HTTP fetch flow below. If MCP returns no useful content, use the same HTTP flow.
 
 1. Fetch the Agora docs sitemap:
 
