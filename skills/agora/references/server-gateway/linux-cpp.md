@@ -108,6 +108,8 @@ static void SampleSendAudioTask(
 }
 ```
 
+`sampleRate` and `numOfChannels` must describe the buffer actually being sent. When the PCM comes from device capture (ALSA, embedded codecs) and feeds a ConvoAI agent, a silent change in capture rate or channel layout breaks VAD, turn detection, and interruption while the connection still looks healthy. See [../conversational-ai/audio-input-diagnostics.md](../conversational-ai/audio-input-diagnostics.md).
+
 ### Send encoded H.264 video
 
 ```cpp
