@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Claude plugin and marketplace descriptions now list Cloud Recording and Agora CLI onboarding.
+- README now includes a Privacy section linking the Agora Privacy Policy for the bundled Docs MCP server, and `plugin.json` declares `privacyPolicyUrl`.
+
 ## [1.9.0] - 2026-09-21
 
 ### Added
