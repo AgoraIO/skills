@@ -1,7 +1,7 @@
 {
   "name": "agora",
   "displayName": "Agora",
-  "description": "Real-time communication with Agora SDKs — Conversational AI, RTC, RTM, Cloud Recording, token generation, and Agora CLI onboarding",
+  "description": "Real-time communication with Agora SDKs — RTC, RTM, Conversational AI, and token generation",
   "version": "1.9.0",
   "author": {
     "name": "Agora",
@@ -10,7 +10,6 @@
   "homepage": "https://github.com/AgoraIO/skills",
   "repository": "https://github.com/AgoraIO/skills",
   "license": "MIT",
-  "privacyPolicyUrl": "https://www.agora.io/en/privacy-policy/",
   "keywords": [
     "agora",
     "rtc",
