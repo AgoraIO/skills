@@ -36,7 +36,7 @@ Top-level workflow for selecting the right Agora path and loading only the refer
   Route to **[references/rtc/README.md](references/rtc/README.md)**.
 - **RTM**: chat, signaling, presence, metadata, notifications inside the client
   Route to **[references/rtm/README.md](references/rtm/README.md)**.
-- **ConvoAI**: AI assistant, voice bot, agent demo, provider choice, MLLM, Studio Agent ID, agent backend
+- **ConvoAI**: AI assistant, voice bot, agent demo, provider choice, MLLM, Studio Agent ID, agent backend, VAD / turn detection / interruption behavior
   Route to **[references/conversational-ai/README.md](references/conversational-ai/README.md)**.
 - **ConvoAI + existing app**: user already has a codebase and wants ConvoAI added
   Route to **[references/conversational-ai/README.md](references/conversational-ai/README.md)** first, then **[references/conversational-ai/integration-from-quickstart.md](references/conversational-ai/integration-from-quickstart.md)** after the official quickstart has been cloned and inspected.

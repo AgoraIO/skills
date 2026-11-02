@@ -944,6 +944,20 @@ For each case:
 - Pass Criteria: Does not emit both `rtc` and `live` as duplicate `const client` declarations or both join examples as duplicate `const uid` declarations in one code path; screen sharing uses a separate client with its own matching UID and token
 - Result: ___
 
+### C-18: Unreliable interruption on hardware checks input audio first
+
+- User Input: "My ConvoAI agent works on my Linux board for the first question, but later questions get ignored and interrupting it only works sometimes. Which VAD settings should I change?"
+- Expected Behavior: Routes to `references/conversational-ai/audio-input-diagnostics.md` and verifies input audio before suggesting VAD or turn-detection changes
+- Pass Criteria: Asks for or adds per-second frame and sample throughput logging compared against the declared sample rate and channel count; correlates it with playback start/stop/restart; checks for echo, including that custom capture tracks do not enable AEC by default (`enableAudioProcessing` is `false`); does not recommend specific VAD threshold or silence-duration values before input is verified; any VAD field guidance routes to the live join schema
+- Result: ___
+
+### C-19: Declared PCM format matches the actual buffer
+
+- User Input: "I'm pushing 16 kHz mono PCM from ALSA into the Agora Linux SDK for a voice agent, but after the agent speaks the mic seems to send twice as many frames. Is this an Agora bug?"
+- Expected Behavior: Identifies a mismatch between actual capture throughput and the declared sample rate or channel count as the likely cause, in the device audio stack
+- Pass Criteria: Explains in plain language that doubled throughput declared as 16 kHz makes speech mistimed for VAD and ASR; suggests reading live ALSA `hw_params`, capturing in the codec's native channel layout and downmixing, and keeping playback open between turns; does not attribute the issue to Agora without evidence
+- Result: ___
+
 ---
 
 ## Evaluation Log

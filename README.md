@@ -134,6 +134,10 @@ Powered by [Agora](https://agora.io) — the real-time engagement platform behin
 - Agora Console: [https://console.agora.io/](https://console.agora.io/)
 - Agora GitHub: [https://github.com/AgoraIO](https://github.com/AgoraIO)
 
+## Privacy
+
+The plugin connects to the Agora Docs MCP server (`https://mcp.agora.io`) to look up Agora documentation. See the [Agora Privacy Policy](https://www.agora.io/en/privacy-policy/).
+
 ## License
 
 MIT

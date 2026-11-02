@@ -204,6 +204,7 @@ Things the official docs don't emphasize that cause frequent mistakes:
 - **RTM login identity must match the RTM token subject** — if the RTM token was minted for `String(rtcUid)`, the RTM client must log in with that same identity. Do not mint a token for one user identity and then log in RTM with another random user ID; this can surface as generic startup failures such as "Failed to start conversation".
 - **RTM enablement can lag behind control-plane state** — after enabling RTM or related project capabilities, CLI/control-plane checks may report the feature as enabled before the RTM service is actually usable. For first-success flows, treat RTM availability as a bounded wait/retry condition for up to about 5 minutes before concluding the project still needs intervention.
 - **Custom LLM interruptable metadata** — the first SSE chunk can be `{"object": "chat.completion.custom_metadata", "metadata": {"interruptable": false}}` to prevent user speech from interrupting critical responses (e.g., compliance disclaimers). Subsequent chunks use standard `chat.completion.chunk` format.
+- **Unreliable VAD, turn detection, or interruption is usually an input-audio problem first** — follow-up questions ignored, stale answers, or flaky barge-in on custom capture or embedded hardware usually mean the PCM reaching the agent does not match its declared sample rate, channel count, or real-time cadence, or that the mic hears the agent's own voice. Verify input with [audio-input-diagnostics.md](audio-input-diagnostics.md) before changing any VAD or turn-detection setting.
 - **Error response format** — non-200 responses return `{ "detail": "...", "reason": "..." }`.
 - **MLLM `location` not `region`** — use `params.location: "us-central1"`, not `region`. The field name is `location` at every level (join payload and backend env vars).
 
@@ -245,6 +246,7 @@ Use the file that matches what the user is building:
 | Android client: ConversationalAIAPIImpl, Kotlin | [agent-toolkit-android.md](agent-toolkit-android.md) |
 | Custom LLM backend: RAG, tool calling, conversation memory | [server-custom-llm.md](server-custom-llm.md) |
 | Persistent per-user memory via MCP | [server-mcp.md](server-mcp.md) |
+| VAD, turn detection, or interruption unreliable; custom audio capture, embedded hardware, or ALSA input | [audio-input-diagnostics.md](audio-input-diagnostics.md) |
 
 ## REST API Reference
 

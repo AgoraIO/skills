@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- ConvoAI audio input diagnostics topic: when VAD, turn detection, or interruption is unreliable, verify the actual sample rate, channel count, real-time cadence, and echo path before tuning agent settings. Includes embedded Linux / ALSA guidance for capture-rate changes triggered by playback restarts. Routed from the ConvoAI gotchas, RTC README, and Server Gateway PCM sender.
+- Eval cases C-18 and C-19 for input-audio-first diagnosis on hardware.
+
+### Changed
+
+- Claude plugin and marketplace descriptions now list Cloud Recording and Agora CLI onboarding.
+- README now includes a Privacy section linking the Agora Privacy Policy for the bundled Docs MCP server.
+
 ## [1.9.0] - 2026-09-21
 
 ### Added
