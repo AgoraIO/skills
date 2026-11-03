@@ -69,10 +69,14 @@ Before suggesting any PR, run:
 ```bash
 bash scripts/validate-skills.sh
 skills-ref validate skills/agora
-claude plugin validate . --strict
+claude plugin validate ./.claude-plugin/marketplace.json --strict
 claude plugin validate ./.claude-plugin/plugin.json
 claude plugin validate ./skills --strict
+claude plugin validate . --profile directory
 ```
 
-Zero errors required. Direct manifest validation may emit the expected warning
-that this contributor-only `CLAUDE.md` is not loaded as plugin context.
+Zero errors required. Plugin validation may emit the expected warning that this
+contributor-only `CLAUDE.md` is not loaded as plugin context; that is the only
+acceptable warning. The directory profile must report no findings (for example
+`ICON_MISSING` or `PRIVACY_URL_MISSING`). CI enforces this from the `--json`
+report, because `--strict` would also fail on the `CLAUDE.md` warning.
