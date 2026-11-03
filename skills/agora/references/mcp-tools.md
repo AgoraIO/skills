@@ -12,7 +12,7 @@ The server searches product guides and SDK API references.
 Use filter discovery when an advertised tool supports it.
 Use the local `agora` CLI for login, projects, environment files, and readiness checks.
 
-**Use MCP only when the user explicitly asks for it.** The Claude Code plugin connects this server automatically, so being connected is not consent. For every other Level 2 lookup, use the HTTP flow in [doc-fetching.md](doc-fetching.md).
+MCP is optional. The Claude Code plugin connects this server automatically; other agents connect it only if the user adds it. Without it, the skill uses the HTTP lookup in [doc-fetching.md](doc-fetching.md).
 
 ## Data sent to the server
 

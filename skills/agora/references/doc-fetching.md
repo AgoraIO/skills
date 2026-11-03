@@ -11,9 +11,10 @@ rules. If the answer is here, stop — no fetch needed.
 When bundled references don't cover the detail needed (full request/response schemas,
 vendor-specific configs, language-specific quick-start code):
 
-Use the HTTP fetch flow below by default.
-Use Agora Docs MCP only when the user explicitly asks for it. Its tool calls send request context to a third-party search host (see [mcp-tools.md](mcp-tools.md#data-sent-to-the-server)).
-When using MCP, follow [mcp-tools.md](mcp-tools.md) to discover the available tools and read their input schemas before calling them. If MCP returns no useful content, use the HTTP flow.
+If Agora Docs MCP is available in the current runtime, prefer it for Level 2 lookup.
+Follow [mcp-tools.md](mcp-tools.md) to discover the available tools and read their input schemas before calling them, and follow its rules for [data sent to the server](mcp-tools.md#data-sent-to-the-server).
+Otherwise, use the HTTP fetch flow below. If MCP returns no useful content, use the same HTTP flow.
+MCP is optional: do not ask the user to install it, and do not block on it.
 
 1. Fetch the Agora docs sitemap:
 
