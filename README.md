@@ -136,7 +136,14 @@ Powered by [Agora](https://agora.io) — the real-time engagement platform behin
 
 ## Privacy
 
-The plugin connects to the Agora Docs MCP server (`https://mcp.agora.io`) to look up Agora documentation. See the [Agora Privacy Policy](https://www.agora.io/en/privacy-policy/).
+The skill itself is local Markdown and sends nothing on its own. The Claude Code plugin also configures the Agora Docs MCP server (`https://mcp.agora.io`), a read-only documentation search service hosted by [Algolia](https://www.algolia.com/doc/guides/model-context-protocol) on Agora's behalf.
+
+When your AI assistant calls an Agora Docs MCP tool, the call is sent to Algolia. Tool inputs include the search terms and can also include the text of your request, the assistant's summary of what you are trying to do, and a conversation session ID, as defined by the server's tool schemas. Don't put credentials, App Certificates, or customer data in requests you expect to trigger a documentation search.
+
+In Claude Code the server is listed as `plugin:agora:agora-docs-mcp` and is provided by the plugin, so `claude mcp remove` does not apply to it. To use the skill without the MCP server, install the skill on its own (Skills CLI, symlink, or copy, as shown above) instead of the plugin, or turn the plugin off with `claude plugin disable agora@agora-skills`.
+
+- Agora: [Agora Privacy Policy](https://www.agora.io/en/privacy-policy/)
+- Algolia: [Privacy Policy](https://www.algolia.com/policies/privacy/) and [Infrastructure & Sub-Processors](https://www.algolia.com/policies/infrastructure-and-sub-processors)
 
 ## License
 

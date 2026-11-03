@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - Claude plugin and marketplace descriptions now list Cloud Recording and Agora CLI onboarding.
-- README now includes a Privacy section linking the Agora Privacy Policy for the bundled Docs MCP server, and `plugin.json` declares `privacyPolicyUrl`.
+- README now includes a Privacy section disclosing that the bundled Docs MCP server is hosted by Algolia, what tool inputs are sent, and how to use the skill without it; `plugin.json` declares `privacyPolicyUrl`.
 - Claude plugin now ships a 1024×1024 listing icon (`.claude-plugin/icon.png`, rendered from `agora/assets/logo.svg`).
 - CI now pins Claude Code `2.1.317` and fails on any plugin-directory finding (such as a missing icon or privacy policy URL), allowing only the expected contributor `CLAUDE.md` warning.
 
