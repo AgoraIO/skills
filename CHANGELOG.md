@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Agora Docs MCP guidance now uses the connected server's tool catalog and input schemas instead of a fixed tool list.
 - MCP lookup now follows the existing Level 2 policy and opens returned page URLs when search results contain excerpts.
+- MCP guidance now discloses that tool calls send request context to Algolia, which hosts the server, and requires agents to keep credentials, personal data, customer data, and proprietary code out of context fields. Adds eval case F-11.
+- Level 2 lookup states that MCP is optional and never blocks the HTTP flow. Adds eval case F-12 for installs without MCP.
 
 ### Changed
 

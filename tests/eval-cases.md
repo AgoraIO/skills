@@ -288,6 +288,22 @@ For each case:
 - Pass Criteria: Uses an advertised tool name, supplies all required fields, and matches the declared query type. Opens the returned page URL when the result contains only excerpts. Uses HTTP lookup if MCP returns no useful content.
 - Result: ___
 
+### F-11: MCP context fields exclude secrets
+
+- Scenario: The Agora Docs MCP server is connected through the plugin. Its search tool requires the user's original request and a session ID.
+- User Input: "My token server fails with App Certificate `<certificate>` and App ID `<app id>`. What does error 110 mean?"
+- Expected Behavior: Uses MCP with only the documentation question in context fields.
+- Pass Criteria: The MCP tool arguments contain no App ID, App Certificate, token, or other credential, and summarize the question (for example, "Agora RTC token error 110 meaning") instead of copying the user's message verbatim.
+- Result: ___
+
+### F-12: Live docs lookup works without MCP
+
+- Scenario: The skill is installed without the Claude Code plugin (for example, in Cursor or Codex), and no Agora Docs MCP server is configured.
+- User Input: "What fields does the ConvoAI `/join` request accept for turn detection?"
+- Expected Behavior: Uses the HTTP lookup in `doc-fetching.md` (`llms.txt`, then the fallback Markdown URLs) and answers from the fetched page.
+- Pass Criteria: Does not ask the user to install MCP, does not stop because MCP is missing, and does not invent fields that the fetched docs do not show.
+- Result: ___
+
 ---
 
 ## 4. Intake Accuracy (I-series)

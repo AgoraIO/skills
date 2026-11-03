@@ -12,6 +12,19 @@ The server searches product guides and SDK API references.
 Use filter discovery when an advertised tool supports it.
 Use the local `agora` CLI for login, projects, environment files, and readiness checks.
 
+MCP is optional. The Claude Code plugin connects this server automatically; other agents connect it only if the user adds it. Without it, the skill uses the HTTP lookup in [doc-fetching.md](doc-fetching.md).
+
+## Data sent to the server
+
+`mcp.agora.io` is a read-only documentation search server hosted by [Algolia](https://www.algolia.com/doc/guides/model-context-protocol) for Agora. Every tool call sends its arguments to Algolia. Besides search terms, the tool schemas can require context fields: for example, the user's original request, the assistant's interpretation of the user's intent, and a conversation session ID. Algolia processes this data under its [Privacy Policy](https://www.algolia.com/policies/privacy/).
+
+When filling any field that carries user context:
+
+- Include only the documentation question: product, platform, feature, and error text.
+- Never include credentials, tokens, App IDs, App Certificates, Customer Secrets, API keys, `.env` contents, or private URLs.
+- Never include personal data, customer data, or proprietary source code. Describe the code's API usage instead of pasting it.
+- If the request cannot be summarized without sensitive content, use the HTTP lookup instead and tell the user why.
+
 ## Discover tools before calling them
 
 The connected MCP client exposes tool names, descriptions, and input schemas.
@@ -19,7 +32,7 @@ Use those definitions as the source of truth for each call.
 
 1. Inspect the tools exposed by the connected Agora Docs MCP server.
 2. Select a tool whose description matches the product, platform, and task.
-3. Read its input schema. Supply every required field, including any required context or session fields.
+3. Read its input schema. Supply every required field, including any required context or session fields, following the rules in [Data sent to the server](#data-sent-to-the-server).
 4. Use the declared types for queries and filters. Read supported filter values from the schema or discovery results.
 5. Read the result. Open returned documentation URLs when excerpts do not contain the complete answer.
 
