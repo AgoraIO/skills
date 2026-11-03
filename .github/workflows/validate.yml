@@ -26,13 +26,39 @@ jobs:
           skills-ref validate skills/agora
 
       - name: Install Claude Code
-        run: npm install -g @anthropic-ai/claude-code@2.1.238
+        run: npm install -g @anthropic-ai/claude-code@2.1.317
 
       - name: Validate Claude marketplace and plugin manifests
         run: |
-          claude plugin validate . --strict
+          claude plugin validate ./.claude-plugin/marketplace.json --strict
           claude plugin validate ./.claude-plugin/plugin.json
           claude plugin validate ./skills --strict
+
+      - name: Verify Claude plugin directory readiness
+        run: |
+          # --strict would also fail on the expected contributor CLAUDE.md warning,
+          # so read the JSON report and allow only that warning.
+          report="$(claude plugin validate . --profile directory --json)"
+          REPORT_JSON="$report" node - <<'NODE'
+          const report = JSON.parse(process.env.REPORT_JSON)
+          const isKnownClaudeMdWarning = ({ path, message }) =>
+            path === "root" && message.startsWith("CLAUDE.md at the plugin root is not loaded")
+          const problems = []
+          for (const result of [report.manifest, ...(report.contents ?? [])]) {
+            if (!result) continue
+            for (const e of result.errors) problems.push(`${result.file}: error: ${e.message}`)
+            for (const w of result.warnings.filter((w) => !isKnownClaudeMdWarning(w)))
+              problems.push(`${result.file}: warning: ${w.message}`)
+          }
+          if (!report.directory) problems.push("plugin directory checks did not run")
+          for (const f of report.directory?.findings ?? [])
+            problems.push(`directory ${f.severity} ${f.code}: ${f.message}`)
+          if (problems.length) {
+            console.error(problems.join("\n"))
+            process.exit(1)
+          }
+          console.log("Plugin directory checks passed (only the known contributor CLAUDE.md warning remains)")
+          NODE
 
       - name: Verify bundled MCP discovery
         run: |
